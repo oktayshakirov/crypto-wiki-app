@@ -48,9 +48,9 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name="sounds"
+        name="exchanges"
         options={{
-          title: "Sounds",
+          title: "Exchanges",
           tabBarIcon: ({ color }) => (
             <MaterialIcons name="music-note" size={23} color={color} />
           ),
@@ -59,9 +59,9 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name="tags"
+        name="ogs"
         options={{
-          title: "Tags",
+          title: "OG's",
           tabBarIcon: ({ color }) => (
             <MaterialIcons name="hashtag" size={23} color={color} />
           ),
