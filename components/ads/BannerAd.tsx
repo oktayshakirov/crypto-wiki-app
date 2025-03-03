@@ -10,8 +10,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const USE_TEST_ADS = false;
 
 const productionAdUnitIDs = Platform.select({
-  ios: "ca-app-pub-5852582960793521/1981176406",
-  android: "ca-app-pub-5852582960793521/7251752754",
+  ios: "ca-app-pub-5852582960793521/3679843833",
+  android: "ca-app-pub-5852582960793521/8692497364",
 })!;
 
 const testAdUnitID = TestIds.BANNER;

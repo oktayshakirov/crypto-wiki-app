@@ -1,16 +1,16 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { AppState, Platform, StyleSheet, View } from "react-native";
 import { WebView } from "react-native-webview";
 import { useRefresh } from "@/contexts/RefreshContext";
 import { Colors } from "@/constants/Colors";
 import { useLoader } from "@/contexts/LoaderContext";
 
-export default function SoundsScreen() {
-  const { refreshCount } = useRefresh("sounds");
+export default function ToolsScreen() {
+  const { refreshCount } = useRefresh("tools");
   const { showLoader, hideLoader } = useLoader();
   const webViewRef = useRef<WebView | null>(null);
   const [webViewKey, setWebViewKey] = useState(0);
-  const defaultUrl = "https://www.thecrypto.wiki/exchanges/?isApp=true";
+  const defaultUrl = "https://www.thecrypto.wiki/tools/?isApp=true";
   const [currentUrl, setCurrentUrl] = useState(defaultUrl);
 
   useEffect(() => {
@@ -43,7 +43,7 @@ export default function SoundsScreen() {
           key={webViewKey}
           src={currentUrl}
           style={{ width: "100%", height: "100vh", border: "none" }}
-          title="TheCrypto.wiki - Exchanges"
+          title="TheCrypto.wiki - Tools"
           onLoad={hideLoader}
         />
       ) : (

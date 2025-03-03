@@ -3,7 +3,7 @@ import * as Notifications from "expo-notifications";
 
 async function registerPushTokenOnServer(token: string) {
   try {
-    await fetch("https://registerpushtoken-culutsb2da-uc.a.run.app", {
+    await fetch("https://registerpushtoken-7p7ces4mpq-uc.a.run.app", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token }),

@@ -10,7 +10,7 @@ export default function HomeScreen() {
   const { showLoader, hideLoader } = useLoader();
   const webViewRef = useRef<WebView | null>(null);
   const [webViewKey, setWebViewKey] = useState(0);
-  const defaultUrl = "https://www.thecrypto.wiki";
+  const defaultUrl = "https://www.thecrypto.wiki/?isApp=true";
   const [currentUrl, setCurrentUrl] = useState(defaultUrl);
 
   useEffect(() => {

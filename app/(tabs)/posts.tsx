@@ -10,7 +10,7 @@ export default function PostsScreen() {
   const { showLoader, hideLoader } = useLoader();
   const webViewRef = useRef<WebView | null>(null);
   const [webViewKey, setWebViewKey] = useState(0);
-  const defaultUrl = "https://www.thecrypto.wiki/posts";
+  const defaultUrl = "https://www.thecrypto.wiki/posts/?isApp=true";
   const [currentUrl, setCurrentUrl] = useState(defaultUrl);
 
   useEffect(() => {

@@ -52,9 +52,11 @@ export default function TabLayout() {
         options={{
           title: "Exchanges",
           tabBarIcon: ({ color }) => (
-            <MaterialIcons name="music-note" size={23} color={color} />
+            <MaterialIcons name="bitcoin" size={23} color={color} />
           ),
-          tabBarButton: (props) => <HapticTab {...props} refreshKey="sounds" />,
+          tabBarButton: (props) => (
+            <HapticTab {...props} refreshKey="exchanges" />
+          ),
         }}
       />
 
@@ -63,9 +65,20 @@ export default function TabLayout() {
         options={{
           title: "OG's",
           tabBarIcon: ({ color }) => (
-            <MaterialIcons name="hashtag" size={23} color={color} />
+            <MaterialIcons name="persons" size={23} color={color} />
           ),
-          tabBarButton: (props) => <HapticTab {...props} refreshKey="tags" />,
+          tabBarButton: (props) => <HapticTab {...props} refreshKey="ogs" />,
+        }}
+      />
+
+      <Tabs.Screen
+        name="tools"
+        options={{
+          title: "Tools",
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons name="pie-chart-2" size={23} color={color} />
+          ),
+          tabBarButton: (props) => <HapticTab {...props} refreshKey="tools" />,
         }}
       />
     </Tabs>
