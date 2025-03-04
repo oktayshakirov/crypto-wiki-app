@@ -1,0 +1,79 @@
+[debug] [2025-03-04T00:43:44.174Z] ----------------------------------------------------------------------
+[debug] [2025-03-04T00:43:44.175Z] Command:       /opt/homebrew/Cellar/node/22.9.0/bin/node /opt/homebrew/bin/firebase functions:shell
+[debug] [2025-03-04T00:43:44.175Z] CLI Version:   13.30.0
+[debug] [2025-03-04T00:43:44.176Z] Platform:      darwin
+[debug] [2025-03-04T00:43:44.176Z] Node Version:  v22.9.0
+[debug] [2025-03-04T00:43:44.176Z] Time:          Tue Mar 04 2025 01:43:44 GMT+0100 (Central European Standard Time)
+[debug] [2025-03-04T00:43:44.176Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-03-04T00:43:44.258Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-03-04T00:43:44.258Z] > authorizing via signed-in user (oktayshakirov@gmail.com)
+[debug] [2025-03-04T00:43:44.259Z] [iam] checking project the-crypto-wiki for permissions ["firebase.projects.get"]
+[debug] [2025-03-04T00:43:44.259Z] Checked if tokens are valid: true, expires at: 1741051127861
+[debug] [2025-03-04T00:43:44.259Z] Checked if tokens are valid: true, expires at: 1741051127861
+[debug] [2025-03-04T00:43:44.260Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/the-crypto-wiki:testIamPermissions [none]
+[debug] [2025-03-04T00:43:44.260Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/the-crypto-wiki:testIamPermissions x-goog-quota-user=projects/the-crypto-wiki
+[debug] [2025-03-04T00:43:44.260Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/the-crypto-wiki:testIamPermissions {"permissions":["firebase.projects.get"]}
+[debug] [2025-03-04T00:43:45.115Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/the-crypto-wiki:testIamPermissions 200
+[debug] [2025-03-04T00:43:45.116Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/the-crypto-wiki:testIamPermissions {"permissions":["firebase.projects.get"]}
+[warn] ⚠  functions: Functions Emulator unable to start on port 5000, starting on 5001 instead. {"metadata":{"emulator":{"name":"functions"},"message":"Functions Emulator unable to start on port 5000, starting on 5001 instead."}}
+[debug] [2025-03-04T00:43:45.264Z] [functions] Functions Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-03-04T00:43:45.264Z] defaultcredentials: writing to file /Users/oktayshakirov/.config/firebase/oktayshakirov_gmail_com_application_default_credentials.json
+[debug] [2025-03-04T00:43:45.265Z] DEBUG: Setting GAC to /Users/oktayshakirov/.config/firebase/oktayshakirov_gmail_com_application_default_credentials.json
+[debug] [2025-03-04T00:43:45.265Z] Checked if tokens are valid: true, expires at: 1741051127861
+[debug] [2025-03-04T00:43:45.265Z] Checked if tokens are valid: true, expires at: 1741051127861
+[debug] [2025-03-04T00:43:45.265Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/the-crypto-wiki/adminSdkConfig [none]
+[debug] [2025-03-04T00:43:45.721Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/the-crypto-wiki/adminSdkConfig 200
+[debug] [2025-03-04T00:43:45.721Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/the-crypto-wiki/adminSdkConfig {"projectId":"the-crypto-wiki","storageBucket":"the-crypto-wiki.firebasestorage.app"}
+[debug] [2025-03-04T00:43:45.738Z] [functions] Watching "/Users/oktayshakirov/Coding/crypto-wiki-app/functions" for Cloud Functions...
+[debug] [2025-03-04T00:43:45.741Z] Validating nodejs source
+[debug] [2025-03-04T00:43:46.228Z] > [functions] package.json contents: {
+  "name": "functions",
+  "scripts": {
+    "lint": "eslint --ext .js,.ts .",
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "serve": "npm run build && firebase emulators:start --only functions",
+    "shell": "npm run build && firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "22"
+  },
+  "main": "lib/index.js",
+  "dependencies": {
+    "expo-server-sdk": "^3.14.0",
+    "firebase-admin": "^12.6.0",
+    "firebase-functions": "^6.3.1"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.12.0",
+    "@typescript-eslint/parser": "^5.12.0",
+    "eslint": "^8.9.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-import": "^2.25.4",
+    "firebase-functions-test": "^3.1.0",
+    "typescript": "^4.9.0"
+  },
+  "private": true
+}
+[debug] [2025-03-04T00:43:46.228Z] Building nodejs source
+[debug] [2025-03-04T00:43:46.229Z] Failed to find version of module node: reached end of search path /Users/oktayshakirov/Coding/crypto-wiki-app/functions/node_modules
+[info] ✔  functions: Using node@22 from host. 
+[debug] [2025-03-04T00:43:46.230Z] Could not find functions.yaml. Must use http discovery
+[debug] [2025-03-04T00:43:46.234Z] Found firebase-functions binary at '/Users/oktayshakirov/Coding/crypto-wiki-app/functions/node_modules/.bin/firebase-functions'
+[info] Serving at port 8176
+
+[error] (node:98591) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+[debug] [2025-03-04T00:43:46.541Z] Got response from /__/functions.yaml {"endpoints":{"registerPushToken":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"httpsTrigger":{},"entryPoint":"registerPushToken"},"sendNewPostNotification":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.created","eventFilters":{"database":"(default)","namespace":"(default)"},"eventFilterPathPatterns":{"document":"posts/{postId}"},"retry":false},"entryPoint":"sendNewPostNotification"},"sendNewExchangeNotification":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.created","eventFilters":{"database":"(default)","namespace":"(default)"},"eventFilterPathPatterns":{"document":"exchanges/{exchangeId}"},"retry":false},"entryPoint":"sendNewExchangeNotification"},"sendNewOGNotification":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.created","eventFilters":{"database":"(default)","namespace":"(default)"},"eventFilterPathPatterns":{"document":"crypto-ogs/{ogId}"},"retry":false},"entryPoint":"sendNewOGNotification"}},"specVersion":"v1alpha1","requiredAPIs":[],"extensions":{}}
+[debug] [2025-03-04T00:43:50.569Z] [functions] Loaded functions definitions from source: registerPushToken, sendNewPostNotification, sendNewExchangeNotification, sendNewOGNotification.
+[debug] [2025-03-04T00:43:50.570Z] [functions[us-central1-registerPushToken]] http function initialized (http://127.0.0.1:5001/the-crypto-wiki/us-central1/registerPushToken).
+[debug] [2025-03-04T00:43:50.570Z] [functions[us-central1-sendNewPostNotification]] function ignored because the firestore emulator does not exist or is not running.
+[debug] [2025-03-04T00:43:50.570Z] [functions[us-central1-sendNewExchangeNotification]] function ignored because the firestore emulator does not exist or is not running.
+[debug] [2025-03-04T00:43:50.570Z] [functions[us-central1-sendNewOGNotification]] function ignored because the firestore emulator does not exist or is not running.
+[info] i  functions: Loaded functions: registerPushToken, sendNewPostNotification, sendNewExchangeNotification, sendNewOGNotification 
+[warn] ⚠  functions: The following emulators are not running, calls to these services will affect production: firestore, database, pubsub, storage, eventarc, tasks 
