@@ -7,7 +7,7 @@ export default function TabBarBackground() {
       style={[
         StyleSheet.absoluteFill,
         {
-          backgroundColor: "#3E2542",
+          backgroundColor: "#171717",
         },
       ]}
     />

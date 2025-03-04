@@ -4,7 +4,7 @@
     "slug": "the-crypto-wiki",
     "owner": "oktay.shakirov",
     "projectId": "21761514-c6bd-4a35-9ef1-a85c0f4b6f09",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "TheCrypto.wiki",
@@ -13,7 +13,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.shadev.thecryptowiki",
-      "buildNumber": "1",
+      "buildNumber": "2",
       "config": {
         "googleMobileAdsAppId": "ca-app-pub-5852582960793521~5465329102"
       },
@@ -151,7 +151,7 @@
     },
     "android": {
       "package": "com.shadev.thecryptowiki",
-      "versionCode": 1,
+      "versionCode": 2,
       "config": {
         "googleMobileAdsAppId": "ca-app-pub-5852582960793521~3669031701"
       },
@@ -166,21 +166,14 @@
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
-    "splash": {
-      "image": "./assets/images/splash-icon.png",
-      "resizeMode": "contain",
-      "imageWidth": 250,
-      "backgroundColor": "#000000"
-    },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
           "image": "./assets/images/splash-icon.png",
-          "resizeMode": "contain",
-          "imageWidth": 250,
-          "backgroundColor": "#000000"
+          "imageWidth": 200,
+          "backgroundColor": "#171717"
         }
       ],
       "expo-tracking-transparency"
