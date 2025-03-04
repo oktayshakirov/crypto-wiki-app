@@ -102,10 +102,10 @@ export const sendNewExchangeNotification = onDocumentCreated(
   async (event) => {
     try {
       const snap = event.data!;
-      const exchangeData = snap.data() as { name?: string } | undefined;
-      const exchangeName = exchangeData?.name || "New Exchange";
+      const exchangeData = snap.data() as { title?: string } | undefined;
+      const exchangeTitle = exchangeData?.title || "New Exchange";
       const title = "New Exchange on CryptoWiki";
-      const body = exchangeName;
+      const body = exchangeTitle;
 
       await sendPushNotification(title, body);
     } catch (error) {
@@ -119,10 +119,10 @@ export const sendNewOGNotification = onDocumentCreated(
   async (event) => {
     try {
       const snap = event.data!;
-      const ogData = snap.data() as { name?: string } | undefined;
-      const ogName = ogData?.name || "New Crypto OG";
+      const ogData = snap.data() as { title?: string } | undefined;
+      const ogTitle = ogData?.title || "New Crypto OG";
       const title = "New Crypto OG on CryptoWiki";
-      const body = ogName;
+      const body = ogTitle;
 
       await sendPushNotification(title, body);
     } catch (error) {
