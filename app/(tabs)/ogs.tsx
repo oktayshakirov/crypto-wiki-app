@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { AppState, Platform, StyleSheet, View } from "react-native";
+import { AppState, Platform, StyleSheet, View, Linking } from "react-native";
 import { WebView } from "react-native-webview";
 import { useRefresh } from "@/contexts/RefreshContext";
 import { Colors } from "@/constants/Colors";
@@ -36,6 +36,15 @@ export default function SoundsScreen() {
     }
   };
 
+  const handleShouldStartLoadWithRequest = (request: any) => {
+    const { url } = request;
+    if (!url.includes("thecrypto.wiki")) {
+      Linking.openURL(url);
+      return false;
+    }
+    return true;
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: Colors.background }]}>
       {Platform.OS === "web" ? (
@@ -57,6 +66,7 @@ export default function SoundsScreen() {
           injectedJavaScript={`window.isApp = true; true;`}
           onLoadStart={showLoader}
           onNavigationStateChange={handleNavigationStateChange}
+          onShouldStartLoadWithRequest={handleShouldStartLoadWithRequest}
         />
       )}
     </View>
