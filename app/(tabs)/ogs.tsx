@@ -6,7 +6,7 @@ import { Colors } from "@/constants/Colors";
 import { useLoader } from "@/contexts/LoaderContext";
 
 export default function SoundsScreen() {
-  const { refreshCount } = useRefresh("tags");
+  const { refreshCount } = useRefresh("ogs");
   const { showLoader, hideLoader } = useLoader();
   const webViewRef = useRef<WebView | null>(null);
   const [webViewKey, setWebViewKey] = useState(0);

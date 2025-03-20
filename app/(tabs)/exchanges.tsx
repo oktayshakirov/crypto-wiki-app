@@ -6,7 +6,7 @@ import { Colors } from "@/constants/Colors";
 import { useLoader } from "@/contexts/LoaderContext";
 
 export default function SoundsScreen() {
-  const { refreshCount } = useRefresh("sounds");
+  const { refreshCount } = useRefresh("exchanges");
   const { showLoader, hideLoader } = useLoader();
   const webViewRef = useRef<WebView | null>(null);
   const [webViewKey, setWebViewKey] = useState(0);
@@ -38,13 +38,11 @@ export default function SoundsScreen() {
 
   const handleShouldStartLoadWithRequest = (request: any) => {
     const { url } = request;
-    // Check if the URL is external (not from thecrypto.wiki)
     if (!url.includes("thecrypto.wiki")) {
-      // Open external links in the device's browser
       Linking.openURL(url);
-      return false; // Prevent WebView from loading the URL
+      return false;
     }
-    return true; // Allow loading internal URLs in WebView
+    return true;
   };
 
   return (
