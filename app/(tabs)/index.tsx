@@ -10,8 +10,13 @@ export default function HomeScreen() {
   const { showLoader, hideLoader } = useLoader();
   const webViewRef = useRef<WebView | null>(null);
   const [webViewKey, setWebViewKey] = useState(0);
-  const defaultUrl = "https://www.thecrypto.wiki/?isApp=true";
+  const defaultUrl = "https://www.thecrypto.wiki/";
   const [currentUrl, setCurrentUrl] = useState(defaultUrl);
+
+  const cookieInjectionScript = `
+    document.cookie = "isApp=true; path=/";
+    true;
+  `;
 
   useEffect(() => {
     setCurrentUrl(defaultUrl);
@@ -63,7 +68,7 @@ export default function HomeScreen() {
           cacheEnabled
           domStorageEnabled
           style={styles.webview}
-          injectedJavaScript={`window.isApp = true; true;`}
+          injectedJavaScript={cookieInjectionScript}
           onLoadStart={showLoader}
           onNavigationStateChange={handleNavigationStateChange}
           onShouldStartLoadWithRequest={handleShouldStartLoadWithRequest}
