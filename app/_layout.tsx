@@ -4,13 +4,7 @@ import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useRef, useState } from "react";
-import {
-  Platform,
-  View,
-  StyleSheet,
-  AppState,
-  AppStateStatus,
-} from "react-native";
+import { Platform, View, StyleSheet } from "react-native";
 import * as Notifications from "expo-notifications";
 import { EventSubscription } from "expo-modules-core";
 import BannerAd from "@/components/ads/BannerAd";
@@ -19,7 +13,6 @@ import ConsentDialog from "@/components/ads/ConsentDialog";
 import initialize from "react-native-google-mobile-ads";
 import { LoaderProvider } from "@/contexts/LoaderContext";
 import { getOrRegisterPushToken } from "@/utils/pushToken";
-import { showAppOpenAd } from "@/components/ads/AppOpenAd";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -76,26 +69,6 @@ export default function RootLayout() {
           console.error("Error during push registration:", error);
         });
     }
-  }, [consentCompleted]);
-
-  useEffect(() => {
-    if (!consentCompleted) return;
-    let appState: AppStateStatus = AppState.currentState;
-    const handleAppStateChange = async (nextAppState: AppStateStatus) => {
-      if (appState.match(/inactive|background/) && nextAppState === "active") {
-        try {
-          await showAppOpenAd();
-        } catch (e) {}
-      }
-      appState = nextAppState;
-    };
-    const subscription = AppState.addEventListener(
-      "change",
-      handleAppStateChange
-    );
-    return () => {
-      subscription.remove();
-    };
   }, [consentCompleted]);
 
   return (

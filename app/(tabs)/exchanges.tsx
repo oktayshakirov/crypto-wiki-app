@@ -85,6 +85,6 @@ const styles = StyleSheet.create({
   webview: {
     flex: 1,
     backgroundColor: Colors.background,
-    marginBottom: Platform.OS === "android" ? -70 : 0,
+    marginBottom: Platform.OS === "android" ? -65 : 65,
   },
 });
