@@ -17,10 +17,13 @@ export const RefreshProvider: React.FC<{ children: React.ReactNode }> = ({
   const [refreshState, setRefreshState] = useState<RefreshState>({});
 
   const triggerRefresh = (key: string) => {
-    setRefreshState((prev) => ({
-      ...prev,
-      [key]: (prev[key] || 0) + 1,
-    }));
+    setRefreshState((prev) => {
+      const newCount = (prev[key] || 0) + 1;
+      return {
+        ...prev,
+        [key]: newCount,
+      };
+    });
   };
 
   return (

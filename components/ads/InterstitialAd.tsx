@@ -5,8 +5,13 @@ import {
   TestIds,
 } from "react-native-google-mobile-ads";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  incrementAdLoadAttempts,
+  resetAdLoadAttempts,
+  canRetryAdLoad,
+} from "@/utils/adUtils";
 
-const USE_TEST_ADS = false;
+const USE_TEST_ADS = true;
 
 const productionAdUnitIDs = Platform.select({
   ios: "ca-app-pub-5852582960793521/7564116438",
@@ -16,43 +21,129 @@ const productionAdUnitIDs = Platform.select({
 const testAdUnitID = TestIds.INTERSTITIAL;
 const adUnitID = USE_TEST_ADS ? testAdUnitID : productionAdUnitIDs;
 
-let interstitial = InterstitialAd.createForAdRequest(adUnitID!, {
-  requestNonPersonalizedAdsOnly: true,
-});
+let interstitial: InterstitialAd | null = null;
+let isAdLoaded = false;
+let isLoading = false;
+let unsubscribeLoaded: (() => void) | null = null;
+let unsubscribeError: (() => void) | null = null;
+let unsubscribeClosed: (() => void) | null = null;
 
-export async function showInterstitial() {
-  const consent = await AsyncStorage.getItem("trackingConsent");
-  const requestNonPersonalizedAdsOnly = consent === "granted" ? false : true;
+function cleanupEventListeners() {
+  if (unsubscribeLoaded) {
+    unsubscribeLoaded();
+    unsubscribeLoaded = null;
+  }
+  if (unsubscribeError) {
+    unsubscribeError();
+    unsubscribeError = null;
+  }
+  if (unsubscribeClosed) {
+    unsubscribeClosed();
+    unsubscribeClosed = null;
+  }
+}
 
-  interstitial = InterstitialAd.createForAdRequest(adUnitID!, {
-    requestNonPersonalizedAdsOnly,
-  });
+export async function initializeInterstitial() {
+  try {
+    cleanupEventListeners();
 
-  return new Promise<void>((resolve, reject) => {
-    const unsubscribeLoaded = interstitial.addAdEventListener(
+    const consent = await AsyncStorage.getItem("trackingConsent");
+    const requestNonPersonalizedAdsOnly = consent === "granted" ? false : true;
+
+    interstitial = InterstitialAd.createForAdRequest(adUnitID!, {
+      requestNonPersonalizedAdsOnly,
+    });
+
+    unsubscribeLoaded = interstitial.addAdEventListener(
       AdEventType.LOADED,
       () => {
-        interstitial.show();
+        isAdLoaded = true;
+        isLoading = false;
+        resetAdLoadAttempts();
+        console.log("Interstitial ad loaded successfully");
       }
     );
-    const unsubscribeError = interstitial.addAdEventListener(
+
+    unsubscribeError = interstitial.addAdEventListener(
       AdEventType.ERROR,
       (error: Error) => {
-        unsubscribeLoaded();
-        unsubscribeError();
-        reject(error);
+        isAdLoaded = false;
+        isLoading = false;
+        incrementAdLoadAttempts();
+
+        if (canRetryAdLoad()) {
+          setTimeout(() => {
+            if (!isLoading && !isAdLoaded) {
+              loadInterstitial();
+            }
+          }, 5000);
+        }
       }
     );
-    const unsubscribeClosed = interstitial.addAdEventListener(
+
+    unsubscribeClosed = interstitial.addAdEventListener(
       AdEventType.CLOSED,
       () => {
-        unsubscribeLoaded();
-        unsubscribeError();
-        resolve();
+        isAdLoaded = false;
+        setTimeout(() => {
+          loadInterstitial();
+        }, 1000);
       }
     );
-    interstitial.load();
+
+    await loadInterstitial();
+  } catch (error) {
+    console.error("Failed to initialize interstitial:", error);
+  }
+}
+
+async function loadInterstitial() {
+  if (!interstitial || isLoading || isAdLoaded) {
+    return;
+  }
+
+  try {
+    isLoading = true;
+    await interstitial.load();
+  } catch (error) {
+    isLoading = false;
+    console.error("Failed to load interstitial:", error);
+  }
+}
+
+export async function showInterstitial(): Promise<boolean> {
+  if (!interstitial || !isAdLoaded) {
+    return false;
+  }
+
+  return new Promise<boolean>((resolve) => {
+    try {
+      interstitial!.show();
+      isAdLoaded = false;
+      resolve(true);
+    } catch (error) {
+      console.error("Failed to show interstitial:", error);
+      resolve(false);
+    }
   });
+}
+
+export function isInterstitialReady(): boolean {
+  return isAdLoaded && !isLoading;
+}
+
+export async function reloadInterstitial() {
+  isAdLoaded = false;
+  isLoading = false;
+  resetAdLoadAttempts();
+  await loadInterstitial();
+}
+
+export function cleanupInterstitial() {
+  cleanupEventListeners();
+  interstitial = null;
+  isAdLoaded = false;
+  isLoading = false;
 }
 
 export default null;

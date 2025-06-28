@@ -3,31 +3,30 @@ import { BottomTabBarButtonProps } from "@react-navigation/bottom-tabs";
 import { PlatformPressable } from "@react-navigation/elements";
 import * as Haptics from "expo-haptics";
 import { useRefresh } from "@/contexts/RefreshContext";
-import { showInterstitial } from "@/components/ads/InterstitialAd";
+import { useNavigationState } from "@react-navigation/native";
 
 interface HapticTabProps extends BottomTabBarButtonProps {
   refreshKey: string;
 }
 
-// Frequency capping: only show an interstitial every 2 minutes
-const INTERSTITIAL_INTERVAL_MS = 2 * 60 * 1000; // 2 minutes
-let lastInterstitialTime = 0;
-
 export function HapticTab(props: HapticTabProps) {
   const { refreshKey, ...rest } = props;
   const { triggerRefresh } = useRefresh(refreshKey);
 
-  const handlePress = async (ev: any) => {
-    if (props.accessibilityState?.selected) {
+  const currentRouteIndex = useNavigationState((state) => state?.index ?? 0);
+
+  const getTabIndex = (key: string) => {
+    const tabOrder = ["home", "posts", "exchanges", "ogs", "tools"];
+    return tabOrder.indexOf(key);
+  };
+
+  const tabIndex = getTabIndex(refreshKey);
+  const isSelected = tabIndex === currentRouteIndex;
+
+  const handlePress = (ev: any) => {
+    if (isSelected) {
       triggerRefresh();
     } else {
-      const now = Date.now();
-      if (now - lastInterstitialTime >= INTERSTITIAL_INTERVAL_MS) {
-        try {
-          await showInterstitial();
-          lastInterstitialTime = Date.now();
-        } catch (e) {}
-      }
       props.onPress?.(ev);
     }
   };

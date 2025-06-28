@@ -6,7 +6,7 @@ import {
 } from "react-native-google-mobile-ads";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const USE_TEST_ADS = false;
+const USE_TEST_ADS = true;
 
 const productionAdUnitIDs = Platform.select({
   ios: "ca-app-pub-5852582960793521/6510055062",
