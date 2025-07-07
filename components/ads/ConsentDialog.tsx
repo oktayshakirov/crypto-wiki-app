@@ -54,14 +54,34 @@ const ConsentDialog = ({ onConsentCompleted }: ConsentDialogProps) => {
     >
       <View style={styles.modalOverlay}>
         <View style={styles.modalContainer}>
-          <Text style={styles.title}>Dear User</Text>
+          <Text style={styles.title}>Your Privacy & Experience</Text>
           <Text style={styles.message}>
-            To keep TheCrypto.wiki free and provide you with the best
-            experience, we rely on personalized ads and push notifications. Our
-            partners will collect data which means you’ll see ads that match
-            your interests, while enabling notifications keeps you updated with
-            every new post or sound we add. Your privacy is our priority and
-            your data is handled securely.
+            To keep TheCrypto.wiki free and enjoyable, we ask for your consent
+            to:
+          </Text>
+          <View style={styles.bulletList}>
+            <Text style={styles.bulletItem}>
+              {"\u2022"} Show you personalized ads that help support our app.
+            </Text>
+            <Text style={styles.bulletItem}>
+              {"\u2022"} Send you push notifications so you never miss new
+              posts.
+            </Text>
+          </View>
+          <Text style={styles.sectionTitle}>How we use your data:</Text>
+          <View style={styles.bulletList}>
+            <Text style={styles.bulletItem}>
+              {"\u2022"} We and our partners use your data to show ads that
+              match your interests.
+            </Text>
+            <Text style={styles.bulletItem}>
+              {"\u2022"} Your privacy is important to us. All data is handled
+              securely.
+            </Text>
+          </View>
+          <Text style={styles.sectionTitle}>You’re in control:</Text>
+          <Text style={styles.message}>
+            You can choose to allow or deny these features at any time.
           </Text>
           <View style={styles.buttonContainer}>
             {Platform.OS === "android" ? (
@@ -107,17 +127,34 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   title: {
-    fontSize: 22,
+    fontSize: 23,
     fontWeight: "bold",
-    marginBottom: 10,
+    marginBottom: 30,
     color: Colors.text,
     textAlign: "center",
   },
   message: {
-    marginBottom: 15,
+    marginBottom: 10,
     fontSize: 16,
     color: Colors.text,
     textAlign: "left",
+  },
+  bulletList: {
+    marginLeft: 10,
+    marginBottom: 10,
+  },
+  bulletItem: {
+    fontSize: 16,
+    color: Colors.text,
+    marginBottom: 2,
+    marginLeft: 10,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: Colors.text,
+    marginTop: 8,
+    marginBottom: 2,
   },
   buttonContainer: {
     flexDirection: "row",

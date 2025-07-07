@@ -1,41 +1,25 @@
-import { Platform } from "react-native";
-import {
-  AppOpenAd,
-  AdEventType,
-  TestIds,
-} from "react-native-google-mobile-ads";
+import { AppOpenAd, AdEventType } from "react-native-google-mobile-ads";
+import { getAdUnitId } from "./adConfig";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const USE_TEST_ADS = true;
-
-const productionAdUnitIDs = Platform.select({
-  ios: "ca-app-pub-5852582960793521/6510055062",
-  android: "ca-app-pub-5852582960793521/4746381400",
-});
-
-const testAdUnitID = TestIds.APP_OPEN;
-const adUnitID = USE_TEST_ADS ? testAdUnitID : productionAdUnitIDs;
-
-let appOpenAd = AppOpenAd.createForAdRequest(adUnitID!, {
-  requestNonPersonalizedAdsOnly: true,
-});
+let appOpenAd: AppOpenAd | null = null;
 
 export async function showAppOpenAd() {
   const consent = await AsyncStorage.getItem("trackingConsent");
-  const requestNonPersonalizedAdsOnly = consent === "granted" ? false : true;
+  const requestNonPersonalizedAdsOnly = consent !== "granted";
 
-  appOpenAd = AppOpenAd.createForAdRequest(adUnitID!, {
+  appOpenAd = AppOpenAd.createForAdRequest(getAdUnitId("appOpen")!, {
     requestNonPersonalizedAdsOnly,
   });
 
   return new Promise<void>((resolve, reject) => {
-    const unsubscribeLoaded = appOpenAd.addAdEventListener(
+    const unsubscribeLoaded = appOpenAd!.addAdEventListener(
       AdEventType.LOADED,
       () => {
-        appOpenAd.show();
+        appOpenAd!.show();
       }
     );
-    const unsubscribeError = appOpenAd.addAdEventListener(
+    const unsubscribeError = appOpenAd!.addAdEventListener(
       AdEventType.ERROR,
       (error: Error) => {
         unsubscribeLoaded();
@@ -44,7 +28,7 @@ export async function showAppOpenAd() {
         reject(error);
       }
     );
-    const unsubscribeClosed = appOpenAd.addAdEventListener(
+    const unsubscribeClosed = appOpenAd!.addAdEventListener(
       AdEventType.CLOSED,
       () => {
         unsubscribeLoaded();
@@ -53,7 +37,7 @@ export async function showAppOpenAd() {
         resolve();
       }
     );
-    appOpenAd.load();
+    appOpenAd!.load();
   });
 }
 

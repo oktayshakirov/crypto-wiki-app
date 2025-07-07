@@ -1,43 +1,24 @@
-import React, { useEffect, useState } from "react";
-import { Platform, View, StyleSheet } from "react-native";
-import {
-  BannerAd,
-  BannerAdSize,
-  TestIds,
-} from "react-native-google-mobile-ads";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
-const USE_TEST_ADS = true;
-
-const productionAdUnitIDs = Platform.select({
-  ios: "ca-app-pub-5852582960793521/3679843833",
-  android: "ca-app-pub-5852582960793521/8692497364",
-})!;
-
-const testAdUnitID = TestIds.BANNER;
-const adUnitID: string = USE_TEST_ADS ? testAdUnitID : productionAdUnitIDs;
+import React from "react";
+import { View, StyleSheet } from "react-native";
+import { BannerAd, BannerAdSize } from "react-native-google-mobile-ads";
+import { getAdUnitId } from "./adConfig";
+import { useAdConsent } from "./useAdConsent";
 
 const BannerAdComponent = () => {
-  const [consent, setConsent] = useState<string | null>(null);
-
-  useEffect(() => {
-    AsyncStorage.getItem("trackingConsent").then((storedConsent) => {
-      setConsent(storedConsent);
-    });
-  }, []);
-
-  const requestNonPersonalizedAdsOnly = consent === "granted" ? false : true;
+  const { requestNonPersonalizedAdsOnly } = useAdConsent();
 
   return (
     <View style={styles.bannerContainer}>
       <BannerAd
-        unitId={adUnitID}
+        unitId={getAdUnitId("banner")!}
         size={BannerAdSize.ADAPTIVE_BANNER}
         requestOptions={{
-          requestNonPersonalizedAdsOnly: requestNonPersonalizedAdsOnly,
+          requestNonPersonalizedAdsOnly,
         }}
-        onAdLoaded={() => console.log("Ad loaded!")}
-        onAdFailedToLoad={(error) => console.error("Ad failed to load:", error)}
+        onAdLoaded={() => console.log("Banner ad loaded!")}
+        onAdFailedToLoad={(error) =>
+          console.error("Banner ad failed to load:", error)
+        }
       />
     </View>
   );
