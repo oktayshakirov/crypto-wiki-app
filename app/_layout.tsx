@@ -4,7 +4,13 @@ import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useRef, useState } from "react";
-import { Platform, View, StyleSheet } from "react-native";
+import {
+  Platform,
+  View,
+  StyleSheet,
+  AppState,
+  TouchableWithoutFeedback,
+} from "react-native";
 import * as Notifications from "expo-notifications";
 import { EventSubscription } from "expo-modules-core";
 import BannerAd from "@/components/ads/BannerAd";
@@ -13,6 +19,12 @@ import ConsentDialog from "@/components/ads/ConsentDialog";
 import initialize from "react-native-google-mobile-ads";
 import { LoaderProvider } from "@/contexts/LoaderContext";
 import { getOrRegisterPushToken } from "@/utils/pushToken";
+import {
+  showInterstitial,
+  initializeInterstitial,
+} from "@/components/ads/InterstitialAd";
+import { showAppOpenAd } from "@/components/ads/AppOpenAd";
+import { useGlobalAds } from "@/components/ads/adsManager";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -27,6 +39,8 @@ export default function RootLayout() {
   const [consentCompleted, setConsentCompleted] = useState(false);
   const notificationListener = useRef<EventSubscription | null>(null);
   const responseListener = useRef<EventSubscription | null>(null);
+  const lastInterstitialTime = React.useRef(0);
+  const appState = React.useRef(AppState.currentState);
 
   useEffect(() => {
     const adapterStatuses = initialize();
@@ -71,32 +85,61 @@ export default function RootLayout() {
     }
   }, [consentCompleted]);
 
+  React.useEffect(() => {
+    initializeInterstitial();
+  }, []);
+
+  // App Open Ad on resume
+  React.useEffect(() => {
+    const subscription = AppState.addEventListener(
+      "change",
+      async (nextAppState) => {
+        if (
+          appState.current.match(/inactive|background/) &&
+          nextAppState === "active"
+        ) {
+          try {
+            await showAppOpenAd();
+          } catch (e) {
+            console.log("AppOpenAd error", e);
+          }
+        }
+        appState.current = nextAppState;
+      }
+    );
+    return () => subscription.remove();
+  }, []);
+
+  const { handleGlobalPress } = useGlobalAds();
+
   return (
     <SafeAreaProvider>
-      <View style={styles.appContainer}>
-        {Platform.OS === "ios" && <View style={styles.statusBarBackground} />}
-        <LoaderProvider>
-          <RefreshProvider>
-            <ThemeProvider value={DefaultTheme}>
-              <StatusBar
-                backgroundColor={Colors.background}
-                translucent={true}
-                style="light"
-              />
-              <SafeAreaView
-                style={styles.safeArea}
-                edges={["top", "left", "right"]}
-              >
-                <BannerAd />
-                <ConsentDialog
-                  onConsentCompleted={() => setConsentCompleted(true)}
+      <TouchableWithoutFeedback onPress={handleGlobalPress}>
+        <View style={styles.appContainer}>
+          {Platform.OS === "ios" && <View style={styles.statusBarBackground} />}
+          <LoaderProvider>
+            <RefreshProvider>
+              <ThemeProvider value={DefaultTheme}>
+                <StatusBar
+                  backgroundColor={Colors.background}
+                  translucent={true}
+                  style="light"
                 />
-                <Slot />
-              </SafeAreaView>
-            </ThemeProvider>
-          </RefreshProvider>
-        </LoaderProvider>
-      </View>
+                <SafeAreaView
+                  style={styles.safeArea}
+                  edges={["top", "left", "right"]}
+                >
+                  <BannerAd />
+                  <ConsentDialog
+                    onConsentCompleted={() => setConsentCompleted(true)}
+                  />
+                  <Slot />
+                </SafeAreaView>
+              </ThemeProvider>
+            </RefreshProvider>
+          </LoaderProvider>
+        </View>
+      </TouchableWithoutFeedback>
     </SafeAreaProvider>
   );
 }
