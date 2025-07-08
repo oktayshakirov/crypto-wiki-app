@@ -26,6 +26,11 @@ export async function initializeInterstitial() {
     console.error("Interstitial ad failed to load:", error);
   });
 
+  interstitial.addAdEventListener(AdEventType.CLOSED, () => {
+    isAdLoaded = false;
+    interstitial!.load();
+  });
+
   await interstitial.load();
 }
 

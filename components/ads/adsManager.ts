@@ -6,6 +6,8 @@ import { showAppOpenAd } from "./AppOpenAd";
 export function useGlobalAds() {
   const lastInterstitialTime = useRef(0);
   const appState = useRef(AppState.currentState);
+  const lastBackgroundedAt = useRef(Date.now());
+  const APP_OPEN_AD_THRESHOLD = 30000; // 30 seconds
 
   useEffect(() => {
     initializeInterstitial();
@@ -15,14 +17,20 @@ export function useGlobalAds() {
     const subscription = AppState.addEventListener(
       "change",
       async (nextAppState) => {
+        if (nextAppState === "background") {
+          lastBackgroundedAt.current = Date.now();
+        }
         if (
           appState.current.match(/inactive|background/) &&
           nextAppState === "active"
         ) {
-          try {
-            await showAppOpenAd();
-          } catch (e) {
-            console.log("AppOpenAd error", e);
+          const now = Date.now();
+          if (now - lastBackgroundedAt.current > APP_OPEN_AD_THRESHOLD) {
+            try {
+              await showAppOpenAd();
+            } catch (e) {
+              console.log("AppOpenAd error", e);
+            }
           }
         }
         appState.current = nextAppState;
