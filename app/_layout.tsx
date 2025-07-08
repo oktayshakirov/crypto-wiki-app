@@ -8,7 +8,6 @@ import {
   Platform,
   View,
   StyleSheet,
-  AppState,
   TouchableWithoutFeedback,
 } from "react-native";
 import * as Notifications from "expo-notifications";
@@ -19,11 +18,6 @@ import ConsentDialog from "@/components/ads/ConsentDialog";
 import initialize from "react-native-google-mobile-ads";
 import { LoaderProvider } from "@/contexts/LoaderContext";
 import { getOrRegisterPushToken } from "@/utils/pushToken";
-import {
-  showInterstitial,
-  initializeInterstitial,
-} from "@/components/ads/InterstitialAd";
-import { showAppOpenAd } from "@/components/ads/AppOpenAd";
 import { useGlobalAds } from "@/components/ads/adsManager";
 
 Notifications.setNotificationHandler({
@@ -39,8 +33,6 @@ export default function RootLayout() {
   const [consentCompleted, setConsentCompleted] = useState(false);
   const notificationListener = useRef<EventSubscription | null>(null);
   const responseListener = useRef<EventSubscription | null>(null);
-  const lastInterstitialTime = React.useRef(0);
-  const appState = React.useRef(AppState.currentState);
 
   useEffect(() => {
     const adapterStatuses = initialize();
@@ -84,30 +76,6 @@ export default function RootLayout() {
         });
     }
   }, [consentCompleted]);
-
-  React.useEffect(() => {
-    initializeInterstitial();
-  }, []);
-
-  React.useEffect(() => {
-    const subscription = AppState.addEventListener(
-      "change",
-      async (nextAppState) => {
-        if (
-          appState.current.match(/inactive|background/) &&
-          nextAppState === "active"
-        ) {
-          try {
-            await showAppOpenAd();
-          } catch (e) {
-            console.log("AppOpenAd error", e);
-          }
-        }
-        appState.current = nextAppState;
-      }
-    );
-    return () => subscription.remove();
-  }, []);
 
   const { handleGlobalPress } = useGlobalAds();
 
