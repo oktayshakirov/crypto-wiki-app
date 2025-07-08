@@ -89,7 +89,6 @@ export default function RootLayout() {
     initializeInterstitial();
   }, []);
 
-  // App Open Ad on resume
   React.useEffect(() => {
     const subscription = AppState.addEventListener(
       "change",
