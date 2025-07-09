@@ -1,18 +1,15 @@
 import { useEffect, useRef } from "react";
 import { AppState } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { showInterstitial, initializeInterstitial } from "./InterstitialAd";
-import { showAppOpenAd, loadAppOpenAd } from "./AppOpenAd";
+import { showInterstitial } from "./InterstitialAd";
+import { showAppOpenAd } from "./AppOpenAd";
 
 const AD_INTERVAL_MS = 60000; // 1 minute
 
+export function initializeGlobalAds() {}
+
 export function useGlobalAds() {
   const appState = useRef(AppState.currentState);
-
-  useEffect(() => {
-    initializeInterstitial();
-    loadAppOpenAd();
-  }, []);
 
   useEffect(() => {
     const subscription = AppState.addEventListener(

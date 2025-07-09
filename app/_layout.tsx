@@ -18,7 +18,8 @@ import ConsentDialog from "@/components/ads/ConsentDialog";
 import initialize from "react-native-google-mobile-ads";
 import { LoaderProvider } from "@/contexts/LoaderContext";
 import { getOrRegisterPushToken } from "@/utils/pushToken";
-import { useGlobalAds } from "@/components/ads/adsManager";
+import { initializeInterstitial } from "@/components/ads/InterstitialAd";
+import { loadAppOpenAd } from "@/components/ads/AppOpenAd";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -37,6 +38,10 @@ export default function RootLayout() {
   useEffect(() => {
     const adapterStatuses = initialize();
     console.log("Ads initialized:", adapterStatuses);
+
+    // Initialize interstitial and app open ads ONCE
+    initializeInterstitial();
+    loadAppOpenAd();
 
     notificationListener.current =
       Notifications.addNotificationReceivedListener((notification) => {
@@ -77,36 +82,32 @@ export default function RootLayout() {
     }
   }, [consentCompleted]);
 
-  const { handleGlobalPress } = useGlobalAds();
-
   return (
     <SafeAreaProvider>
-      <TouchableWithoutFeedback onPress={handleGlobalPress}>
-        <View style={styles.appContainer}>
-          {Platform.OS === "ios" && <View style={styles.statusBarBackground} />}
-          <LoaderProvider>
-            <RefreshProvider>
-              <ThemeProvider value={DefaultTheme}>
-                <StatusBar
-                  backgroundColor={Colors.background}
-                  translucent={true}
-                  style="light"
+      <View style={styles.appContainer}>
+        {Platform.OS === "ios" && <View style={styles.statusBarBackground} />}
+        <LoaderProvider>
+          <RefreshProvider>
+            <ThemeProvider value={DefaultTheme}>
+              <StatusBar
+                backgroundColor={Colors.background}
+                translucent={true}
+                style="light"
+              />
+              <SafeAreaView
+                style={styles.safeArea}
+                edges={["top", "left", "right"]}
+              >
+                <BannerAd />
+                <ConsentDialog
+                  onConsentCompleted={() => setConsentCompleted(true)}
                 />
-                <SafeAreaView
-                  style={styles.safeArea}
-                  edges={["top", "left", "right"]}
-                >
-                  <BannerAd />
-                  <ConsentDialog
-                    onConsentCompleted={() => setConsentCompleted(true)}
-                  />
-                  <Slot />
-                </SafeAreaView>
-              </ThemeProvider>
-            </RefreshProvider>
-          </LoaderProvider>
-        </View>
-      </TouchableWithoutFeedback>
+                <Slot />
+              </SafeAreaView>
+            </ThemeProvider>
+          </RefreshProvider>
+        </LoaderProvider>
+      </View>
     </SafeAreaProvider>
   );
 }
