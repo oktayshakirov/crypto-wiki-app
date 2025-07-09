@@ -4,6 +4,8 @@ import { WebView } from "react-native-webview";
 import { useRefresh } from "@/contexts/RefreshContext";
 import { Colors } from "@/constants/Colors";
 import { useLoader } from "@/contexts/LoaderContext";
+import { useGlobalAds } from "@/components/ads/adsManager";
+import { Pressable } from "react-native";
 
 export default function ExchangesScreen() {
   const { refreshCount } = useRefresh("exchanges");
@@ -17,6 +19,8 @@ export default function ExchangesScreen() {
     document.cookie = "isApp=true; path=/";
     true;
   `;
+
+  const { handleGlobalPress } = useGlobalAds();
 
   useEffect(() => {
     setCurrentUrl(defaultUrl);
@@ -61,18 +65,25 @@ export default function ExchangesScreen() {
           onLoad={hideLoader}
         />
       ) : (
-        <WebView
-          ref={webViewRef}
-          key={webViewKey}
-          source={{ uri: currentUrl }}
-          cacheEnabled
-          domStorageEnabled
-          style={styles.webview}
-          injectedJavaScript={cookieInjectionScript}
-          onLoadStart={showLoader}
-          onNavigationStateChange={handleNavigationStateChange}
-          onShouldStartLoadWithRequest={handleShouldStartLoadWithRequest}
-        />
+        <>
+          <WebView
+            ref={webViewRef}
+            key={webViewKey}
+            source={{ uri: currentUrl }}
+            cacheEnabled
+            domStorageEnabled
+            style={styles.webview}
+            injectedJavaScript={cookieInjectionScript}
+            onLoadStart={showLoader}
+            onNavigationStateChange={handleNavigationStateChange}
+            onShouldStartLoadWithRequest={handleShouldStartLoadWithRequest}
+          />
+          <Pressable
+            style={StyleSheet.absoluteFill}
+            onPress={handleGlobalPress}
+            pointerEvents="box-none"
+          />
+        </>
       )}
     </View>
   );

@@ -1,7 +1,7 @@
 import { Platform } from "react-native";
 import { TestIds } from "react-native-google-mobile-ads";
 
-export const USE_TEST_ADS = __DEV__;
+export const USE_TEST_ADS = false;
 
 export const adUnitIDs = {
   banner: Platform.select({
