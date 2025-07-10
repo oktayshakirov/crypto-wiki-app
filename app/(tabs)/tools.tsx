@@ -15,8 +15,11 @@ export default function ToolsScreen() {
   const defaultUrl = "https://www.thecrypto.wiki/tools/";
   const [currentUrl, setCurrentUrl] = useState(defaultUrl);
 
-  const cookieInjectionScript = `
+  const injectedJavaScript = `
     document.cookie = "isApp=true; path=/";
+    window.addEventListener('click', function() {
+      window.ReactNativeWebView.postMessage('ad');
+    });
     true;
   `;
 
@@ -73,7 +76,12 @@ export default function ToolsScreen() {
             cacheEnabled
             domStorageEnabled
             style={styles.webview}
-            injectedJavaScript={cookieInjectionScript}
+            injectedJavaScript={injectedJavaScript}
+            onMessage={(event) => {
+              if (event.nativeEvent.data === "ad") {
+                handleGlobalPress();
+              }
+            }}
             onLoadStart={showLoader}
             onNavigationStateChange={handleNavigationStateChange}
             onShouldStartLoadWithRequest={handleShouldStartLoadWithRequest}
