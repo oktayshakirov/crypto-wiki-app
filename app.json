@@ -13,7 +13,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.shadev.thecryptowiki",
-      "buildNumber": "4",
+      "buildNumber": "5",
       "config": {
         "googleMobileAdsAppId": "ca-app-pub-5852582960793521~5465329102"
       },
@@ -151,7 +151,7 @@
     },
     "android": {
       "package": "com.shadev.thecryptowiki",
-      "versionCode": 4,
+      "versionCode": 5,
       "config": {
         "googleMobileAdsAppId": "ca-app-pub-5852582960793521~3669031701"
       },

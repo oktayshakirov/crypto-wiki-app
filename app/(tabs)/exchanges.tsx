@@ -16,12 +16,13 @@ export default function ExchangesScreen() {
   const [currentUrl, setCurrentUrl] = useState(defaultUrl);
 
   const injectedJavaScript = `
-    document.cookie = "isApp=true; path=/";
-    window.addEventListener('click', function() {
-      window.ReactNativeWebView.postMessage('ad');
-    });
-    true;
-  `;
+  localStorage.setItem('isApp', 'true');
+  window.addEventListener('click', function() {
+    window.ReactNativeWebView.postMessage('ad');
+  });
+
+  true;
+`;
 
   const { handleGlobalPress } = useGlobalAds();
 
