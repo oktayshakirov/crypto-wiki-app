@@ -38,8 +38,6 @@ export default function RootLayout() {
   useEffect(() => {
     const adapterStatuses = initialize();
     console.log("Ads initialized:", adapterStatuses);
-
-    // Initialize interstitial and app open ads ONCE
     initializeInterstitial();
     loadAppOpenAd();
 
@@ -89,11 +87,7 @@ export default function RootLayout() {
         <LoaderProvider>
           <RefreshProvider>
             <ThemeProvider value={DefaultTheme}>
-              <StatusBar
-                backgroundColor={Colors.background}
-                translucent={true}
-                style="light"
-              />
+              <StatusBar backgroundColor={Colors.background} style="light" />
               <SafeAreaView
                 style={styles.safeArea}
                 edges={["top", "left", "right"]}
