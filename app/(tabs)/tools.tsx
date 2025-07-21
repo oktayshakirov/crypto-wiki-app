@@ -1,18 +1,19 @@
 import React, { useRef, useEffect, useState } from "react";
-import { AppState, Platform, StyleSheet, View, Linking } from "react-native";
+import { AppState, Platform, StyleSheet, View } from "react-native";
 import { WebView } from "react-native-webview";
 import { useRefresh } from "@/contexts/RefreshContext";
 import { Colors } from "@/constants/Colors";
 import { useLoader } from "@/contexts/LoaderContext";
 import { useGlobalAds } from "@/components/ads/adsManager";
 import { Pressable } from "react-native";
+import { openBrowserAsync } from "expo-web-browser";
 
 export default function ToolsScreen() {
   const { refreshCount } = useRefresh("tools");
   const { showLoader, hideLoader } = useLoader();
   const webViewRef = useRef<WebView | null>(null);
   const [webViewKey, setWebViewKey] = useState(0);
-  const defaultUrl = "https://www.thecrypto.wiki/tools/";
+  const defaultUrl = "https://www.thecrypto.wiki/tools/?isApp=true";
   const [currentUrl, setCurrentUrl] = useState(defaultUrl);
 
   const injectedJavaScript = `
@@ -52,7 +53,7 @@ export default function ToolsScreen() {
   const handleShouldStartLoadWithRequest = (request: any) => {
     const { url } = request;
     if (!url.includes("thecrypto.wiki")) {
-      Linking.openURL(url);
+      openBrowserAsync(url);
       return false;
     }
     return true;
