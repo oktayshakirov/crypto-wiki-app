@@ -10,7 +10,8 @@ import { openBrowserAsync } from "expo-web-browser";
 
 export default function ToolsScreen() {
   const { refreshCount } = useRefresh("tools");
-  const { showLoader, hideLoader } = useLoader();
+  const { showLoaderMin, hideLoaderMin, isContentVisible } =
+    useLoader();
   const webViewRef = useRef<WebView | null>(null);
   const [webViewKey, setWebViewKey] = useState(0);
   const defaultUrl = "https://www.thecrypto.wiki/tools/?isApp=true";
@@ -30,14 +31,14 @@ export default function ToolsScreen() {
   useEffect(() => {
     setCurrentUrl(defaultUrl);
     setWebViewKey((prev) => prev + 1);
-    showLoader();
+    showLoaderMin();
   }, [refreshCount]);
 
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (nextAppState) => {
       if (nextAppState === "active") {
         setWebViewKey((prev) => prev + 1);
-        showLoader();
+        showLoaderMin();
       }
     });
     return () => subscription.remove();
@@ -46,7 +47,7 @@ export default function ToolsScreen() {
   const handleNavigationStateChange = (navState: any) => {
     if (!navState.loading) {
       setCurrentUrl(navState.url);
-      hideLoader();
+      hideLoaderMin();
     }
   };
 
@@ -65,9 +66,14 @@ export default function ToolsScreen() {
         <iframe
           key={webViewKey}
           src={currentUrl}
-          style={{ width: "100%", height: "100vh", border: "none" }}
+          style={{
+            width: "100%",
+            height: "100vh",
+            border: "none",
+            opacity: isContentVisible ? 1 : 0,
+          }}
           title="TheCrypto.wiki - Tools"
-          onLoad={hideLoader}
+          onLoad={hideLoaderMin}
         />
       ) : (
         <>
@@ -77,14 +83,14 @@ export default function ToolsScreen() {
             source={{ uri: currentUrl }}
             cacheEnabled
             domStorageEnabled
-            style={styles.webview}
+            style={[styles.webview, { opacity: isContentVisible ? 1 : 0 }]}
             injectedJavaScript={injectedJavaScript}
             onMessage={(event) => {
               if (event.nativeEvent.data === "ad") {
                 handleGlobalPress();
               }
             }}
-            onLoadStart={showLoader}
+            onLoadStart={() => showLoaderMin()}
             onNavigationStateChange={handleNavigationStateChange}
             onShouldStartLoadWithRequest={handleShouldStartLoadWithRequest}
           />

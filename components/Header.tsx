@@ -10,12 +10,56 @@ import {
 } from "react-native";
 import { Colors } from "@/constants/Colors";
 import MaterialIcons from "@expo/vector-icons/Fontisto";
+import { useRefresh } from "@/contexts/RefreshContext";
+import { useSegments, useRouter } from "expo-router";
 
 const { width } = Dimensions.get("window");
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [menuAnimation] = useState(new Animated.Value(0));
+  const router = useRouter();
+
+  const segments = useSegments();
+  const currentRoute = segments[segments.length - 1] || "index";
+  const parentRoute = segments[segments.length - 2] || "";
+
+  // Handle nested routes like saved-content/saved-posts
+  const getCurrentRouteKey = () => {
+    if (parentRoute === "saved-content") {
+      return currentRoute; // This will be saved-posts, saved-exchanges, or saved-ogs
+    }
+    return currentRoute;
+  };
+
+  const { triggerRefresh } = useRefresh(
+    getRefreshKey(getCurrentRouteKey()) || "home"
+  );
+
+  function getRefreshKey(route: string) {
+    switch (route) {
+      case "index":
+        return "home";
+      case "posts":
+        return "posts";
+      case "exchanges":
+        return "exchanges";
+      case "ogs":
+        return "ogs";
+      case "tools":
+        return "tools";
+      case "saved-content":
+        return "saved-posts";
+      case "saved-posts":
+        return "saved-posts";
+      case "saved-exchanges":
+        return "saved-exchanges";
+      case "saved-ogs":
+        return "saved-ogs";
+      default:
+        return "home";
+    }
+  }
 
   const toggleMenu = () => {
     const toValue = isMenuOpen ? 0 : 1;
@@ -42,16 +86,21 @@ export default function Header() {
     {
       label: "Saved Posts",
       icon: "quote-a-left",
-      route: "/saved-posts",
+      route: "/saved-content/saved-posts",
       count: 5,
     },
     {
       label: "Saved Exchanges",
       icon: "bitcoin",
-      route: "/saved-exchanges",
+      route: "/saved-content/saved-exchanges",
       count: 3,
     },
-    { label: "Saved OG's", icon: "persons", route: "/saved-ogs", count: 8 },
+    {
+      label: "Saved OG's",
+      icon: "persons",
+      route: "/saved-content/saved-ogs",
+      count: 8,
+    },
   ];
 
   return (
@@ -60,8 +109,12 @@ export default function Header() {
         <TouchableOpacity
           style={styles.logoContainer}
           onPress={() => {
-            console.log("Logo clicked - navigate to home");
-            // Add navigation logic here
+            // If we're on a saved content page, go back to home, otherwise refresh
+            if (parentRoute === "saved-content") {
+              router.push("/(tabs)/");
+            } else {
+              triggerRefresh();
+            }
           }}
           activeOpacity={0.7}
         >
@@ -73,12 +126,23 @@ export default function Header() {
         </TouchableOpacity>
 
         <TouchableOpacity
+          style={styles.bookmarkButton}
+          onPress={() => {
+            // TODO: Implement save content functionality
+            console.log("Bookmark button pressed");
+          }}
+          activeOpacity={0.7}
+        >
+          <MaterialIcons name="download" size={24} color={Colors.text} />
+        </TouchableOpacity>
+
+        <TouchableOpacity
           style={styles.menuButton}
           onPress={toggleMenu}
           activeOpacity={0.7}
         >
           <MaterialIcons
-            name={isMenuOpen ? "close" : "nav-icon-a"}
+            name={isMenuOpen ? "close-a" : "folder"}
             size={24}
             color={Colors.text}
           />
@@ -101,7 +165,7 @@ export default function Header() {
               style={styles.menuItem}
               activeOpacity={0.7}
               onPress={() => {
-                console.log(`Navigate to: ${item.route}`);
+                router.push(item.route);
                 toggleMenu();
               }}
             >
@@ -153,10 +217,14 @@ const styles = StyleSheet.create({
     width: 200,
     height: 40,
   },
+  bookmarkButton: {
+    padding: 8,
+    borderRadius: 8,
+    marginRight: 8,
+  },
   menuButton: {
     padding: 8,
     borderRadius: 8,
-    backgroundColor: "#333",
   },
   menu: {
     position: "absolute",
