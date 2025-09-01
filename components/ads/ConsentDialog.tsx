@@ -34,7 +34,6 @@ const ConsentDialog = ({ onConsentCompleted }: ConsentDialogProps) => {
     if (Platform.OS === "ios") {
       const { status } =
         await TrackingTransparency.requestTrackingPermissionsAsync();
-      console.log("Tracking permission status:", status);
     }
     onConsentCompleted();
   };

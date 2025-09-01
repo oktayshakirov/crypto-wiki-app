@@ -16,12 +16,10 @@ export async function loadAppOpenAd() {
 
   appOpenAd.addAdEventListener(AdEventType.LOADED, () => {
     isAppOpenAdLoaded = true;
-    console.log("AppOpenAd loaded");
   });
 
-  appOpenAd.addAdEventListener(AdEventType.ERROR, (error: Error) => {
+  appOpenAd.addAdEventListener(AdEventType.ERROR, () => {
     isAppOpenAdLoaded = false;
-    console.error("AppOpenAd failed to load:", error);
   });
 
   appOpenAd.addAdEventListener(AdEventType.CLOSED, () => {
@@ -38,8 +36,7 @@ export async function showAppOpenAd() {
     try {
       isShowingAd = true;
       await appOpenAd.show();
-    } catch (error) {
-      console.error("Error showing AppOpenAd:", error);
+    } catch {
       isShowingAd = false;
     }
   }

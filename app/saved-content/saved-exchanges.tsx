@@ -6,75 +6,40 @@ import {
   FlatList,
   TouchableOpacity,
   RefreshControl,
+  Alert,
+  Image,
 } from "react-native";
 import { Colors } from "@/constants/Colors";
 import { useRefresh } from "@/contexts/RefreshContext";
-import { useLoader } from "@/contexts/LoaderContext";
+import { useSavedContent } from "@/contexts/SavedContentContext";
+import { useWebViewNavigation } from "@/contexts/WebViewNavigationContext";
+import { SavedContentStorage, SavedContent } from "@/utils/savedContentStorage";
 import MaterialIcons from "@expo/vector-icons/Fontisto";
 import { useRouter } from "expo-router";
-
-interface SavedExchange {
-  id: string;
-  title: string;
-  description: string;
-  date: string;
-  image: string;
-}
+import { RemoveContentDialog } from "@/components/RemoveContentDialog";
+import { useNetworkStatus } from "@/hooks/useNetworkStatus";
+import OfflineImage from "@/components/OfflineImage";
 
 export default function SavedExchangesScreen() {
   const { refreshCount } = useRefresh("saved-exchanges");
-  const { showLoader, hideLoader } = useLoader();
+  const { refreshSavedCounts } = useSavedContent();
+  const { navigateToUrl } = useWebViewNavigation();
   const router = useRouter();
-  const [savedExchanges, setSavedExchanges] = useState<SavedExchange[]>([]);
+  const [savedExchanges, setSavedExchanges] = useState<SavedContent[]>([]);
   const [refreshing, setRefreshing] = useState(false);
-
-  // Mock data - replace with actual saved exchanges from your storage
-  const mockSavedExchanges: SavedExchange[] = [
-    // Temporarily empty to test "no content" scenario
-    // Uncomment the exchanges below to test "with content" scenario
-    /*
-    {
-      id: "1",
-      title: "Binance Exchange Review",
-      description:
-        "World's largest cryptocurrency exchange by trading volume. Offers spot trading, futures, staking, and more.",
-      date: "2024-09-03",
-      image: "/images/exchanges/binance.jpg",
-    },
-    {
-      id: "2",
-      title: "Uniswap DEX Analysis",
-      description:
-        "Leading decentralized exchange built on Ethereum. Enables peer-to-peer trading without intermediaries.",
-      date: "2024-09-01",
-      image: "/images/exchanges/uniswap.jpg",
-    },
-    {
-      id: "3",
-      title: "Coinbase Pro Platform Review",
-      description:
-        "Professional trading platform from Coinbase. Advanced charting and trading tools for experienced users.",
-      date: "2024-08-28",
-      image: "/images/exchanges/coinbase-pro.jpg",
-    },
-    */
-  ];
+  const { isOffline } = useNetworkStatus();
 
   useEffect(() => {
     loadSavedExchanges();
   }, [refreshCount]);
 
   const loadSavedExchanges = async () => {
-    // Only show loader if we have content to load
-    if (mockSavedExchanges.length > 0) {
-      showLoader();
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setSavedExchanges(mockSavedExchanges);
-    } else {
+    try {
+      const exchanges = await SavedContentStorage.getSavedContent("exchanges");
+      setSavedExchanges(exchanges);
+    } catch {
       setSavedExchanges([]);
     }
-    hideLoader();
   };
 
   const onRefresh = async () => {
@@ -83,24 +48,64 @@ export default function SavedExchangesScreen() {
     setRefreshing(false);
   };
 
-  const renderSavedExchange = ({ item }: { item: SavedExchange }) => (
-    <TouchableOpacity style={styles.exchangeCard} activeOpacity={0.7}>
+  const handleRemoveExchange = async (exchangeId: string) => {
+    RemoveContentDialog.show({
+      contentType: "exchanges",
+      onRemove: async () => {
+        try {
+          await SavedContentStorage.removeSavedContent("exchanges", exchangeId);
+          await loadSavedExchanges();
+          await refreshSavedCounts();
+          return true;
+        } catch {
+          return false;
+        }
+      },
+      onSuccess: () => {},
+      onError: () => {
+        Alert.alert("Error", "Failed to remove exchange");
+      },
+    });
+  };
+
+  const renderSavedExchange = ({ item }: { item: SavedContent }) => (
+    <TouchableOpacity
+      style={styles.exchangeCard}
+      activeOpacity={0.7}
+      onPress={() => {
+        router.push({
+          pathname: "/saved-content/offline-viewer",
+          params: { type: "exchanges", id: item.id },
+        });
+      }}
+    >
       <View style={styles.exchangeHeader}>
-        <View style={styles.exchangeInfo}>
-          <Text style={styles.exchangeTitle}>{item.title}</Text>
+        <OfflineImage
+          source={item.image ? { uri: item.image } : undefined}
+          style={styles.exchangeImage}
+          resizeMode="cover"
+          fallbackIcon="bitcoin"
+          fallbackIconSize={32}
+        />
+        <View style={styles.exchangeContent}>
+          <View style={styles.titleRow}>
+            <Text style={styles.exchangeTitle}>{item.title}</Text>
+            <TouchableOpacity
+              style={styles.removeButton}
+              activeOpacity={0.7}
+              onPress={(e) => {
+                e.stopPropagation();
+                handleRemoveExchange(item.id);
+              }}
+            >
+              <MaterialIcons name="trash" size={16} color={Colors.icon} />
+            </TouchableOpacity>
+          </View>
+
+          <Text style={styles.exchangeDescription} numberOfLines={3}>
+            {item.description}
+          </Text>
         </View>
-        <TouchableOpacity style={styles.removeButton} activeOpacity={0.7}>
-          <MaterialIcons name="close" size={16} color={Colors.icon} />
-        </TouchableOpacity>
-      </View>
-
-      <Text style={styles.exchangeDescription} numberOfLines={3}>
-        {item.description}
-      </Text>
-
-      <View style={styles.exchangeFooter}>
-        <Text style={styles.exchangeDate}>{item.date}</Text>
-        <Text style={styles.exchangeImage}>{item.image}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -115,7 +120,7 @@ export default function SavedExchangesScreen() {
             activeOpacity={0.7}
           >
             <MaterialIcons name="arrow-left" size={12} color={Colors.text} />
-            <Text style={styles.backButtonText}>Back to Home</Text>
+            <Text style={styles.backButtonText}>Live Content</Text>
           </TouchableOpacity>
 
           <View style={styles.titleSection}>
@@ -204,30 +209,47 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     padding: 20,
+    paddingBottom: 100,
   },
   exchangeCard: {
     backgroundColor: "#222",
     borderRadius: 12,
-    padding: 20,
+    padding: 16,
     marginBottom: 16,
     borderWidth: 1,
     borderColor: "#333",
   },
   exchangeHeader: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "flex-start",
     marginBottom: 12,
+  },
+  exchangeImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+    marginRight: 12,
+    backgroundColor: "#333",
+  },
+  exchangeContent: {
+    flex: 1,
+  },
+  titleRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: 8,
   },
   exchangeInfo: {
     flex: 1,
     marginRight: 12,
   },
   exchangeTitle: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: "600",
     color: Colors.text,
-    marginBottom: 8,
+    flex: 1,
+    marginRight: 8,
   },
   removeButton: {
     padding: 4,
@@ -236,18 +258,26 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.icon,
     lineHeight: 20,
-    marginBottom: 16,
   },
   exchangeFooter: {
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-between",
+    alignItems: "flex-end",
   },
+  dateSection: {
+    flex: 1,
+  },
+  publishedDate: {
+    fontSize: 11,
+    color: Colors.highlight,
+    marginBottom: 2,
+  },
+
   exchangeDate: {
     fontSize: 12,
     color: Colors.icon,
   },
-  exchangeImage: {
+  exchangeType: {
     fontSize: 12,
     color: Colors.highlight,
     fontWeight: "500",

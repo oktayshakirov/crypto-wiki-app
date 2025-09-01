@@ -17,9 +17,13 @@ import { Colors } from "@/constants/Colors";
 import ConsentDialog from "@/components/ads/ConsentDialog";
 import initialize from "react-native-google-mobile-ads";
 import { LoaderProvider } from "@/contexts/LoaderContext";
+import { SavedContentProvider } from "@/contexts/SavedContentContext";
+import { WebViewNavigationProvider } from "@/contexts/WebViewNavigationContext";
+import { WebViewProvider } from "@/contexts/WebViewContext";
 import { getOrRegisterPushToken } from "@/utils/pushToken";
 import { initializeInterstitial } from "@/components/ads/InterstitialAd";
 import { loadAppOpenAd } from "@/components/ads/AppOpenAd";
+import OfflineGuard from "@/components/OfflineGuard";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -37,19 +41,14 @@ export default function RootLayout() {
 
   useEffect(() => {
     const adapterStatuses = initialize();
-    console.log("Ads initialized:", adapterStatuses);
     initializeInterstitial();
     loadAppOpenAd();
 
     notificationListener.current =
-      Notifications.addNotificationReceivedListener((notification) => {
-        console.log("Notification Received:", notification);
-      });
+      Notifications.addNotificationReceivedListener(() => {});
 
     responseListener.current =
-      Notifications.addNotificationResponseReceivedListener((response) => {
-        console.log("Notification Clicked:", response);
-      });
+      Notifications.addNotificationResponseReceivedListener(() => {});
 
     return () => {
       if (notificationListener.current) {
@@ -69,14 +68,9 @@ export default function RootLayout() {
         .then((token) => {
           if (token) {
             setExpoPushToken(token);
-            console.log("Expo Push Token:", token);
-          } else {
-            console.warn("No Expo push token returned.");
           }
         })
-        .catch((error) => {
-          console.error("Error during push registration:", error);
-        });
+        .catch(() => {});
     }
   }, [consentCompleted]);
 
@@ -86,19 +80,30 @@ export default function RootLayout() {
         {Platform.OS === "ios" && <View style={styles.statusBarBackground} />}
         <LoaderProvider>
           <RefreshProvider>
-            <ThemeProvider value={DefaultTheme}>
-              <StatusBar backgroundColor={Colors.background} style="light" />
-              <SafeAreaView
-                style={styles.safeArea}
-                edges={["top", "left", "right"]}
-              >
-                <BannerAd />
-                <ConsentDialog
-                  onConsentCompleted={() => setConsentCompleted(true)}
-                />
-                <Slot />
-              </SafeAreaView>
-            </ThemeProvider>
+            <SavedContentProvider>
+              <WebViewNavigationProvider>
+                <WebViewProvider>
+                  <ThemeProvider value={DefaultTheme}>
+                    <StatusBar
+                      backgroundColor={Colors.background}
+                      style="light"
+                    />
+                    <SafeAreaView
+                      style={styles.safeArea}
+                      edges={["top", "left", "right"]}
+                    >
+                      <BannerAd />
+                      <ConsentDialog
+                        onConsentCompleted={() => setConsentCompleted(true)}
+                      />
+                      <OfflineGuard>
+                        <Slot />
+                      </OfflineGuard>
+                    </SafeAreaView>
+                  </ThemeProvider>
+                </WebViewProvider>
+              </WebViewNavigationProvider>
+            </SavedContentProvider>
           </RefreshProvider>
         </LoaderProvider>
       </View>

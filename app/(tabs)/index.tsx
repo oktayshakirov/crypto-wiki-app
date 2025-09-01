@@ -1,37 +1,67 @@
 import React, { useRef, useEffect, useState } from "react";
-import { AppState, Platform, StyleSheet, View } from "react-native";
+import { AppState, Platform, StyleSheet, View, Pressable } from "react-native";
 import { WebView } from "react-native-webview";
+import { useFocusEffect } from "expo-router";
+import { openBrowserAsync } from "expo-web-browser";
 import { useRefresh } from "@/contexts/RefreshContext";
 import { Colors } from "@/constants/Colors";
 import { useLoader } from "@/contexts/LoaderContext";
+import { useSavedContent } from "@/contexts/SavedContentContext";
+import { useWebViewNavigation } from "@/contexts/WebViewNavigationContext";
+import { useWebView } from "@/contexts/WebViewContext";
 import { useGlobalAds } from "@/components/ads/adsManager";
-import { Pressable } from "react-native";
-import { openBrowserAsync } from "expo-web-browser";
+import { handleNetworkError } from "@/utils/networkErrorHandler";
 
 export default function HomeScreen() {
   const { refreshCount } = useRefresh("home");
   const { showLoaderMin, hideLoaderMin, isContentVisible } = useLoader();
+  const { setCurrentUrl: setSavedContentUrl, forceRefreshSavedState } =
+    useSavedContent();
+  const { pendingNavigation, clearPendingNavigation } = useWebViewNavigation();
+  const { registerWebView, unregisterWebView } = useWebView();
   const webViewRef = useRef<WebView | null>(null);
   const [webViewKey, setWebViewKey] = useState(0);
   const defaultUrl = "https://www.thecrypto.wiki/?isApp=true";
   const [currentUrl, setCurrentUrl] = useState(defaultUrl);
 
   const injectedJavaScript = `
-  localStorage.setItem('isApp', 'true');
-  window.addEventListener('click', function() {
-    window.ReactNativeWebView.postMessage('ad');
-  });
-
-  true;
-`;
+    localStorage.setItem('isApp', 'true');
+    window.addEventListener('click', function() {
+      window.ReactNativeWebView.postMessage('ad');
+    });
+    true;
+  `;
 
   const { handleGlobalPress } = useGlobalAds();
 
   useEffect(() => {
     setCurrentUrl(defaultUrl);
+    setSavedContentUrl(defaultUrl);
     setWebViewKey((prev) => prev + 1);
     showLoaderMin();
-  }, [refreshCount]);
+  }, [refreshCount, setSavedContentUrl]);
+
+  useEffect(() => {
+    if (pendingNavigation && !pendingNavigation.targetTab) {
+      setCurrentUrl(pendingNavigation.url);
+      setSavedContentUrl(pendingNavigation.url);
+      setWebViewKey((prev) => prev + 1);
+      showLoaderMin();
+      clearPendingNavigation();
+    }
+  }, [
+    pendingNavigation,
+    clearPendingNavigation,
+    setSavedContentUrl,
+    showLoaderMin,
+  ]);
+
+  useEffect(() => {
+    if (webViewRef.current) {
+      registerWebView("home", webViewRef);
+    }
+    return () => unregisterWebView("home");
+  }, [registerWebView, unregisterWebView]);
 
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (nextAppState) => {
@@ -43,9 +73,16 @@ export default function HomeScreen() {
     return () => subscription.remove();
   }, []);
 
+  useFocusEffect(
+    React.useCallback(() => {
+      forceRefreshSavedState();
+    }, [forceRefreshSavedState])
+  );
+
   const handleNavigationStateChange = (navState: any) => {
-    if (!navState.loading) {
+    if (!navState.loading && navState.url) {
       setCurrentUrl(navState.url);
+      setSavedContentUrl(navState.url);
       hideLoaderMin();
     }
   };
@@ -85,13 +122,32 @@ export default function HomeScreen() {
             style={[styles.webview, { opacity: isContentVisible ? 1 : 0 }]}
             injectedJavaScript={injectedJavaScript}
             onMessage={(event) => {
-              if (event.nativeEvent.data === "ad") {
-                handleGlobalPress();
+              try {
+                const data = JSON.parse(event.nativeEvent.data);
+                if (data.type === "URL_CHECK") {
+                  (global as any).webviewCurrentUrl = data.fullUrl;
+                  (global as any).webviewCurrentPath = data.currentPath;
+                } else if (data.type === "URL_VERIFICATION") {
+                  (global as any).webviewCurrentUrl = data.currentUrl;
+                  (global as any).webviewCurrentPath = data.currentPath;
+                } else if (data.type === "METADATA_EXTRACTED") {
+                  (global as any).extractedMetadata = data.metadata;
+                } else if (event.nativeEvent.data === "ad") {
+                  handleGlobalPress();
+                }
+              } catch {
+                if (event.nativeEvent.data === "ad") {
+                  handleGlobalPress();
+                }
               }
             }}
             onLoadStart={() => showLoaderMin()}
             onNavigationStateChange={handleNavigationStateChange}
             onShouldStartLoadWithRequest={handleShouldStartLoadWithRequest}
+            onError={(syntheticEvent) => {
+              const { nativeEvent } = syntheticEvent;
+              handleNetworkError(nativeEvent);
+            }}
           />
           <Pressable
             style={StyleSheet.absoluteFill}

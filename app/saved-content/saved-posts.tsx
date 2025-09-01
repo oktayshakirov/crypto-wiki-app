@@ -6,91 +6,40 @@ import {
   FlatList,
   TouchableOpacity,
   RefreshControl,
+  Alert,
+  Image,
 } from "react-native";
 import { Colors } from "@/constants/Colors";
 import { useRefresh } from "@/contexts/RefreshContext";
-import { useLoader } from "@/contexts/LoaderContext";
+import { useSavedContent } from "@/contexts/SavedContentContext";
+import { useWebViewNavigation } from "@/contexts/WebViewNavigationContext";
+import { SavedContentStorage, SavedContent } from "@/utils/savedContentStorage";
 import MaterialIcons from "@expo/vector-icons/Fontisto";
 import { useRouter } from "expo-router";
-
-interface SavedPost {
-  id: string;
-  title: string;
-  description: string;
-  date: string;
-  image: string;
-}
+import { RemoveContentDialog } from "@/components/RemoveContentDialog";
+import { useNetworkStatus } from "@/hooks/useNetworkStatus";
+import OfflineImage from "@/components/OfflineImage";
 
 export default function SavedPostsScreen() {
   const { refreshCount } = useRefresh("saved-posts");
-  const { showLoader, hideLoader } = useLoader();
+  const { refreshSavedCounts } = useSavedContent();
+  const { navigateToUrl } = useWebViewNavigation();
   const router = useRouter();
-  const [savedPosts, setSavedPosts] = useState<SavedPost[]>([]);
+  const [savedPosts, setSavedPosts] = useState<SavedContent[]>([]);
   const [refreshing, setRefreshing] = useState(false);
-
-  // Mock data - replace with actual saved posts from your storage
-  const mockSavedPosts: SavedPost[] = [
-    // Temporarily empty to test "no content" scenario
-    // Uncomment the posts below to test "with content" scenario
-    /*
-    {
-      id: "1",
-      title: "AI and Blockchain: A New Era of Technological Innovations",
-      description:
-        "How AI and blockchain are transforming industries with transparency, security, and innovative solutions, paving the way for a new era of technology.",
-      date: "2024-09-03",
-      image: "/images/posts/ai-and-human.jpg",
-    },
-    {
-      id: "2",
-      title: "The Future of Bitcoin: What to Expect in 2024",
-      description:
-        "Bitcoin continues to evolve with new developments in scalability, security, and adoption. This comprehensive guide explores what's coming next...",
-      date: "2024-01-15",
-      image: "/images/posts/bitcoin-future.jpg",
-    },
-    {
-      id: "3",
-      title: "DeFi Revolution: Understanding Decentralized Finance",
-      description:
-        "Decentralized Finance is reshaping traditional financial services. Learn about the key concepts, risks, and opportunities in this emerging space...",
-      date: "2024-01-12",
-      image: "/images/posts/defi-revolution.jpg",
-    },
-    {
-      id: "4",
-      title: "NFT Market Analysis: Trends and Predictions",
-      description:
-        "The NFT market has seen significant changes. Discover the latest trends, market dynamics, and what the future holds for digital collectibles...",
-      date: "2024-01-10",
-      image: "/images/posts/nft-trends.jpg",
-    },
-    {
-      id: "5",
-      title: "Ethereum 2.0: The Complete Guide",
-      description:
-        "Ethereum's transition to proof-of-stake brings major improvements. Understand the technical changes, benefits, and implications for developers...",
-      date: "2024-01-08",
-      image: "/images/posts/ethereum-2.jpg",
-    },
-    */
-  ];
+  const { isOffline } = useNetworkStatus();
 
   useEffect(() => {
     loadSavedPosts();
   }, [refreshCount]);
 
   const loadSavedPosts = async () => {
-    // Only show loader if we have content to load
-    if (mockSavedPosts.length > 0) {
-      showLoader();
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setSavedPosts(mockSavedPosts);
-    } else {
+    try {
+      const posts = await SavedContentStorage.getSavedContent("posts");
+      setSavedPosts(posts);
+    } catch {
       setSavedPosts([]);
     }
-    hideLoader();
   };
 
   const onRefresh = async () => {
@@ -99,27 +48,71 @@ export default function SavedPostsScreen() {
     setRefreshing(false);
   };
 
-  const renderSavedPost = ({ item }: { item: SavedPost }) => (
-    <TouchableOpacity style={styles.postCard} activeOpacity={0.7}>
-      <View style={styles.postHeader}>
-        <Text style={styles.postTitle} numberOfLines={2}>
-          {item.title}
-        </Text>
-        <TouchableOpacity style={styles.removeButton} activeOpacity={0.7}>
-          <MaterialIcons name="close" size={16} color={Colors.icon} />
-        </TouchableOpacity>
-      </View>
+  const handleRemovePost = async (postId: string) => {
+    RemoveContentDialog.show({
+      contentType: "posts",
+      onRemove: async () => {
+        try {
+          await SavedContentStorage.removeSavedContent("posts", postId);
+          await loadSavedPosts();
+          await refreshSavedCounts();
+          return true;
+        } catch {
+          return false;
+        }
+      },
+      onSuccess: () => {},
+      onError: () => {
+        Alert.alert("Error", "Failed to remove post");
+      },
+    });
+  };
 
-      <Text style={styles.postDescription} numberOfLines={3}>
-        {item.description}
-      </Text>
+  const renderSavedPost = ({ item }: { item: SavedContent }) => {
+    return (
+      <TouchableOpacity
+        style={styles.postCard}
+        activeOpacity={0.7}
+        onPress={() => {
+          router.push({
+            pathname: "/saved-content/offline-viewer",
+            params: { type: "posts", id: item.id },
+          });
+        }}
+      >
+        <View style={styles.postHeader}>
+          <OfflineImage
+            source={item.image ? { uri: item.image } : undefined}
+            style={styles.postImage}
+            resizeMode="cover"
+            fallbackIcon="quote-a-left"
+            fallbackIconSize={32}
+          />
+          <View style={styles.postContent}>
+            <View style={styles.titleRow}>
+              <Text style={styles.postTitle} numberOfLines={2}>
+                {item.title}
+              </Text>
+              <TouchableOpacity
+                style={styles.removeButton}
+                activeOpacity={0.7}
+                onPress={(e) => {
+                  e.stopPropagation();
+                  handleRemovePost(item.id);
+                }}
+              >
+                <MaterialIcons name="trash" size={16} color={Colors.icon} />
+              </TouchableOpacity>
+            </View>
 
-      <View style={styles.postFooter}>
-        <Text style={styles.postDate}>{item.date}</Text>
-        <Text style={styles.postImage}>{item.image}</Text>
-      </View>
-    </TouchableOpacity>
-  );
+            <Text style={styles.postDescription} numberOfLines={3}>
+              {item.description}
+            </Text>
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -131,7 +124,7 @@ export default function SavedPostsScreen() {
             activeOpacity={0.7}
           >
             <MaterialIcons name="arrow-left" size={12} color={Colors.text} />
-            <Text style={styles.backButtonText}>Back to Home</Text>
+            <Text style={styles.backButtonText}>Live Content</Text>
           </TouchableOpacity>
 
           <View style={styles.titleSection}>
@@ -220,27 +213,43 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     padding: 20,
+    paddingBottom: 100,
   },
   postCard: {
     backgroundColor: "#222",
     borderRadius: 12,
-    padding: 20,
+    padding: 16,
     marginBottom: 16,
     borderWidth: 1,
     borderColor: "#333",
   },
   postHeader: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "flex-start",
     marginBottom: 12,
   },
+  postImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+    marginRight: 12,
+    backgroundColor: "#333",
+  },
+  postContent: {
+    flex: 1,
+  },
+  titleRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: 8,
+  },
   postTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "600",
     color: Colors.text,
     flex: 1,
-    marginRight: 12,
+    marginRight: 8,
   },
   removeButton: {
     padding: 4,
@@ -249,18 +258,22 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.icon,
     lineHeight: 20,
-    marginBottom: 16,
   },
   postFooter: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-end",
   },
-  postDate: {
-    fontSize: 12,
-    color: Colors.icon,
+  dateSection: {
+    flex: 1,
   },
-  postImage: {
+  publishedDate: {
+    fontSize: 11,
+    color: Colors.highlight,
+    marginBottom: 2,
+  },
+
+  postType: {
     fontSize: 12,
     color: Colors.highlight,
     fontWeight: "500",

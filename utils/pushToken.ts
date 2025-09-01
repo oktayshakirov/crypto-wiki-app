@@ -8,38 +8,40 @@ async function registerPushTokenOnServer(token: string) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token }),
     });
-    console.log("Push token registered on server:", token);
-  } catch (error) {
-    console.error("Error registering push token on server:", error);
-  }
+  } catch (error) {}
 }
 
 export async function getOrRegisterPushToken(): Promise<string | null> {
   try {
-    let storedToken = await AsyncStorage.getItem("pushToken");
-    if (storedToken) {
-      console.log("Token already registered:", storedToken);
-      return storedToken;
-    }
-
-    const { status } = await Notifications.requestPermissionsAsync();
+    const { status } = await Notifications.getPermissionsAsync();
     if (status !== "granted") {
-      console.warn("Permission for push notifications was not granted");
       return null;
     }
 
-    const { data: newToken } = await Notifications.getExpoPushTokenAsync();
-    if (!newToken) {
-      console.warn("No push token returned from Expo");
-      return null;
+    const token = await Notifications.getExpoPushTokenAsync({
+      projectId: "your-project-id",
+    });
+
+    if (token.data) {
+      await fetch("https://registerpushtoken-7p7ces4mpq-uc.a.run.app", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ token: token.data }),
+      });
+
+      const storedToken = await AsyncStorage.getItem("@push_token");
+      if (storedToken === token.data) {
+        return token.data;
+      }
+
+      await AsyncStorage.setItem("@push_token", token.data);
+      return token.data;
     }
 
-    await AsyncStorage.setItem("pushToken", newToken);
-    await registerPushTokenOnServer(newToken);
-
-    return newToken;
+    return null;
   } catch (error) {
-    console.error("Error in getOrRegisterPushToken:", error);
     return null;
   }
 }
