@@ -4,14 +4,18 @@ import { WebView } from "react-native-webview";
 import { useRefresh } from "@/contexts/RefreshContext";
 import { Colors } from "@/constants/Colors";
 import { useLoader } from "@/contexts/LoaderContext";
+import { useSavedContent } from "@/contexts/SavedContentContext";
 import { useGlobalAds } from "@/components/ads/adsManager";
+import { handleNetworkError } from "@/utils/networkErrorHandler";
 import { Pressable } from "react-native";
 import { openBrowserAsync } from "expo-web-browser";
+import { useFocusEffect } from "expo-router";
 
 export default function ToolsScreen() {
   const { refreshCount } = useRefresh("tools");
-  const { showLoaderMin, hideLoaderMin, isContentVisible } =
-    useLoader();
+  const { showLoaderMin, hideLoaderMin, isContentVisible } = useLoader();
+  const { setCurrentUrl: setSavedContentUrl, forceRefreshSavedState } =
+    useSavedContent();
   const webViewRef = useRef<WebView | null>(null);
   const [webViewKey, setWebViewKey] = useState(0);
   const defaultUrl = "https://www.thecrypto.wiki/tools/?isApp=true";
@@ -30,9 +34,10 @@ export default function ToolsScreen() {
 
   useEffect(() => {
     setCurrentUrl(defaultUrl);
+    setSavedContentUrl(defaultUrl);
     setWebViewKey((prev) => prev + 1);
     showLoaderMin();
-  }, [refreshCount]);
+  }, [refreshCount, setSavedContentUrl]);
 
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (nextAppState) => {
@@ -44,9 +49,16 @@ export default function ToolsScreen() {
     return () => subscription.remove();
   }, []);
 
+  useFocusEffect(
+    React.useCallback(() => {
+      forceRefreshSavedState();
+    }, [forceRefreshSavedState])
+  );
+
   const handleNavigationStateChange = (navState: any) => {
-    if (!navState.loading) {
+    if (!navState.loading && navState.url) {
       setCurrentUrl(navState.url);
+      setSavedContentUrl(navState.url);
       hideLoaderMin();
     }
   };
@@ -93,6 +105,10 @@ export default function ToolsScreen() {
             onLoadStart={() => showLoaderMin()}
             onNavigationStateChange={handleNavigationStateChange}
             onShouldStartLoadWithRequest={handleShouldStartLoadWithRequest}
+            onError={(syntheticEvent) => {
+              const { nativeEvent } = syntheticEvent;
+              handleNetworkError(nativeEvent);
+            }}
           />
           <Pressable
             style={StyleSheet.absoluteFill}

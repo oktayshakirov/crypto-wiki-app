@@ -5,7 +5,7 @@ import React, {
   ReactNode,
   useRef,
 } from "react";
-import Loader from "@/components/ui/Loader";
+import Loader from "@/components/Loader";
 
 type LoaderContextType = {
   showLoader: () => void;
@@ -37,7 +37,6 @@ export const LoaderProvider = ({ children }: LoaderProviderProps) => {
   const hideLoader = () => setIsLoading(false);
 
   const showLoaderMin = (minDelay: number = 800) => {
-    // Clear any existing timeout
     if (hideTimeoutRef.current) {
       clearTimeout(hideTimeoutRef.current);
       hideTimeoutRef.current = null;
@@ -56,7 +55,7 @@ export const LoaderProvider = ({ children }: LoaderProviderProps) => {
     }
 
     const elapsedTime = Date.now() - loaderStartTime.current;
-    const minDelay = 800; // 800ms minimum delay
+    const minDelay = 800;
 
     if (elapsedTime >= minDelay) {
       setIsLoading(false);

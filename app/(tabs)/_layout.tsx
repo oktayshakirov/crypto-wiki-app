@@ -3,7 +3,7 @@ import React from "react";
 import { Platform, View } from "react-native";
 import MaterialIcons from "@expo/vector-icons/Fontisto";
 import { HapticTab } from "@/components/HapticTab";
-import TabBarBackground from "@/components/ui/TabBarBackground";
+import TabBarBackground from "@/components/TabBarBackground";
 import { Colors } from "@/constants/Colors";
 import Header from "@/components/Header";
 

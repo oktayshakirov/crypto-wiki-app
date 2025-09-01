@@ -1,26 +1,48 @@
-import React from "react";
-import { View, StyleSheet } from "react-native";
+import React, { useState } from "react";
+import { View, StyleSheet, Animated } from "react-native";
 import { BannerAd, BannerAdSize } from "react-native-google-mobile-ads";
 import { getAdUnitId } from "./adConfig";
 import { useAdConsent } from "./useAdConsent";
 
 const BannerAdComponent = () => {
   const { requestNonPersonalizedAdsOnly } = useAdConsent();
+  const [isAdLoaded, setIsAdLoaded] = useState(false);
+  const [fadeAnim] = useState(new Animated.Value(0));
+
+  const handleAdLoaded = () => {
+    setIsAdLoaded(true);
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handleAdFailedToLoad = () => {
+    setIsAdLoaded(false);
+  };
 
   return (
-    <View style={styles.bannerContainer}>
+    <Animated.View
+      style={[
+        styles.bannerContainer,
+        {
+          opacity: fadeAnim,
+          height: isAdLoaded ? "auto" : 0,
+          overflow: "hidden",
+        },
+      ]}
+    >
       <BannerAd
         unitId={getAdUnitId("banner")!}
         size={BannerAdSize.ADAPTIVE_BANNER}
         requestOptions={{
           requestNonPersonalizedAdsOnly,
         }}
-        onAdLoaded={() => console.log("Banner ad loaded!")}
-        onAdFailedToLoad={(error) =>
-          console.error("Banner ad failed to load:", error)
-        }
+        onAdLoaded={handleAdLoaded}
+        onAdFailedToLoad={handleAdFailedToLoad}
       />
-    </View>
+    </Animated.View>
   );
 };
 

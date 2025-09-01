@@ -18,12 +18,10 @@ export async function initializeInterstitial() {
 
   interstitial.addAdEventListener(AdEventType.LOADED, () => {
     isAdLoaded = true;
-    console.log("Interstitial ad loaded");
   });
 
-  interstitial.addAdEventListener(AdEventType.ERROR, (error: Error) => {
+  interstitial.addAdEventListener(AdEventType.ERROR, () => {
     isAdLoaded = false;
-    console.error("Interstitial ad failed to load:", error);
   });
 
   interstitial.addAdEventListener(AdEventType.CLOSED, () => {

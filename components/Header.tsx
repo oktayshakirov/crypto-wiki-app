@@ -1,105 +1,150 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
-  Animated,
-  Dimensions,
   Image,
+  Alert,
+  AppState,
 } from "react-native";
 import { Colors } from "@/constants/Colors";
 import MaterialIcons from "@expo/vector-icons/Fontisto";
 import { useRefresh } from "@/contexts/RefreshContext";
-import { useSegments, useRouter } from "expo-router";
+import { useSavedContent } from "@/contexts/SavedContentContext";
+import { useWebView } from "@/contexts/WebViewContext";
+import { useSegments, useRouter, useFocusEffect } from "expo-router";
+import { RemoveContentDialog } from "@/components/RemoveContentDialog";
+import HeaderMenu from "@/components/HeaderMenu";
+import { ContentSaver } from "@/utils/ContentSaver";
 
-const { width } = Dimensions.get("window");
+const ROUTE_REFRESH_MAP: Record<string, string> = {
+  index: "home",
+  posts: "posts",
+  exchanges: "exchanges",
+  ogs: "ogs",
+  tools: "tools",
+};
 
 export default function Header() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [menuAnimation] = useState(new Animated.Value(0));
+  const [isSaving, setIsSaving] = useState(false);
   const router = useRouter();
+  const {
+    currentUrl,
+    isCurrentPageSaveable,
+    isCurrentPageSaved,
+    saveCurrentPage,
+    removeSavedContent,
+    currentPageType,
+    currentPageSlug,
+    savedCounts,
+    forceRefreshSavedState,
+  } = useSavedContent();
+  const { getWebViewRef } = useWebView();
+
+  useEffect(() => {
+    forceRefreshSavedState();
+  }, [forceRefreshSavedState]);
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (nextAppState) => {
+      if (nextAppState === "active") {
+        forceRefreshSavedState();
+      }
+    });
+
+    return () => subscription.remove();
+  }, [forceRefreshSavedState]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      forceRefreshSavedState();
+    }, [forceRefreshSavedState])
+  );
 
   const segments = useSegments();
   const currentRoute = segments[segments.length - 1] || "index";
   const parentRoute = segments[segments.length - 2] || "";
 
-  // Handle nested routes like saved-content/saved-posts
-  const getCurrentRouteKey = () => {
-    if (parentRoute === "saved-content") {
-      return currentRoute; // This will be saved-posts, saved-exchanges, or saved-ogs
+  const refreshKey = ROUTE_REFRESH_MAP[currentRoute] || "home";
+
+  const { triggerRefresh } = useRefresh(refreshKey);
+
+  const handleSaveContent = async () => {
+    if (isSaving) return;
+
+    setIsSaving(true);
+
+    try {
+      if (isCurrentPageSaved) {
+        if (currentPageType && currentPageSlug) {
+          RemoveContentDialog.show({
+            contentType: currentPageType,
+            onRemove: async () => {
+              return await removeSavedContent(currentPageType, currentPageSlug);
+            },
+            onSuccess: () => {
+              Alert.alert("Success", "Content removed from saved items");
+            },
+            onError: () => {
+              Alert.alert("Error", "Failed to remove content");
+            },
+          });
+        }
+      } else {
+        Alert.alert(
+          "Save Content",
+          "This page will be saved for offline viewing",
+          [
+            {
+              text: "Cancel",
+              style: "cancel",
+            },
+            {
+              text: "Save",
+              onPress: async () => {
+                if (!currentUrl || !isCurrentPageSaveable) {
+                  Alert.alert("Error", "Cannot save this page");
+                  return;
+                }
+
+                await ContentSaver.saveContent(
+                  currentUrl,
+                  currentPageType,
+                  currentPageSlug,
+                  getWebViewRef,
+                  saveCurrentPage
+                );
+              },
+            },
+          ]
+        );
+      }
+    } catch (error) {
+      Alert.alert("Error", "An unexpected error occurred");
+    } finally {
+      setIsSaving(false);
     }
-    return currentRoute;
   };
-
-  const { triggerRefresh } = useRefresh(
-    getRefreshKey(getCurrentRouteKey()) || "home"
-  );
-
-  function getRefreshKey(route: string) {
-    switch (route) {
-      case "index":
-        return "home";
-      case "posts":
-        return "posts";
-      case "exchanges":
-        return "exchanges";
-      case "ogs":
-        return "ogs";
-      case "tools":
-        return "tools";
-      case "saved-content":
-        return "saved-posts";
-      case "saved-posts":
-        return "saved-posts";
-      case "saved-exchanges":
-        return "saved-exchanges";
-      case "saved-ogs":
-        return "saved-ogs";
-      default:
-        return "home";
-    }
-  }
-
-  const toggleMenu = () => {
-    const toValue = isMenuOpen ? 0 : 1;
-    setIsMenuOpen(!isMenuOpen);
-
-    Animated.timing(menuAnimation, {
-      toValue,
-      duration: 300,
-      useNativeDriver: false,
-    }).start();
-  };
-
-  const menuTranslateY = menuAnimation.interpolate({
-    inputRange: [0, 1],
-    outputRange: [-10, 0],
-  });
-
-  const menuOpacity = menuAnimation.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 1],
-  });
 
   const menuItems = [
     {
       label: "Saved Posts",
       icon: "quote-a-left",
       route: "/saved-content/saved-posts",
-      count: 5,
+      count: savedCounts.posts,
     },
     {
       label: "Saved Exchanges",
       icon: "bitcoin",
       route: "/saved-content/saved-exchanges",
-      count: 3,
+      count: savedCounts.exchanges,
     },
     {
       label: "Saved OG's",
       icon: "persons",
       route: "/saved-content/saved-ogs",
-      count: 8,
+      count: savedCounts["crypto-ogs"],
     },
   ];
 
@@ -109,7 +154,6 @@ export default function Header() {
         <TouchableOpacity
           style={styles.logoContainer}
           onPress={() => {
-            // If we're on a saved content page, go back to home, otherwise refresh
             if (parentRoute === "saved-content") {
               router.push("/(tabs)/");
             } else {
@@ -125,70 +169,23 @@ export default function Header() {
           />
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.bookmarkButton}
-          onPress={() => {
-            // TODO: Implement save content functionality
-            console.log("Bookmark button pressed");
-          }}
-          activeOpacity={0.7}
-        >
-          <MaterialIcons name="download" size={24} color={Colors.text} />
-        </TouchableOpacity>
+        {isCurrentPageSaveable && (
+          <TouchableOpacity
+            style={styles.bookmarkButton}
+            onPress={handleSaveContent}
+            activeOpacity={0.7}
+            disabled={isSaving}
+          >
+            <MaterialIcons
+              name={isCurrentPageSaved ? "check" : "download"}
+              size={24}
+              color={isCurrentPageSaved ? Colors.activeIcon : Colors.text}
+            />
+          </TouchableOpacity>
+        )}
 
-        <TouchableOpacity
-          style={styles.menuButton}
-          onPress={toggleMenu}
-          activeOpacity={0.7}
-        >
-          <MaterialIcons
-            name={isMenuOpen ? "close-a" : "folder"}
-            size={24}
-            color={Colors.text}
-          />
-        </TouchableOpacity>
+        <HeaderMenu savedCounts={savedCounts} />
       </View>
-
-      <Animated.View
-        style={[
-          styles.menu,
-          {
-            transform: [{ translateY: menuTranslateY }],
-            opacity: menuOpacity,
-          },
-        ]}
-      >
-        <View style={styles.menuContent}>
-          {menuItems.map((item, index) => (
-            <TouchableOpacity
-              key={index}
-              style={styles.menuItem}
-              activeOpacity={0.7}
-              onPress={() => {
-                router.push(item.route);
-                toggleMenu();
-              }}
-            >
-              <MaterialIcons
-                name={item.icon as any}
-                size={18}
-                color={Colors.activeIcon}
-                style={styles.menuIcon}
-              />
-              <Text style={styles.menuText}>{item.label}</Text>
-              <Text style={styles.menuCount}>({item.count})</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </Animated.View>
-
-      {isMenuOpen && (
-        <TouchableOpacity
-          style={styles.overlay}
-          activeOpacity={1}
-          onPress={toggleMenu}
-        />
-      )}
     </View>
   );
 }
@@ -221,65 +218,5 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 8,
     marginRight: 8,
-  },
-  menuButton: {
-    padding: 8,
-    borderRadius: 8,
-  },
-  menu: {
-    position: "absolute",
-    top: "100%",
-    left: 0,
-    right: 0,
-    backgroundColor: Colors.background,
-    borderBottomWidth: 1,
-    borderColor: "#333",
-    borderRadius: 0,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  menuContent: {
-    paddingVertical: 10,
-  },
-  menuItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: "#333",
-  },
-  menuIcon: {
-    marginRight: 15,
-    width: 24,
-    height: 20,
-    textAlign: "center",
-  },
-  menuText: {
-    fontSize: 16,
-    color: Colors.text,
-    fontWeight: "500",
-    flex: 1,
-  },
-  menuCount: {
-    fontSize: 14,
-    color: Colors.icon,
-    fontWeight: "600",
-    marginLeft: 8,
-  },
-  overlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    zIndex: -1,
   },
 });
