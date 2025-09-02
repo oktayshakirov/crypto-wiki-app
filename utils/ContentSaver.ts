@@ -216,6 +216,7 @@ export class ContentSaver {
             return;
           }
 
+          // Helper function to extract page content
           function extractPageContent() {
             const contentDiv = document.querySelector('.content');
             if (contentDiv) {
@@ -293,148 +294,167 @@ export class ContentSaver {
             return '';
           }
 
+          // Helper function to extract title from page content
+          function extractTitle() {
+            const titleSelectors = [
+              'h1',
+              '.content h1',
+              '.post-content h1', 
+              '.article-content h1',
+              '.entry-content h1',
+              'main h1',
+              'article h1',
+              '.page-title',
+              '.post-title',
+              '.article-title'
+            ];
+            
+            for (const selector of titleSelectors) {
+              const titleElement = document.querySelector(selector);
+              if (titleElement && titleElement.textContent && titleElement.textContent.trim()) {
+                return titleElement.textContent.trim();
+              }
+            }
+            
+            // Fallback to meta tags
+            return document.querySelector('meta[property="og:title"]')?.getAttribute('content') ||
+                   document.querySelector('meta[name="title"]')?.getAttribute('content') ||
+                   document.querySelector('title')?.textContent;
+          }
+
+          // Helper function to determine content type from URL path
+          function getContentTypeFromPath(path) {
+            if (path.startsWith('/exchanges/') || path.startsWith('/exchange/')) {
+              return "exchanges";
+            } else if (path.startsWith('/crypto-ogs/') || path.startsWith('/og/')) {
+              return "crypto-ogs";
+            } else if (path.startsWith('/posts/') || path.startsWith('/post/')) {
+              return "posts";
+            }
+            return null;
+          }
+
+          // Helper function to find content item in all data structures
+          function findContentItem(pageProps, currentPath, preferredType) {
+            const dataStructures = [
+              // Prioritize based on preferred type
+              ...(preferredType === "posts" ? [
+                { data: pageProps?.posts, type: "posts" },
+                { data: pageProps?.post, type: "posts" }
+              ] : []),
+              ...(preferredType === "exchanges" ? [
+                { data: pageProps?.exchanges, type: "exchanges" },
+                { data: pageProps?.exchange, type: "exchanges" }
+              ] : []),
+              ...(preferredType === "crypto-ogs" ? [
+                { data: pageProps?.ogs, type: "crypto-ogs" },
+                { data: pageProps?.og, type: "crypto-ogs" }
+              ] : []),
+              // Fallback to all structures
+              { data: pageProps?.posts, type: "posts" },
+              { data: pageProps?.exchanges, type: "exchanges" },
+              { data: pageProps?.exchange, type: "exchanges" },
+              { data: pageProps?.ogs, type: "crypto-ogs" },
+              { data: pageProps?.og, type: "crypto-ogs" },
+              { data: pageProps?.post, type: "posts" }
+            ];
+
+            for (const { data, type } of dataStructures) {
+              if (Array.isArray(data)) {
+                const item = data.find(item => 
+                  item.slug && (currentPath.includes(item.slug) || currentPath.endsWith(item.slug))
+                );
+                if (item) return { item, type };
+              } else if (data && data.slug) {
+                if (currentPath.includes(data.slug) || currentPath.endsWith(data.slug)) {
+                  return { item: data, type };
+                }
+              }
+            }
+            return null;
+          }
+
+          // Helper function to extract meta data
+          function extractMetaData() {
+            return {
+              title: document.querySelector('meta[property="og:title"]')?.getAttribute('content') ||
+                    document.querySelector('meta[name="title"]')?.getAttribute('content') ||
+                    document.querySelector('title')?.textContent,
+              description: document.querySelector('meta[property="og:description"]')?.getAttribute('content') ||
+                          document.querySelector('meta[name="description"]')?.getAttribute('content'),
+              image: document.querySelector('meta[property="og:image"]')?.getAttribute('content') ||
+                    document.querySelector('meta[name="image"]')?.getAttribute('content')
+            };
+          }
+
+          // Unified extraction logic
+          const currentPath = window.location.pathname;
+          const preferredType = getContentTypeFromPath(currentPath);
+          const extractedContent = extractPageContent();
+          const contentTitle = extractTitle();
+          const metaData = extractMetaData();
+          
+          let finalMetadata = null;
+
+          // Try to get data from __NEXT_DATA__ first
           const nextDataElement = document.getElementById('__NEXT_DATA__');
           if (nextDataElement) {
-            const data = JSON.parse(nextDataElement.textContent);
-            const pageProps = data?.props?.pageProps;
-            
-            let currentItem = null;
-            let contentType = null;
-            const currentPath = window.location.pathname;
-            
-            if (pageProps?.posts && Array.isArray(pageProps.posts)) {
-              currentItem = pageProps.posts.find(post => 
-                post.slug && (currentPath.includes(post.slug) || currentPath.endsWith(post.slug))
-              );
-              if (currentItem) {
-                contentType = "posts";
-              }
-            }
-            
-            if (!currentItem && pageProps?.exchanges && Array.isArray(pageProps.exchanges)) {
-              currentItem = pageProps.exchanges.find(exchange => 
-                exchange.slug && (currentPath.includes(exchange.slug) || currentPath.endsWith(exchange.slug))
-              );
-              if (currentItem) {
-                contentType = "exchanges";
-              }
-            }
-            
-            if (!currentItem && pageProps?.exchange && Array.isArray(pageProps.exchange)) {
-              currentItem = pageProps.exchange.find(exchange => 
-                exchange.slug && (currentPath.includes(exchange.slug) || currentPath.endsWith(exchange.slug))
-              );
-              if (currentItem) {
-                contentType = "exchanges";
-              }
-            }
-            
-            if (!currentItem && pageProps?.ogs && Array.isArray(pageProps.ogs)) {
-              currentItem = pageProps.ogs.find(og => 
-                og.slug && (currentPath.includes(og.slug) || currentPath.endsWith(og.slug))
-              );
-              if (currentItem) {
-                contentType = "crypto-ogs";
-              }
-            }
-            
-            if (!currentItem && pageProps?.og && Array.isArray(pageProps.og)) {
-              currentItem = pageProps.og.find(og => 
-                og.slug && (currentPath.includes(og.slug) || currentPath.endsWith(og.slug))
-              );
-              if (currentItem) {
-                contentType = "crypto-ogs";
-              }
-            }
-            
-            if (currentItem && currentItem.frontmatter) {
-              const frontmatter = currentItem.frontmatter;
-              const baseUrl = window.location.origin;
+            try {
+              const data = JSON.parse(nextDataElement.textContent);
+              const pageProps = data?.props?.pageProps;
+              const result = findContentItem(pageProps, currentPath, preferredType);
               
-              const extractedContent = extractPageContent();
-              
-              let finalContent = extractedContent;
-              if (!finalContent && currentItem.content) {
-                finalContent = currentItem.content;
-              }
-              
-              const metadata = {
-                title: frontmatter.title || "Unknown Title",
-                description: frontmatter.description || "No description available",
-                image: frontmatter.image ? baseUrl + frontmatter.image : "",
-                contentType: contentType || "posts",
-                slug: currentItem.slug,
-                content: finalContent,
-                url: currentUrl
-              };
-              
-              window.ReactNativeWebView.postMessage(JSON.stringify({
-                type: 'METADATA_EXTRACTED',
-                metadata: metadata
-              }));
-            } else {
-              const metaTitle = document.querySelector('meta[property="og:title"]')?.getAttribute('content') ||
-                              document.querySelector('meta[name="title"]')?.getAttribute('content');
-              
-              const metaDescription = document.querySelector('meta[property="og:description"]')?.getAttribute('content') ||
-                                    document.querySelector('meta[name="description"]')?.getAttribute('content');
-              
-              const metaImage = document.querySelector('meta[property="og:image"]')?.getAttribute('content') ||
-                              document.querySelector('meta[name="image"]')?.getAttribute('content');
-              
-              if (metaTitle || metaDescription) {
-                const fallbackMetadata = {
-                  title: metaTitle || "Unknown Title",
-                  description: metaDescription || "No description available",
-                  image: metaImage || "",
-                  contentType: contentType || "unknown",
-                  slug: currentItem?.slug || window.location.pathname.split('/').pop() || "unknown",
-                  content: extractPageContent(),
+              if (result && result.item && result.item.frontmatter) {
+                const { item, type } = result;
+                const frontmatter = item.frontmatter;
+                const baseUrl = window.location.origin;
+                
+                // Smart title selection: prefer frontmatter title, fallback to content title
+                const selectedTitle = frontmatter.title || contentTitle;
+                
+                finalMetadata = {
+                  title: selectedTitle || metaData.title || "Unknown Title",
+                  description: frontmatter.description || metaData.description || "No description available",
+                  image: frontmatter.image ? baseUrl + frontmatter.image : metaData.image || "",
+                  contentType: type,
+                  slug: item.slug,
+                  content: extractedContent || item.content || '',
                   url: currentUrl
                 };
-                
-                window.ReactNativeWebView.postMessage(JSON.stringify({
-                  type: 'METADATA_EXTRACTED',
-                  metadata: fallbackMetadata
-                }));
-              } else {
-                window.ReactNativeWebView.postMessage(JSON.stringify({
-                  type: 'METADATA_EXTRACTED',
-                  metadata: null
-                }));
               }
+            } catch (error) {
+              // Continue to fallback
             }
-          } else {
-            const metaTitle = document.querySelector('meta[property="og:title"]')?.getAttribute('content') ||
-                            document.querySelector('meta[name="title"]')?.getAttribute('content');
+          }
+
+          // Fallback: use extracted content and meta data
+          if (!finalMetadata) {
+            const extractedTitle = contentTitle || metaData.title;
             
-            const metaDescription = document.querySelector('meta[property="og:description"]')?.getAttribute('content') ||
-                                  document.querySelector('meta[name="description"]')?.getAttribute('content');
-            
-            const metaImage = document.querySelector('meta[property="og:image"]')?.getAttribute('content') ||
-                            document.querySelector('meta[name="image"]')?.getAttribute('content');
-            
-            if (metaTitle || metaDescription) {
-              const fallbackMetadata = {
-                title: metaTitle || "Unknown Title",
-                description: metaDescription || "No description available",
-                image: metaImage || "",
-                contentType: "unknown",
+            if (extractedTitle || metaData.description) {
+              finalMetadata = {
+                title: extractedTitle || "Unknown Title",
+                description: metaData.description || "No description available",
+                image: metaData.image || "",
+                contentType: preferredType || "unknown",
                 slug: window.location.pathname.split('/').pop() || "unknown",
-                content: extractPageContent(),
+                content: extractedContent,
                 url: currentUrl
               };
-              
-              window.ReactNativeWebView.postMessage(JSON.stringify({
-                type: 'METADATA_EXTRACTED',
-                metadata: fallbackMetadata
-              }));
-            } else {
-              window.ReactNativeWebView.postMessage(JSON.stringify({
-                type: 'METADATA_EXTRACTED',
-                metadata: null
-              }));
             }
+          }
+
+          // Send result
+          if (finalMetadata) {
+            window.ReactNativeWebView.postMessage(JSON.stringify({
+              type: 'METADATA_EXTRACTED',
+              metadata: finalMetadata
+            }));
+          } else {
+            window.ReactNativeWebView.postMessage(JSON.stringify({
+              type: 'METADATA_EXTRACTED',
+              metadata: null
+            }));
           }
         } catch (error) {
           window.ReactNativeWebView.postMessage(JSON.stringify({
