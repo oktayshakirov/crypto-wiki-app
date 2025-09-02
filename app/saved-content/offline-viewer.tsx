@@ -1,20 +1,61 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import React, { useState, useEffect, useRef } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  AppState,
+} from "react-native";
 import { WebView } from "react-native-webview";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter, useFocusEffect } from "expo-router";
 import { Colors } from "@/constants/Colors";
 import { SavedContentStorage, SavedContent } from "@/utils/savedContentStorage";
 import MaterialIcons from "@expo/vector-icons/Fontisto";
+import { useWebView } from "@/contexts/WebViewContext";
+import { handleNetworkError } from "@/utils/networkErrorHandler";
 
 export default function OfflineViewerScreen() {
   const { type, id } = useLocalSearchParams<{ type: string; id: string }>();
   const router = useRouter();
   const [content, setContent] = useState<SavedContent | null>(null);
   const [loading, setLoading] = useState(true);
+  const [webViewKey, setWebViewKey] = useState(0);
+  const webViewRef = useRef<WebView>(null);
+  const { registerWebView, unregisterWebView } = useWebView();
 
   useEffect(() => {
     loadContent();
   }, [type, id]);
+
+  useEffect(() => {
+    if (webViewRef.current) {
+      registerWebView("offline-viewer", webViewRef);
+    }
+    return () => unregisterWebView("offline-viewer");
+  }, [registerWebView, unregisterWebView]);
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (nextAppState) => {
+      if (nextAppState === "active") {
+        setWebViewKey((prev) => prev + 1);
+      }
+    });
+    return () => subscription.remove();
+  }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      return () => {
+        if (webViewRef.current) {
+          try {
+            webViewRef.current.stopLoading();
+          } catch (error) {
+            // Ignore errors during cleanup
+          }
+        }
+      };
+    }, [])
+  );
 
   const loadContent = async () => {
     if (!type || !id) {
@@ -35,6 +76,17 @@ export default function OfflineViewerScreen() {
     }
   };
 
+  const handleBackPress = () => {
+    if (webViewRef.current) {
+      try {
+        webViewRef.current.stopLoading();
+      } catch (error) {
+        // Ignore errors during cleanup
+      }
+    }
+    router.back();
+  };
+
   const renderContentHeader = () => {
     if (!content) return null;
 
@@ -43,7 +95,7 @@ export default function OfflineViewerScreen() {
         <View style={styles.topRow}>
           <TouchableOpacity
             style={styles.backButton}
-            onPress={() => router.back()}
+            onPress={handleBackPress}
             activeOpacity={0.7}
           >
             <MaterialIcons name="arrow-left" size={20} color={Colors.text} />
@@ -139,22 +191,16 @@ export default function OfflineViewerScreen() {
     <View style={styles.container}>
       {content && renderContentHeader()}
       <WebView
-        key={`${type}-${id}`}
+        ref={webViewRef}
+        key={`${type}-${id}-${webViewKey}`}
         source={{ html: htmlContent }}
-        scrollEnabled={true}
-        showsVerticalScrollIndicator={true}
-        showsHorizontalScrollIndicator={false}
-        startInLoadingState={false}
-        scalesPageToFit={false}
-        bounces={true}
+        cacheEnabled={false}
         domStorageEnabled={true}
-        javaScriptEnabled={true}
-        allowFileAccess={true}
-        allowUniversalAccessFromFileURLs={true}
-        allowFileAccessFromFileURLs={true}
-        originWhitelist={["*"]}
         style={styles.webView}
-        nestedScrollEnabled={true}
+        onError={(syntheticEvent) => {
+          const { nativeEvent } = syntheticEvent;
+          handleNetworkError(nativeEvent);
+        }}
       />
     </View>
   );
