@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -84,6 +84,9 @@ function AddCryptoModal({
     { symbol: string; name: string }[]
   >([]);
   const [isLoadingCoins, setIsLoadingCoins] = useState(false);
+
+  const amountInputRef = useRef<TextInput>(null);
+  const purchasePriceInputRef = useRef<TextInput>(null);
 
   const fetchAllAvailableCoins = async () => {
     if (allAvailableCoins.length > 0) return;
@@ -248,6 +251,10 @@ function AddCryptoModal({
                 placeholderTextColor={Colors.icon}
                 autoCapitalize="characters"
                 editable={!editCrypto}
+                returnKeyType="next"
+                onSubmitEditing={() => {
+                  amountInputRef.current?.focus();
+                }}
               />
 
               {showSuggestions && !editCrypto && (
@@ -294,12 +301,17 @@ function AddCryptoModal({
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>Amount *</Text>
             <TextInput
+              ref={amountInputRef}
               style={styles.textInput}
               value={amount}
-              onChangeText={setAmount}
+              onChangeText={(text) => setAmount(text.replace(",", "."))}
               placeholder="0.00"
               placeholderTextColor={Colors.icon}
-              keyboardType="decimal-pad"
+              keyboardType="numeric"
+              returnKeyType="next"
+              onSubmitEditing={() => {
+                purchasePriceInputRef.current?.focus();
+              }}
             />
           </View>
 
@@ -309,12 +321,15 @@ function AddCryptoModal({
               Leave empty to use current market price
             </Text>
             <TextInput
+              ref={purchasePriceInputRef}
               style={styles.textInput}
               value={purchasePrice}
-              onChangeText={setPurchasePrice}
+              onChangeText={(text) => setPurchasePrice(text.replace(",", "."))}
               placeholder="0.00"
               placeholderTextColor={Colors.icon}
-              keyboardType="decimal-pad"
+              keyboardType="numeric"
+              returnKeyType="done"
+              onSubmitEditing={handleSubmit}
             />
           </View>
 
@@ -362,7 +377,7 @@ function CryptoCard({
         <View style={styles.cryptoInfo}>
           <Text style={styles.cryptoSymbol}>{crypto.symbol}</Text>
           <Text style={styles.cryptoAmount}>
-            {crypto.amount.toLocaleString()} {crypto.symbol}
+            {crypto.amount.toFixed(8).replace(/\.?0+$/, "")} {crypto.symbol}
           </Text>
         </View>
         <View style={styles.cryptoActions}>
@@ -383,12 +398,22 @@ function CryptoCard({
         <View style={styles.valueRow}>
           <Text style={styles.valueLabel}>Current Price:</Text>
           <Text style={styles.valueText}>
-            ${crypto.currentPrice.toLocaleString()}
+            $
+            {crypto.currentPrice.toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
           </Text>
         </View>
         <View style={styles.valueRow}>
           <Text style={styles.valueLabel}>Total Value:</Text>
-          <Text style={styles.valueText}>${totalValue.toLocaleString()}</Text>
+          <Text style={styles.valueText}>
+            $
+            {totalValue.toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </Text>
         </View>
         <View style={styles.valueRow}>
           <Text style={styles.valueLabel}>Profit/Loss:</Text>
@@ -398,7 +423,12 @@ function CryptoCard({
               isProfit ? styles.profitText : styles.lossText,
             ]}
           >
-            ${profitLoss.toLocaleString()} ({profitLossPercent.toFixed(2)}%)
+            $
+            {profitLoss.toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}{" "}
+            ({profitLossPercent.toFixed(2)}%)
           </Text>
         </View>
       </View>
@@ -502,7 +532,11 @@ export default function PortfolioScreen() {
                   <View style={styles.summaryRow}>
                     <Text style={styles.summaryLabel}>Total Value</Text>
                     <Text style={styles.summaryValue}>
-                      ${totalValue.toLocaleString()}
+                      $
+                      {totalValue.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                     </Text>
                   </View>
 
@@ -514,8 +548,12 @@ export default function PortfolioScreen() {
                         isProfit ? styles.profitText : styles.lossText,
                       ]}
                     >
-                      ${totalProfitLoss.toLocaleString()} (
-                      {totalProfitLossPercent.toFixed(2)}%)
+                      $
+                      {totalProfitLoss.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}{" "}
+                      ({totalProfitLossPercent.toFixed(2)}%)
                     </Text>
                   </View>
 

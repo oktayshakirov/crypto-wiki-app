@@ -52,8 +52,9 @@ export default function OfflineGuard({
   const isInSavedContent = segments.some(
     (segment) => segment === "saved-content"
   );
+  const isInPortfolio = segments.some((segment) => segment === "portfolio");
   if (isOffline) {
-    if (showOfflineScreen && !isInSavedContent) {
+    if (showOfflineScreen && !isInSavedContent && !isInPortfolio) {
       return (
         <View style={styles.overlayContainer}>
           {children}

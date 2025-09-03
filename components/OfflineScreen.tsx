@@ -34,7 +34,9 @@ export default function OfflineScreen({
 
   return (
     <View style={styles.overlayContainer}>
-      <Header />
+      <View style={styles.headerContainer}>
+        <Header />
+      </View>
 
       <View style={styles.content}>
         <View style={styles.iconContainer}>
@@ -93,16 +95,10 @@ const styles = StyleSheet.create({
     bottom: 0,
     backgroundColor: Colors.background,
     zIndex: 1000,
-    borderTopWidth: 1,
-    borderTopColor: "#333",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    flex: 1,
+  },
+  headerContainer: {
+    zIndex: 1001,
   },
   content: {
     flex: 1,
@@ -110,7 +106,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     maxWidth: 400,
     paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingVertical: 40,
+    alignSelf: "center",
+    width: "100%",
+    marginTop: 60,
   },
   iconContainer: {
     marginBottom: 24,
