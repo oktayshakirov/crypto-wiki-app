@@ -263,13 +263,14 @@ function AddCryptoModal({
                       </Text>
                     </View>
                   ) : (
-                    <FlatList
-                      data={filteredCryptos.slice(0, 8)}
-                      keyExtractor={(item) => item.symbol}
+                    <ScrollView
                       style={styles.suggestionsList}
                       keyboardShouldPersistTaps="handled"
-                      renderItem={({ item }) => (
+                      showsVerticalScrollIndicator={false}
+                    >
+                      {filteredCryptos.slice(0, 8).map((item) => (
                         <TouchableOpacity
+                          key={item.symbol}
                           style={styles.suggestionItem}
                           onPress={() => handleSelectCrypto(item.symbol)}
                         >
@@ -282,8 +283,8 @@ function AddCryptoModal({
                             </Text>
                           </View>
                         </TouchableOpacity>
-                      )}
-                    />
+                      ))}
+                    </ScrollView>
                   )}
                 </View>
               )}
