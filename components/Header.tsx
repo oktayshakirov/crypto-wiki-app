@@ -150,11 +150,10 @@ export default function Header() {
     },
   ];
 
-  // Portfolio badge logic
   const portfolioCount = assets.length;
   const { amount: totalProfitLoss } = getTotalProfitLoss();
   const isPortfolioProfit = totalProfitLoss >= 0;
-  const showPortfolioBadge = portfolioCount > 0;
+  const showPortfolioBadge = true;
 
   return (
     <View style={styles.container}>
@@ -205,7 +204,12 @@ export default function Header() {
               style={[
                 styles.portfolioBadge,
                 {
-                  backgroundColor: isPortfolioProfit ? "#4ade80" : "#f87171",
+                  backgroundColor:
+                    portfolioCount === 0
+                      ? Colors.activeIcon
+                      : isPortfolioProfit
+                      ? "#4ade80"
+                      : "#f87171",
                 },
               ]}
             >
@@ -258,7 +262,7 @@ const styles = StyleSheet.create({
   portfolioBadge: {
     position: "absolute",
     top: 4,
-    right: -5,
+    right: -7,
     minWidth: 18,
     height: 18,
     borderRadius: 9,

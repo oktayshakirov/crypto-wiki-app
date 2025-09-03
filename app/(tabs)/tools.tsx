@@ -9,9 +9,10 @@ import { useGlobalAds } from "@/components/ads/adsManager";
 import { handleNetworkError } from "@/utils/networkErrorHandler";
 import { Pressable } from "react-native";
 import { openBrowserAsync } from "expo-web-browser";
-import { useFocusEffect } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 
 export default function ToolsScreen() {
+  const router = useRouter();
   const { refreshCount } = useRefresh("tools");
   const { showLoaderMin, hideLoaderMin, isContentVisible } = useLoader();
   const { setCurrentUrl: setSavedContentUrl, forceRefreshSavedState } =
@@ -31,6 +32,19 @@ export default function ToolsScreen() {
 `;
 
   const { handleGlobalPress } = useGlobalAds();
+
+  const handleMessage = (event: any) => {
+    try {
+      const data = JSON.parse(event.nativeEvent.data);
+      if (data.type === "NAVIGATE" && data.path === "/portfolio") {
+        router.push("/portfolio");
+      }
+    } catch (error) {
+      if (event.nativeEvent.data === "ad") {
+        handleGlobalPress();
+      }
+    }
+  };
 
   useEffect(() => {
     setCurrentUrl(defaultUrl);
@@ -97,11 +111,7 @@ export default function ToolsScreen() {
             domStorageEnabled
             style={[styles.webview, { opacity: isContentVisible ? 1 : 0 }]}
             injectedJavaScript={injectedJavaScript}
-            onMessage={(event) => {
-              if (event.nativeEvent.data === "ad") {
-                handleGlobalPress();
-              }
-            }}
+            onMessage={handleMessage}
             onLoadStart={() => showLoaderMin()}
             onNavigationStateChange={handleNavigationStateChange}
             onShouldStartLoadWithRequest={handleShouldStartLoadWithRequest}
