@@ -20,6 +20,7 @@ import { LoaderProvider } from "@/contexts/LoaderContext";
 import { SavedContentProvider } from "@/contexts/SavedContentContext";
 import { WebViewNavigationProvider } from "@/contexts/WebViewNavigationContext";
 import { WebViewProvider } from "@/contexts/WebViewContext";
+import { PortfolioProvider } from "@/contexts/PortfolioContext";
 import { getOrRegisterPushToken } from "@/utils/pushToken";
 import { initializeInterstitial } from "@/components/ads/InterstitialAd";
 import { loadAppOpenAd } from "@/components/ads/AppOpenAd";
@@ -81,28 +82,30 @@ export default function RootLayout() {
         <LoaderProvider>
           <RefreshProvider>
             <SavedContentProvider>
-              <WebViewNavigationProvider>
-                <WebViewProvider>
-                  <ThemeProvider value={DefaultTheme}>
-                    <StatusBar
-                      backgroundColor={Colors.background}
-                      style="light"
-                    />
-                    <SafeAreaView
-                      style={styles.safeArea}
-                      edges={["top", "left", "right"]}
-                    >
-                      <BannerAd />
-                      <ConsentDialog
-                        onConsentCompleted={() => setConsentCompleted(true)}
+              <PortfolioProvider>
+                <WebViewNavigationProvider>
+                  <WebViewProvider>
+                    <ThemeProvider value={DefaultTheme}>
+                      <StatusBar
+                        backgroundColor={Colors.background}
+                        style="light"
                       />
-                      <OfflineGuard>
-                        <Slot />
-                      </OfflineGuard>
-                    </SafeAreaView>
-                  </ThemeProvider>
-                </WebViewProvider>
-              </WebViewNavigationProvider>
+                      <SafeAreaView
+                        style={styles.safeArea}
+                        edges={["top", "left", "right"]}
+                      >
+                        <BannerAd />
+                        <ConsentDialog
+                          onConsentCompleted={() => setConsentCompleted(true)}
+                        />
+                        <OfflineGuard>
+                          <Slot />
+                        </OfflineGuard>
+                      </SafeAreaView>
+                    </ThemeProvider>
+                  </WebViewProvider>
+                </WebViewNavigationProvider>
+              </PortfolioProvider>
             </SavedContentProvider>
           </RefreshProvider>
         </LoaderProvider>

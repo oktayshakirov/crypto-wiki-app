@@ -13,6 +13,7 @@ import MaterialIcons from "@expo/vector-icons/Fontisto";
 import { useRefresh } from "@/contexts/RefreshContext";
 import { useSavedContent } from "@/contexts/SavedContentContext";
 import { useWebView } from "@/contexts/WebViewContext";
+import { usePortfolio } from "@/contexts/PortfolioContext";
 import { useSegments, useRouter, useFocusEffect } from "expo-router";
 import { RemoveContentDialog } from "@/components/RemoveContentDialog";
 import HeaderMenu from "@/components/HeaderMenu";
@@ -41,6 +42,7 @@ export default function Header() {
     forceRefreshSavedState,
   } = useSavedContent();
   const { getWebViewRef } = useWebView();
+  const { assets, getTotalProfitLoss } = usePortfolio();
 
   useEffect(() => {
     forceRefreshSavedState();
@@ -148,6 +150,12 @@ export default function Header() {
     },
   ];
 
+  // Portfolio badge logic
+  const portfolioCount = assets.length;
+  const { amount: totalProfitLoss } = getTotalProfitLoss();
+  const isPortfolioProfit = totalProfitLoss >= 0;
+  const showPortfolioBadge = portfolioCount > 0;
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -155,6 +163,8 @@ export default function Header() {
           style={styles.logoContainer}
           onPress={() => {
             if (parentRoute === "saved-content") {
+              router.push("/(tabs)/");
+            } else if (currentRoute === "portfolio") {
               router.push("/(tabs)/");
             } else {
               triggerRefresh();
@@ -183,6 +193,26 @@ export default function Header() {
             />
           </TouchableOpacity>
         )}
+
+        <TouchableOpacity
+          style={styles.portfolioButton}
+          onPress={() => router.push("/portfolio")}
+          activeOpacity={0.7}
+        >
+          <MaterialIcons name="dollar" size={24} color={Colors.text} />
+          {showPortfolioBadge && (
+            <View
+              style={[
+                styles.portfolioBadge,
+                {
+                  backgroundColor: isPortfolioProfit ? "#4ade80" : "#f87171",
+                },
+              ]}
+            >
+              <Text style={styles.portfolioBadgeText}>{portfolioCount}</Text>
+            </View>
+          )}
+        </TouchableOpacity>
 
         <HeaderMenu savedCounts={savedCounts} />
       </View>
@@ -218,5 +248,27 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 8,
     marginRight: 8,
+  },
+  portfolioButton: {
+    padding: 8,
+    borderRadius: 8,
+    marginRight: 8,
+    position: "relative",
+  },
+  portfolioBadge: {
+    position: "absolute",
+    top: 4,
+    right: -5,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 4,
+  },
+  portfolioBadgeText: {
+    color: "#000",
+    fontSize: 12,
+    fontWeight: "bold",
   },
 });
