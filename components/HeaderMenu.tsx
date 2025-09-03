@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
   badgeContainer: {
     position: "absolute",
     top: 4,
-    right: 0,
+    right: -5,
     backgroundColor: Colors.activeIcon,
     borderRadius: 10,
     minWidth: 20,
