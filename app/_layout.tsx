@@ -21,10 +21,15 @@ import { SavedContentProvider } from "@/contexts/SavedContentContext";
 import { WebViewNavigationProvider } from "@/contexts/WebViewNavigationContext";
 import { WebViewProvider } from "@/contexts/WebViewContext";
 import { PortfolioProvider } from "@/contexts/PortfolioContext";
+import {
+  OnboardingProvider,
+  useOnboarding,
+} from "@/contexts/OnboardingContext";
 import { getOrRegisterPushToken } from "@/utils/pushToken";
 import { initializeInterstitial } from "@/components/ads/InterstitialAd";
 import { loadAppOpenAd } from "@/components/ads/AppOpenAd";
 import OfflineGuard from "@/components/OfflineGuard";
+import OnboardingWrapper from "@/components/OnboardingWrapper";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -34,6 +39,19 @@ Notifications.setNotificationHandler({
   }),
 });
 
+function AdInitializer() {
+  const { isOnboardingActive, isLoading } = useOnboarding();
+
+  useEffect(() => {
+    if (!isOnboardingActive && !isLoading) {
+      initializeInterstitial();
+      loadAppOpenAd();
+    }
+  }, [isOnboardingActive, isLoading]);
+
+  return null;
+}
+
 export default function RootLayout() {
   const [expoPushToken, setExpoPushToken] = useState("");
   const [consentCompleted, setConsentCompleted] = useState(false);
@@ -42,8 +60,6 @@ export default function RootLayout() {
 
   useEffect(() => {
     const adapterStatuses = initialize();
-    initializeInterstitial();
-    loadAppOpenAd();
 
     notificationListener.current =
       Notifications.addNotificationReceivedListener(() => {});
@@ -83,28 +99,33 @@ export default function RootLayout() {
           <RefreshProvider>
             <SavedContentProvider>
               <PortfolioProvider>
-                <WebViewNavigationProvider>
-                  <WebViewProvider>
-                    <ThemeProvider value={DefaultTheme}>
-                      <StatusBar
-                        backgroundColor={Colors.background}
-                        style="light"
-                      />
-                      <SafeAreaView
-                        style={styles.safeArea}
-                        edges={["top", "left", "right"]}
-                      >
-                        <BannerAd />
-                        <ConsentDialog
-                          onConsentCompleted={() => setConsentCompleted(true)}
+                <OnboardingProvider>
+                  <WebViewNavigationProvider>
+                    <WebViewProvider>
+                      <ThemeProvider value={DefaultTheme}>
+                        <StatusBar
+                          backgroundColor={Colors.background}
+                          style="light"
                         />
-                        <OfflineGuard>
-                          <Slot />
-                        </OfflineGuard>
-                      </SafeAreaView>
-                    </ThemeProvider>
-                  </WebViewProvider>
-                </WebViewNavigationProvider>
+                        <SafeAreaView
+                          style={styles.safeArea}
+                          edges={["top", "left", "right"]}
+                        >
+                          <BannerAd />
+                          <ConsentDialog
+                            onConsentCompleted={() => setConsentCompleted(true)}
+                          />
+                          <AdInitializer />
+                          <OnboardingWrapper>
+                            <OfflineGuard>
+                              <Slot />
+                            </OfflineGuard>
+                          </OnboardingWrapper>
+                        </SafeAreaView>
+                      </ThemeProvider>
+                    </WebViewProvider>
+                  </WebViewNavigationProvider>
+                </OnboardingProvider>
               </PortfolioProvider>
             </SavedContentProvider>
           </RefreshProvider>
