@@ -151,7 +151,7 @@
     },
     "android": {
       "package": "com.shadev.thecryptowiki",
-      "versionCode": 6,
+      "versionCode": 8,
       "config": {
         "googleMobileAdsAppId": "ca-app-pub-5852582960793521~3669031701"
       },

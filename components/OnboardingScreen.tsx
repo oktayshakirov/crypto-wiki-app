@@ -6,8 +6,8 @@ import {
   TouchableOpacity,
   Image,
   Dimensions,
-  SafeAreaView,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Colors } from "@/constants/Colors";
 import MaterialIcons from "@expo/vector-icons/Fontisto";
 import { useOnboarding } from "@/contexts/OnboardingContext";
@@ -60,7 +60,10 @@ export default function OnboardingScreen() {
 
   return (
     <View style={styles.overlay}>
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView
+        style={styles.container}
+        edges={["top", "bottom", "left", "right"]}
+      >
         <View style={styles.content}>
           <View style={styles.header}>
             <View style={styles.logoContainer}>
