@@ -33,7 +33,8 @@ export const registerPushToken = onRequest(async (req, res) => {
     res
       .status(200)
       .json({ message: "Push token registered/updated successfully." });
-  } catch {
+  } catch (error) {
+    console.error("Error registering push token:", error);
     res.status(500).send("Internal Server Error");
   }
 });
@@ -50,6 +51,8 @@ async function sendPushNotification(
     const token = doc.data().token;
     if (Expo.isExpoPushToken(token)) {
       tokenSet.add(token);
+    } else {
+      console.error(`Push token ${token} is not a valid Expo push token`);
     }
   });
 
@@ -62,6 +65,7 @@ async function sendPushNotification(
   }));
 
   if (messages.length === 0) {
+    console.log("No valid push tokens to send notifications to.");
     return;
   }
 
@@ -69,7 +73,10 @@ async function sendPushNotification(
   for (const chunk of chunks) {
     try {
       const ticketChunk = await expo.sendPushNotificationsAsync(chunk);
-    } catch {}
+      console.log("Notification tickets:", ticketChunk);
+    } catch (error) {
+      console.error("Error sending notification chunk:", error);
+    }
   }
 }
 
@@ -84,7 +91,9 @@ export const sendNewPostNotification = onDocumentCreated(
       const body = postTitle;
 
       await sendPushNotification(title, body);
-    } catch {}
+    } catch (error) {
+      console.error("Error in sendNewPostNotification:", error);
+    }
   }
 );
 
@@ -99,7 +108,9 @@ export const sendNewExchangeNotification = onDocumentCreated(
       const body = exchangeTitle;
 
       await sendPushNotification(title, body);
-    } catch {}
+    } catch (error) {
+      console.error("Error in sendNewExchangeNotification:", error);
+    }
   }
 );
 
@@ -114,6 +125,8 @@ export const sendNewOGNotification = onDocumentCreated(
       const body = ogTitle;
 
       await sendPushNotification(title, body);
-    } catch {}
+    } catch (error) {
+      console.error("Error in sendNewOGNotification:", error);
+    }
   }
 );
