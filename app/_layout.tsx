@@ -31,14 +31,6 @@ import { loadAppOpenAd } from "@/components/ads/AppOpenAd";
 import OfflineGuard from "@/components/OfflineGuard";
 import OnboardingWrapper from "@/components/OnboardingWrapper";
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
-});
-
 function AdInitializer() {
   const { isOnboardingActive, isLoading } = useOnboarding();
 
