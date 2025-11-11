@@ -35,9 +35,21 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
-# build
-android
-ios
+# build - exclude build artifacts but keep source files
+android/app/build/
+android/app/release/
+android/build/
+android/.gradle/
+android/.idea/
+android/.kotlin/
+android/local.properties
+ios/build/
+ios/Pods/
+ios/*.xcworkspace/xcuserdata/
+ios/*.xcodeproj/xcuserdata/
+ios/*.xcodeproj/project.xcworkspace/xcuserdata/
+*.keystore
+!android/app/debug.keystore
 
 # vs
 .vscode
