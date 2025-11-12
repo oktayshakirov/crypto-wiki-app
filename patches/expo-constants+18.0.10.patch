@@ -1,0 +1,870 @@
+diff --git a/node_modules/expo-constants/CHANGELOG.md b/node_modules/expo-constants/CHANGELOG.md
+index a4c05f8..9df5b56 100644
+--- a/node_modules/expo-constants/CHANGELOG.md
++++ b/node_modules/expo-constants/CHANGELOG.md
+@@ -10,27 +10,115 @@
+ 
+ ### 💡 Others
+ 
+-## 17.0.8 — 2025-03-11
++## 18.0.10 — 2025-10-21
++
++_This version does not introduce any user-facing changes._
++
++## 18.0.9 — 2025-09-16
++
++_This version does not introduce any user-facing changes._
++
++## 18.0.8 — 2025-09-10
++
++_This version does not introduce any user-facing changes._
++
++## 18.0.7 — 2025-09-02
++
++_This version does not introduce any user-facing changes._
++
++## 18.0.6 — 2025-08-31
++
++_This version does not introduce any user-facing changes._
++
++## 18.0.5 — 2025-08-27
++
++_This version does not introduce any user-facing changes._
++
++## 18.0.4 — 2025-08-25
++
++_This version does not introduce any user-facing changes._
++
++## 18.0.3 — 2025-08-21
++
++_This version does not introduce any user-facing changes._
++
++## 18.0.2 — 2025-08-16
++
++_This version does not introduce any user-facing changes._
++
++## 18.0.1 — 2025-08-15
++
++_This version does not introduce any user-facing changes._
++
++## 18.0.0 — 2025-08-13
+ 
+ ### 🐛 Bug fixes
+ 
+-- [iOS] Fix pod install in older CocoaPods versions ([#35181](https://github.com/expo/expo/pull/35181) by [@gabrieldonadel](https://github.com/gabrieldonadel))
++- Remove invalid import from expo-dev-launcher. ([#37558](https://github.com/expo/expo/pull/37558) by [@douglowder](https://github.com/douglowder))
++- Fix check-packages warning. ([#37570](https://github.com/expo/expo/pull/37570) by [@douglowder](https://github.com/douglowder))
++
++### 💡 Others
+ 
+-## 17.0.7 — 2025-02-19
++- [iOS] forward PROJECT_ROOT env var to app config script ([#38208](https://github.com/expo/expo/pull/38208) by [@gabrieldonadel](https://github.com/gabrieldonadel))
++
++## 17.1.7 - 2025-07-03
+ 
+ _This version does not introduce any user-facing changes._
+ 
+-## 17.0.6 — 2025-02-14
++## 17.1.6 — 2025-05-06
+ 
+ _This version does not introduce any user-facing changes._
+ 
+-## 17.0.5 — 2025-01-27
++## 17.1.5 — 2025-05-01
++
++_This version does not introduce any user-facing changes._
++
++## 17.1.4 — 2025-04-30
++
++_This version does not introduce any user-facing changes._
++
++## 17.1.3 — 2025-04-25
++
++_This version does not introduce any user-facing changes._
++
++## 17.1.2 — 2025-04-14
++
++_This version does not introduce any user-facing changes._
++
++## 17.1.1 — 2025-04-09
++
++_This version does not introduce any user-facing changes._
++
++## 17.1.0 — 2025-04-04
++
++### 🛠 Breaking changes
++
++- Bump minimum macOS version to 11.0. ([#34980](https://github.com/expo/expo/pull/34980) by [@gabrieldonadel](https://github.com/gabrieldonadel))
+ 
+ ### 🐛 Bug fixes
+ 
++- Add missing types to package exports ([#35223](https://github.com/expo/expo/pull/35223) by [@timostroehlein](https://github.com/timostroehlein))
++
++### 💡 Others
++
+ - [android][ios] Updated Gradle build and Podspec files to ensure app.json/app.config.js values are correctly updated during each native build. ([#34228](https://github.com/expo/expo/pull/34228) by [@chrfalch](https://github.com/chrfalch))
++- [Android] Started using expo modules gradle plugin. ([#34176](https://github.com/expo/expo/pull/34176) by [@lukmccall](https://github.com/lukmccall))
++
++## 17.0.8 - 2025-03-11
++
++### 🐛 Bug fixes
++
++- [iOS] Fix pod install in older CocoaPods versions ([#35181](https://github.com/expo/expo/pull/35181) by [@gabrieldonadel](https://github.com/gabrieldonadel))
++
++## 17.0.7 - 2025-02-19
++
++_This version does not introduce any user-facing changes._
++
++## 17.0.6 - 2025-02-14
++
++_This version does not introduce any user-facing changes._
+ 
+-## 17.0.4 — 2025-01-10
++## 17.0.4 - 2025-01-10
+ 
+ _This version does not introduce any user-facing changes._
+ 
+diff --git a/node_modules/expo-constants/android/build.gradle b/node_modules/expo-constants/android/build.gradle
+index 9862f9a..6a6e310 100644
+--- a/node_modules/expo-constants/android/build.gradle
++++ b/node_modules/expo-constants/android/build.gradle
+@@ -1,26 +1,27 @@
+-apply plugin: 'com.android.library'
+-
+-group = 'host.exp.exponent'
+-version = '17.0.8'
++plugins {
++  id 'com.android.library'
++  id 'expo-module-gradle-plugin'
++}
+ 
+ apply from: "../scripts/get-app-config-android.gradle"
+ 
+-def expoModulesCorePlugin = new File(project(":expo-modules-core").projectDir.absolutePath, "ExpoModulesCorePlugin.gradle")
+-apply from: expoModulesCorePlugin
+-applyKotlinExpoModulesCorePlugin()
+-useCoreDependencies()
+-useDefaultAndroidSdkVersions()
+-useExpoPublishing()
++group = 'host.exp.exponent'
++version = '18.0.10'
++
++expoModule {
++  // We can't prebuild the module because we need to apply `get-app-config-android.gradle` script.
++  canBePublished false
++}
+ 
+ android {
+   namespace "expo.modules.constants"
+   defaultConfig {
+     versionCode 33
+-    versionName "17.0.8"
++    versionName "18.0.10"
+   }
+ }
+ 
+ dependencies {
+   api "androidx.annotation:annotation:1.0.0"
+-  implementation "commons-io:commons-io:2.6"
++  api "commons-io:commons-io:2.6"
+ }
+diff --git a/node_modules/expo-constants/android/build/.transforms/2b10a43e07a358cb074a8f3083f07b64/results.bin b/node_modules/expo-constants/android/build/.transforms/2b10a43e07a358cb074a8f3083f07b64/results.bin
+new file mode 100644
+index 0000000..0d259dd
+--- /dev/null
++++ b/node_modules/expo-constants/android/build/.transforms/2b10a43e07a358cb074a8f3083f07b64/results.bin
+@@ -0,0 +1 @@
++o/classes
+diff --git a/node_modules/expo-constants/android/build/.transforms/2b10a43e07a358cb074a8f3083f07b64/transformed/classes/classes_dex/classes.dex b/node_modules/expo-constants/android/build/.transforms/2b10a43e07a358cb074a8f3083f07b64/transformed/classes/classes_dex/classes.dex
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/generated/assets/expo-constants/app.config b/node_modules/expo-constants/android/build/generated/assets/expo-constants/app.config
+new file mode 100644
+index 0000000..3241f8c
+--- /dev/null
++++ b/node_modules/expo-constants/android/build/generated/assets/expo-constants/app.config
+@@ -0,0 +1 @@
++{"name":"Crypto Wiki","slug":"the-crypto-wiki","owner":"oktay.shakirov","projectId":"21761514-c6bd-4a35-9ef1-a85c0f4b6f09","version":"5.3.0","orientation":"portrait","icon":"./assets/images/icon.png","scheme":"TheCrypto.wiki","userInterfaceStyle":"automatic","newArchEnabled":true,"ios":{"supportsTablet":true,"bundleIdentifier":"com.shadev.thecryptowiki","buildNumber":"7","infoPlist":{"ITSAppUsesNonExemptEncryption":false,"SKAdNetworkItems":[{"SKAdNetworkIdentifier":"cstr6suwn9.skadnetwork"},{"SKAdNetworkIdentifier":"4fzdc2evr5.skadnetwork"},{"SKAdNetworkIdentifier":"2fnua5tdw4.skadnetwork"},{"SKAdNetworkIdentifier":"ydx93a7ass.skadnetwork"},{"SKAdNetworkIdentifier":"p78axxw29g.skadnetwork"},{"SKAdNetworkIdentifier":"v72qych5uu.skadnetwork"},{"SKAdNetworkIdentifier":"ludvb6z3bs.skadnetwork"},{"SKAdNetworkIdentifier":"cp8zw746q7.skadnetwork"},{"SKAdNetworkIdentifier":"3sh42y64q3.skadnetwork"},{"SKAdNetworkIdentifier":"c6k4g5qg8m.skadnetwork"},{"SKAdNetworkIdentifier":"s39g8k73mm.skadnetwork"},{"SKAdNetworkIdentifier":"3qy4746246.skadnetwork"},{"SKAdNetworkIdentifier":"hs6bdukanm.skadnetwork"},{"SKAdNetworkIdentifier":"mlmmfzh3r3.skadnetwork"},{"SKAdNetworkIdentifier":"v4nxqhlyqp.skadnetwork"},{"SKAdNetworkIdentifier":"wzmmz9fp6w.skadnetwork"},{"SKAdNetworkIdentifier":"su67r6k2v3.skadnetwork"},{"SKAdNetworkIdentifier":"yclnxrl5pm.skadnetwork"},{"SKAdNetworkIdentifier":"7ug5zh24hu.skadnetwork"},{"SKAdNetworkIdentifier":"gta9lk7p23.skadnetwork"},{"SKAdNetworkIdentifier":"vutu7akeur.skadnetwork"},{"SKAdNetworkIdentifier":"y5ghdn5j9k.skadnetwork"},{"SKAdNetworkIdentifier":"v9wttpbfk9.skadnetwork"},{"SKAdNetworkIdentifier":"n38lu8286q.skadnetwork"},{"SKAdNetworkIdentifier":"47vhws6wlr.skadnetwork"},{"SKAdNetworkIdentifier":"kbd757ywx3.skadnetwork"},{"SKAdNetworkIdentifier":"9t245vhmpl.skadnetwork"},{"SKAdNetworkIdentifier":"a2p9lx4jpn.skadnetwork"},{"SKAdNetworkIdentifier":"22mmun2rn5.skadnetwork"},{"SKAdNetworkIdentifier":"4468km3ulz.skadnetwork"},{"SKAdNetworkIdentifier":"2u9pt9hc89.skadnetwork"},{"SKAdNetworkIdentifier":"8s468mfl3y.skadnetwork"},{"SKAdNetworkIdentifier":"ppxm28t8ap.skadnetwork"},{"SKAdNetworkIdentifier":"uw77j35x4d.skadnetwork"},{"SKAdNetworkIdentifier":"pwa73g5rt2.skadnetwork"},{"SKAdNetworkIdentifier":"578prtvx9j.skadnetwork"},{"SKAdNetworkIdentifier":"4dzt52r2t5.skadnetwork"},{"SKAdNetworkIdentifier":"tl55sbb4fm.skadnetwork"},{"SKAdNetworkIdentifier":"e5fvkxwrpn.skadnetwork"},{"SKAdNetworkIdentifier":"8c4e2ghe7u.skadnetwork"},{"SKAdNetworkIdentifier":"3rd42ekr43.skadnetwork"},{"SKAdNetworkIdentifier":"3qcr597p9d.skadnetwork"}]}},"android":{"package":"com.shadev.thecryptowiki","versionCode":12,"adaptiveIcon":{"foregroundImage":"./assets/images/adaptive-icon.png","backgroundColor":"#000000"},"permissions":["com.google.android.gms.permission.AD_ID"]},"web":{"bundler":"metro","output":"static","favicon":"./assets/images/favicon.png"},"plugins":["expo-router",["expo-splash-screen",{"image":"./assets/images/splash-icon.png","imageWidth":200,"backgroundColor":"#171717"}],"expo-tracking-transparency"],"extra":{"router":{"origin":false},"eas":{"projectId":"21761514-c6bd-4a35-9ef1-a85c0f4b6f09"}},"sdkVersion":"52.0.0","platforms":["ios","android","web"],"androidStatusBar":{"backgroundColor":"#171717"}}
+\ No newline at end of file
+diff --git a/node_modules/expo-constants/android/build/generated/source/buildConfig/debug/expo/modules/constants/BuildConfig.java b/node_modules/expo-constants/android/build/generated/source/buildConfig/debug/expo/modules/constants/BuildConfig.java
+new file mode 100644
+index 0000000..7280ad3
+--- /dev/null
++++ b/node_modules/expo-constants/android/build/generated/source/buildConfig/debug/expo/modules/constants/BuildConfig.java
+@@ -0,0 +1,10 @@
++/**
++ * Automatically generated file. DO NOT MODIFY
++ */
++package expo.modules.constants;
++
++public final class BuildConfig {
++  public static final boolean DEBUG = Boolean.parseBoolean("true");
++  public static final String LIBRARY_PACKAGE_NAME = "expo.modules.constants";
++  public static final String BUILD_TYPE = "debug";
++}
+diff --git a/node_modules/expo-constants/android/build/intermediates/aapt_friendly_merged_manifests/debug/processDebugManifest/aapt/AndroidManifest.xml b/node_modules/expo-constants/android/build/intermediates/aapt_friendly_merged_manifests/debug/processDebugManifest/aapt/AndroidManifest.xml
+new file mode 100644
+index 0000000..5ee6f3f
+--- /dev/null
++++ b/node_modules/expo-constants/android/build/intermediates/aapt_friendly_merged_manifests/debug/processDebugManifest/aapt/AndroidManifest.xml
+@@ -0,0 +1,7 @@
++<?xml version="1.0" encoding="utf-8"?>
++<manifest xmlns:android="http://schemas.android.com/apk/res/android"
++    package="expo.modules.constants" >
++
++    <uses-sdk android:minSdkVersion="24" />
++
++</manifest>
+\ No newline at end of file
+diff --git a/node_modules/expo-constants/android/build/intermediates/aapt_friendly_merged_manifests/debug/processDebugManifest/aapt/output-metadata.json b/node_modules/expo-constants/android/build/intermediates/aapt_friendly_merged_manifests/debug/processDebugManifest/aapt/output-metadata.json
+new file mode 100644
+index 0000000..7f61d77
+--- /dev/null
++++ b/node_modules/expo-constants/android/build/intermediates/aapt_friendly_merged_manifests/debug/processDebugManifest/aapt/output-metadata.json
+@@ -0,0 +1,18 @@
++{
++  "version": 3,
++  "artifactType": {
++    "type": "AAPT_FRIENDLY_MERGED_MANIFESTS",
++    "kind": "Directory"
++  },
++  "applicationId": "expo.modules.constants",
++  "variantName": "debug",
++  "elements": [
++    {
++      "type": "SINGLE",
++      "filters": [],
++      "attributes": [],
++      "outputFile": "AndroidManifest.xml"
++    }
++  ],
++  "elementType": "File"
++}
+\ No newline at end of file
+diff --git a/node_modules/expo-constants/android/build/intermediates/aar_metadata/debug/writeDebugAarMetadata/aar-metadata.properties b/node_modules/expo-constants/android/build/intermediates/aar_metadata/debug/writeDebugAarMetadata/aar-metadata.properties
+new file mode 100644
+index 0000000..1211b1e
+--- /dev/null
++++ b/node_modules/expo-constants/android/build/intermediates/aar_metadata/debug/writeDebugAarMetadata/aar-metadata.properties
+@@ -0,0 +1,6 @@
++aarFormatVersion=1.0
++aarMetadataVersion=1.0
++minCompileSdk=1
++minCompileSdkExtension=0
++minAndroidGradlePluginVersion=1.0.0
++coreLibraryDesugaringEnabled=false
+diff --git a/node_modules/expo-constants/android/build/intermediates/annotation_processor_list/debug/javaPreCompileDebug/annotationProcessors.json b/node_modules/expo-constants/android/build/intermediates/annotation_processor_list/debug/javaPreCompileDebug/annotationProcessors.json
+new file mode 100644
+index 0000000..9e26dfe
+--- /dev/null
++++ b/node_modules/expo-constants/android/build/intermediates/annotation_processor_list/debug/javaPreCompileDebug/annotationProcessors.json
+@@ -0,0 +1 @@
++{}
+\ No newline at end of file
+diff --git a/node_modules/expo-constants/android/build/intermediates/compile_library_classes_jar/debug/bundleLibCompileToJarDebug/classes.jar b/node_modules/expo-constants/android/build/intermediates/compile_library_classes_jar/debug/bundleLibCompileToJarDebug/classes.jar
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/intermediates/compile_r_class_jar/debug/generateDebugRFile/R.jar b/node_modules/expo-constants/android/build/intermediates/compile_r_class_jar/debug/generateDebugRFile/R.jar
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/intermediates/compile_symbol_list/debug/generateDebugRFile/R.txt b/node_modules/expo-constants/android/build/intermediates/compile_symbol_list/debug/generateDebugRFile/R.txt
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties b/node_modules/expo-constants/android/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties
+new file mode 100644
+index 0000000..55452f0
+--- /dev/null
++++ b/node_modules/expo-constants/android/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties
+@@ -0,0 +1 @@
++#Tue Nov 11 23:30:40 CET 2025
+diff --git a/node_modules/expo-constants/android/build/intermediates/incremental/debug/packageDebugResources/merger.xml b/node_modules/expo-constants/android/build/intermediates/incremental/debug/packageDebugResources/merger.xml
+new file mode 100644
+index 0000000..c2d3a03
+--- /dev/null
++++ b/node_modules/expo-constants/android/build/intermediates/incremental/debug/packageDebugResources/merger.xml
+@@ -0,0 +1,2 @@
++<?xml version="1.0" encoding="utf-8"?>
++<merger version="3"><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="main$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/oktayshakirov/Coding/crypto-wiki-app/node_modules/expo-constants/android/src/main/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="main" generated-set="main$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/oktayshakirov/Coding/crypto-wiki-app/node_modules/expo-constants/android/src/main/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="debug$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/oktayshakirov/Coding/crypto-wiki-app/node_modules/expo-constants/android/src/debug/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="debug" generated-set="debug$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/oktayshakirov/Coding/crypto-wiki-app/node_modules/expo-constants/android/src/debug/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="generated$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/oktayshakirov/Coding/crypto-wiki-app/node_modules/expo-constants/android/build/generated/res/resValues/debug"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="generated" generated-set="generated$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/oktayshakirov/Coding/crypto-wiki-app/node_modules/expo-constants/android/build/generated/res/resValues/debug"/></dataSet><mergedItems/></merger>
+\ No newline at end of file
+diff --git a/node_modules/expo-constants/android/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml b/node_modules/expo-constants/android/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml
+new file mode 100644
+index 0000000..019b93c
+--- /dev/null
++++ b/node_modules/expo-constants/android/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml
+@@ -0,0 +1,2 @@
++<?xml version="1.0" encoding="utf-8"?>
++<merger version="3"><dataSet config="main" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/oktayshakirov/Coding/crypto-wiki-app/node_modules/expo-constants/android/src/main/jniLibs"/></dataSet><dataSet config="debug" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/oktayshakirov/Coding/crypto-wiki-app/node_modules/expo-constants/android/src/debug/jniLibs"/></dataSet></merger>
+\ No newline at end of file
+diff --git a/node_modules/expo-constants/android/build/intermediates/incremental/mergeDebugShaders/merger.xml b/node_modules/expo-constants/android/build/intermediates/incremental/mergeDebugShaders/merger.xml
+new file mode 100644
+index 0000000..792c048
+--- /dev/null
++++ b/node_modules/expo-constants/android/build/intermediates/incremental/mergeDebugShaders/merger.xml
+@@ -0,0 +1,2 @@
++<?xml version="1.0" encoding="utf-8"?>
++<merger version="3"><dataSet config="main" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/oktayshakirov/Coding/crypto-wiki-app/node_modules/expo-constants/android/src/main/shaders"/></dataSet><dataSet config="debug" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/oktayshakirov/Coding/crypto-wiki-app/node_modules/expo-constants/android/src/debug/shaders"/></dataSet></merger>
+\ No newline at end of file
+diff --git a/node_modules/expo-constants/android/build/intermediates/incremental/packageDebugAssets/merger.xml b/node_modules/expo-constants/android/build/intermediates/incremental/packageDebugAssets/merger.xml
+new file mode 100644
+index 0000000..4183e07
+--- /dev/null
++++ b/node_modules/expo-constants/android/build/intermediates/incremental/packageDebugAssets/merger.xml
+@@ -0,0 +1,2 @@
++<?xml version="1.0" encoding="utf-8"?>
++<merger version="3"><dataSet config="main" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/oktayshakirov/Coding/crypto-wiki-app/node_modules/expo-constants/android/src/main/assets"/></dataSet><dataSet config="debug" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/oktayshakirov/Coding/crypto-wiki-app/node_modules/expo-constants/android/src/debug/assets"/></dataSet><dataSet config="assets" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/oktayshakirov/Coding/crypto-wiki-app/node_modules/expo-constants/android/build/generated/assets/expo-constants"><file name="app.config" path="/Users/oktayshakirov/Coding/crypto-wiki-app/node_modules/expo-constants/android/build/generated/assets/expo-constants/app.config"/></source></dataSet><dataSet config="generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/oktayshakirov/Coding/crypto-wiki-app/node_modules/expo-constants/android/build/intermediates/shader_assets/debug/compileDebugShaders/out"/></dataSet></merger>
+\ No newline at end of file
+diff --git a/node_modules/expo-constants/android/build/intermediates/java_res/debug/processDebugJavaRes/out/META-INF/expo-constants_debug.kotlin_module b/node_modules/expo-constants/android/build/intermediates/java_res/debug/processDebugJavaRes/out/META-INF/expo-constants_debug.kotlin_module
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/expo/modules/constants/BuildConfig.class b/node_modules/expo-constants/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/expo/modules/constants/BuildConfig.class
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/intermediates/library_assets/debug/packageDebugAssets/out/app.config b/node_modules/expo-constants/android/build/intermediates/library_assets/debug/packageDebugAssets/out/app.config
+new file mode 100644
+index 0000000..3241f8c
+--- /dev/null
++++ b/node_modules/expo-constants/android/build/intermediates/library_assets/debug/packageDebugAssets/out/app.config
+@@ -0,0 +1 @@
++{"name":"Crypto Wiki","slug":"the-crypto-wiki","owner":"oktay.shakirov","projectId":"21761514-c6bd-4a35-9ef1-a85c0f4b6f09","version":"5.3.0","orientation":"portrait","icon":"./assets/images/icon.png","scheme":"TheCrypto.wiki","userInterfaceStyle":"automatic","newArchEnabled":true,"ios":{"supportsTablet":true,"bundleIdentifier":"com.shadev.thecryptowiki","buildNumber":"7","infoPlist":{"ITSAppUsesNonExemptEncryption":false,"SKAdNetworkItems":[{"SKAdNetworkIdentifier":"cstr6suwn9.skadnetwork"},{"SKAdNetworkIdentifier":"4fzdc2evr5.skadnetwork"},{"SKAdNetworkIdentifier":"2fnua5tdw4.skadnetwork"},{"SKAdNetworkIdentifier":"ydx93a7ass.skadnetwork"},{"SKAdNetworkIdentifier":"p78axxw29g.skadnetwork"},{"SKAdNetworkIdentifier":"v72qych5uu.skadnetwork"},{"SKAdNetworkIdentifier":"ludvb6z3bs.skadnetwork"},{"SKAdNetworkIdentifier":"cp8zw746q7.skadnetwork"},{"SKAdNetworkIdentifier":"3sh42y64q3.skadnetwork"},{"SKAdNetworkIdentifier":"c6k4g5qg8m.skadnetwork"},{"SKAdNetworkIdentifier":"s39g8k73mm.skadnetwork"},{"SKAdNetworkIdentifier":"3qy4746246.skadnetwork"},{"SKAdNetworkIdentifier":"hs6bdukanm.skadnetwork"},{"SKAdNetworkIdentifier":"mlmmfzh3r3.skadnetwork"},{"SKAdNetworkIdentifier":"v4nxqhlyqp.skadnetwork"},{"SKAdNetworkIdentifier":"wzmmz9fp6w.skadnetwork"},{"SKAdNetworkIdentifier":"su67r6k2v3.skadnetwork"},{"SKAdNetworkIdentifier":"yclnxrl5pm.skadnetwork"},{"SKAdNetworkIdentifier":"7ug5zh24hu.skadnetwork"},{"SKAdNetworkIdentifier":"gta9lk7p23.skadnetwork"},{"SKAdNetworkIdentifier":"vutu7akeur.skadnetwork"},{"SKAdNetworkIdentifier":"y5ghdn5j9k.skadnetwork"},{"SKAdNetworkIdentifier":"v9wttpbfk9.skadnetwork"},{"SKAdNetworkIdentifier":"n38lu8286q.skadnetwork"},{"SKAdNetworkIdentifier":"47vhws6wlr.skadnetwork"},{"SKAdNetworkIdentifier":"kbd757ywx3.skadnetwork"},{"SKAdNetworkIdentifier":"9t245vhmpl.skadnetwork"},{"SKAdNetworkIdentifier":"a2p9lx4jpn.skadnetwork"},{"SKAdNetworkIdentifier":"22mmun2rn5.skadnetwork"},{"SKAdNetworkIdentifier":"4468km3ulz.skadnetwork"},{"SKAdNetworkIdentifier":"2u9pt9hc89.skadnetwork"},{"SKAdNetworkIdentifier":"8s468mfl3y.skadnetwork"},{"SKAdNetworkIdentifier":"ppxm28t8ap.skadnetwork"},{"SKAdNetworkIdentifier":"uw77j35x4d.skadnetwork"},{"SKAdNetworkIdentifier":"pwa73g5rt2.skadnetwork"},{"SKAdNetworkIdentifier":"578prtvx9j.skadnetwork"},{"SKAdNetworkIdentifier":"4dzt52r2t5.skadnetwork"},{"SKAdNetworkIdentifier":"tl55sbb4fm.skadnetwork"},{"SKAdNetworkIdentifier":"e5fvkxwrpn.skadnetwork"},{"SKAdNetworkIdentifier":"8c4e2ghe7u.skadnetwork"},{"SKAdNetworkIdentifier":"3rd42ekr43.skadnetwork"},{"SKAdNetworkIdentifier":"3qcr597p9d.skadnetwork"}]}},"android":{"package":"com.shadev.thecryptowiki","versionCode":12,"adaptiveIcon":{"foregroundImage":"./assets/images/adaptive-icon.png","backgroundColor":"#000000"},"permissions":["com.google.android.gms.permission.AD_ID"]},"web":{"bundler":"metro","output":"static","favicon":"./assets/images/favicon.png"},"plugins":["expo-router",["expo-splash-screen",{"image":"./assets/images/splash-icon.png","imageWidth":200,"backgroundColor":"#171717"}],"expo-tracking-transparency"],"extra":{"router":{"origin":false},"eas":{"projectId":"21761514-c6bd-4a35-9ef1-a85c0f4b6f09"}},"sdkVersion":"52.0.0","platforms":["ios","android","web"],"androidStatusBar":{"backgroundColor":"#171717"}}
+\ No newline at end of file
+diff --git a/node_modules/expo-constants/android/build/intermediates/local_only_symbol_list/debug/parseDebugLocalResources/R-def.txt b/node_modules/expo-constants/android/build/intermediates/local_only_symbol_list/debug/parseDebugLocalResources/R-def.txt
+new file mode 100644
+index 0000000..78ac5b8
+--- /dev/null
++++ b/node_modules/expo-constants/android/build/intermediates/local_only_symbol_list/debug/parseDebugLocalResources/R-def.txt
+@@ -0,0 +1,2 @@
++R_DEF: Internal format may change without notice
++local
+diff --git a/node_modules/expo-constants/android/build/intermediates/manifest_merge_blame_file/debug/processDebugManifest/manifest-merger-blame-debug-report.txt b/node_modules/expo-constants/android/build/intermediates/manifest_merge_blame_file/debug/processDebugManifest/manifest-merger-blame-debug-report.txt
+new file mode 100644
+index 0000000..29bd3cd
+--- /dev/null
++++ b/node_modules/expo-constants/android/build/intermediates/manifest_merge_blame_file/debug/processDebugManifest/manifest-merger-blame-debug-report.txt
+@@ -0,0 +1,7 @@
++1<?xml version="1.0" encoding="utf-8"?>
++2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
++3    package="expo.modules.constants" >
++4
++5    <uses-sdk android:minSdkVersion="24" />
++6
++7</manifest>
+diff --git a/node_modules/expo-constants/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml b/node_modules/expo-constants/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml
+new file mode 100644
+index 0000000..5ee6f3f
+--- /dev/null
++++ b/node_modules/expo-constants/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml
+@@ -0,0 +1,7 @@
++<?xml version="1.0" encoding="utf-8"?>
++<manifest xmlns:android="http://schemas.android.com/apk/res/android"
++    package="expo.modules.constants" >
++
++    <uses-sdk android:minSdkVersion="24" />
++
++</manifest>
+\ No newline at end of file
+diff --git a/node_modules/expo-constants/android/build/intermediates/navigation_json/debug/extractDeepLinksDebug/navigation.json b/node_modules/expo-constants/android/build/intermediates/navigation_json/debug/extractDeepLinksDebug/navigation.json
+new file mode 100644
+index 0000000..0637a08
+--- /dev/null
++++ b/node_modules/expo-constants/android/build/intermediates/navigation_json/debug/extractDeepLinksDebug/navigation.json
+@@ -0,0 +1 @@
++[]
+\ No newline at end of file
+diff --git a/node_modules/expo-constants/android/build/intermediates/nested_resources_validation_report/debug/generateDebugResources/nestedResourcesValidationReport.txt b/node_modules/expo-constants/android/build/intermediates/nested_resources_validation_report/debug/generateDebugResources/nestedResourcesValidationReport.txt
+new file mode 100644
+index 0000000..08f4ebe
+--- /dev/null
++++ b/node_modules/expo-constants/android/build/intermediates/nested_resources_validation_report/debug/generateDebugResources/nestedResourcesValidationReport.txt
+@@ -0,0 +1 @@
++0 Warning/Error
+\ No newline at end of file
+diff --git a/node_modules/expo-constants/android/build/intermediates/runtime_library_classes_jar/debug/bundleLibRuntimeToJarDebug/classes.jar b/node_modules/expo-constants/android/build/intermediates/runtime_library_classes_jar/debug/bundleLibRuntimeToJarDebug/classes.jar
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/intermediates/symbol_list_with_package_name/debug/generateDebugRFile/package-aware-r.txt b/node_modules/expo-constants/android/build/intermediates/symbol_list_with_package_name/debug/generateDebugRFile/package-aware-r.txt
+new file mode 100644
+index 0000000..010a114
+--- /dev/null
++++ b/node_modules/expo-constants/android/build/intermediates/symbol_list_with_package_name/debug/generateDebugRFile/package-aware-r.txt
+@@ -0,0 +1 @@
++expo.modules.constants
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.keystream b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.keystream
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.keystream.len b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.keystream.len
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.len b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.len
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.values.at b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.values.at
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab_i b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab_i
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab_i.len b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab_i.len
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.keystream b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.keystream
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.keystream.len b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.keystream.len
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.len b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.len
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.values.at b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.values.at
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab_i b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab_i
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab_i.len b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab_i.len
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.keystream b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.keystream
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.keystream.len b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.keystream.len
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.len b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.len
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.values.at b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.values.at
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab_i b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab_i
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab_i.len b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab_i.len
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.keystream b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.keystream
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.keystream.len b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.keystream.len
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.len b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.len
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.values.at b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.values.at
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab_i b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab_i
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab_i.len b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab_i.len
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab.keystream b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab.keystream
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab.keystream.len b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab.keystream.len
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab.len b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab.len
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab.values.at b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab.values.at
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab_i b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab_i
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab_i.len b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab_i.len
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.keystream b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.keystream
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.keystream.len b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.keystream.len
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.len b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.len
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.values.at b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.values.at
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab_i b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab_i
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab_i.len b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab_i.len
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.keystream b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.keystream
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.keystream.len b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.keystream.len
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.len b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.len
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.values.at b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.values.at
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab_i b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab_i
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab_i.len b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab_i.len
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.keystream b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.keystream
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.keystream.len b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.keystream.len
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.len b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.len
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.values.at b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.values.at
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab_i b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab_i
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab_i.len b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab_i.len
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.keystream b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.keystream
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.keystream.len b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.keystream.len
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.len b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.len
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.values.at b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.values.at
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab_i b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab_i
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab_i.len b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab_i.len
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/counters.tab b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/counters.tab
+new file mode 100644
+index 0000000..c393a51
+--- /dev/null
++++ b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/counters.tab
+@@ -0,0 +1,2 @@
++3
++0
+\ No newline at end of file
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.keystream b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.keystream
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.keystream.len b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.keystream.len
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.len b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.len
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.values.at b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.values.at
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab_i b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab_i
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab_i.len b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab_i.len
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.keystream b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.keystream
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.keystream.len b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.keystream.len
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.len b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.len
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.values.at b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.values.at
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab_i b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab_i
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab_i.len b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab_i.len
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream.len b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream.len
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.len b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.len
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.values.at b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.values.at
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab_i b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab_i
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab_i.len b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab_i.len
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/last-build.bin b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/cacheable/last-build.bin
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/classpath-snapshot/shrunk-classpath-snapshot.bin b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/classpath-snapshot/shrunk-classpath-snapshot.bin
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/local-state/build-history.bin b/node_modules/expo-constants/android/build/kotlin/compileDebugKotlin/local-state/build-history.bin
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/outputs/logs/manifest-merger-debug-report.txt b/node_modules/expo-constants/android/build/outputs/logs/manifest-merger-debug-report.txt
+new file mode 100644
+index 0000000..e09e5c3
+--- /dev/null
++++ b/node_modules/expo-constants/android/build/outputs/logs/manifest-merger-debug-report.txt
+@@ -0,0 +1,14 @@
++-- Merging decision tree log ---
++manifest
++ADDED from /Users/oktayshakirov/Coding/crypto-wiki-app/node_modules/expo-constants/android/src/main/AndroidManifest.xml:1:1-3:12
++INJECTED from /Users/oktayshakirov/Coding/crypto-wiki-app/node_modules/expo-constants/android/src/main/AndroidManifest.xml:1:1-3:12
++	package
++		INJECTED from /Users/oktayshakirov/Coding/crypto-wiki-app/node_modules/expo-constants/android/src/main/AndroidManifest.xml
++uses-sdk
++INJECTED from /Users/oktayshakirov/Coding/crypto-wiki-app/node_modules/expo-constants/android/src/main/AndroidManifest.xml reason: use-sdk injection requested
++INJECTED from /Users/oktayshakirov/Coding/crypto-wiki-app/node_modules/expo-constants/android/src/main/AndroidManifest.xml
++INJECTED from /Users/oktayshakirov/Coding/crypto-wiki-app/node_modules/expo-constants/android/src/main/AndroidManifest.xml
++	android:targetSdkVersion
++		INJECTED from /Users/oktayshakirov/Coding/crypto-wiki-app/node_modules/expo-constants/android/src/main/AndroidManifest.xml
++	android:minSdkVersion
++		INJECTED from /Users/oktayshakirov/Coding/crypto-wiki-app/node_modules/expo-constants/android/src/main/AndroidManifest.xml
+diff --git a/node_modules/expo-constants/android/build/tmp/compileDebugJavaWithJavac/previous-compilation-data.bin b/node_modules/expo-constants/android/build/tmp/compileDebugJavaWithJavac/previous-compilation-data.bin
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/tmp/kotlin-classes/debug/META-INF/expo-constants_debug.kotlin_module b/node_modules/expo-constants/android/build/tmp/kotlin-classes/debug/META-INF/expo-constants_debug.kotlin_module
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/tmp/kotlin-classes/debug/expo/modules/constants/ConstantsModule$definition$1$1.class b/node_modules/expo-constants/android/build/tmp/kotlin-classes/debug/expo/modules/constants/ConstantsModule$definition$1$1.class
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/tmp/kotlin-classes/debug/expo/modules/constants/ConstantsModule$definition$lambda$1$$inlined$AsyncFunction$1.class b/node_modules/expo-constants/android/build/tmp/kotlin-classes/debug/expo/modules/constants/ConstantsModule$definition$lambda$1$$inlined$AsyncFunction$1.class
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/tmp/kotlin-classes/debug/expo/modules/constants/ConstantsModule.class b/node_modules/expo-constants/android/build/tmp/kotlin-classes/debug/expo/modules/constants/ConstantsModule.class
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/tmp/kotlin-classes/debug/expo/modules/constants/ConstantsPackage.class b/node_modules/expo-constants/android/build/tmp/kotlin-classes/debug/expo/modules/constants/ConstantsPackage.class
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/tmp/kotlin-classes/debug/expo/modules/constants/ConstantsService$Companion.class b/node_modules/expo-constants/android/build/tmp/kotlin-classes/debug/expo/modules/constants/ConstantsService$Companion.class
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/tmp/kotlin-classes/debug/expo/modules/constants/ConstantsService$ExecutionEnvironment.class b/node_modules/expo-constants/android/build/tmp/kotlin-classes/debug/expo/modules/constants/ConstantsService$ExecutionEnvironment.class
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/tmp/kotlin-classes/debug/expo/modules/constants/ConstantsService.class b/node_modules/expo-constants/android/build/tmp/kotlin-classes/debug/expo/modules/constants/ConstantsService.class
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/android/build/tmp/kotlin-classes/debug/expo/modules/constants/ConstantsServiceKt.class b/node_modules/expo-constants/android/build/tmp/kotlin-classes/debug/expo/modules/constants/ConstantsServiceKt.class
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-constants/build/Constants.d.ts.map b/node_modules/expo-constants/build/Constants.d.ts.map
+index 3fddb54..120ba3b 100644
+--- a/node_modules/expo-constants/build/Constants.d.ts.map
++++ b/node_modules/expo-constants/build/Constants.d.ts.map
+@@ -1 +1 @@
+-{"version":3,"file":"Constants.d.ts","sourceRoot":"","sources":["../src/Constants.ts"],"names":[],"mappings":"AAeA,OAAO,EACL,eAAe,EACf,YAAY,EACZ,SAAS,EACT,oBAAoB,EACpB,WAAW,EACX,eAAe,EACf,gBAAgB,EAChB,kBAAkB,EAClB,WAAW,EACZ,MAAM,mBAAmB,CAAC;AAG3B,OAAO,EACL,eAAe,EACf,YAAY,EACZ,SAAS,EACT,oBAAoB,EACpB,WAAW,EACX,eAAe,EACf,gBAAgB,EAChB,kBAAkB,EAClB,WAAW,GACZ,CAAC;;AA0NF,wBAAsC"}
+\ No newline at end of file
++{"version":3,"file":"Constants.d.ts","sourceRoot":"","sources":["../src/Constants.ts"],"names":[],"mappings":"AAcA,OAAO,EACL,eAAe,EACf,YAAY,EACZ,SAAS,EACT,oBAAoB,EACpB,WAAW,EACX,eAAe,EACf,gBAAgB,EAChB,kBAAkB,EAClB,WAAW,EACZ,MAAM,mBAAmB,CAAC;AAI3B,OAAO,EACL,eAAe,EACf,YAAY,EACZ,SAAS,EACT,oBAAoB,EACpB,WAAW,EACX,eAAe,EACf,gBAAgB,EAChB,kBAAkB,EAClB,WAAW,GACZ,CAAC;wBA0N0B,SAAS;AAArC,wBAAsC"}
+\ No newline at end of file
+diff --git a/node_modules/expo-constants/build/Constants.js.map b/node_modules/expo-constants/build/Constants.js.map
+index d5ab893..0cec04e 100644
+--- a/node_modules/expo-constants/build/Constants.js.map
++++ b/node_modules/expo-constants/build/Constants.js.map
+@@ -1 +1 @@
+-{"version":3,"file":"Constants.js","sourceRoot":"","sources":["../src/Constants.ts"],"names":[],"mappings":"AAUA,OAAO,EAAE,UAAU,EAAE,2BAA2B,EAAE,MAAM,mBAAmB,CAAC;AAG5E,OAAO,EAAE,QAAQ,EAAE,aAAa,EAAE,MAAM,cAAc,CAAC;AAEvD,OAAO,EAEL,YAAY,EAEZ,oBAAoB,EAIpB,kBAAkB,GAEnB,MAAM,mBAAmB,CAAC;AAC3B,OAAO,iBAAiB,MAAM,qBAAqB,CAAC;AAEpD,OAAO,EAEL,YAAY,EAEZ,oBAAoB,EAIpB,kBAAkB,GAEnB,CAAC;AAEF,IAAI,CAAC,iBAAiB,EAAE;IACtB,OAAO,CAAC,IAAI,CACV,wGAAwG,CACzG,CAAC;CACH;AAED,MAAM,WAAW,GAAG,2BAA2B,CAAoB,aAAa,CAAC,CAAC;AAElF,IAAI,kBAAkB,GAA2B,IAAI,CAAC;AACtD,gEAAgE;AAChE,IAAI,WAAW,EAAE;IACf,IAAI,eAAmC,CAAC;IACxC,IAAI,WAAW,CAAC,QAAQ,EAAE;QACxB,eAAe,GAAG,WAAW,CAAC,QAAQ,CAAC;KACxC;SAAM,IAAI,WAAW,CAAC,cAAc,EAAE;QACrC,eAAe,GAAG,IAAI,CAAC,KAAK,CAAC,WAAW,CAAC,cAAc,CAAC,CAAC;KAC1D;IACD,IAAI,eAAe,IAAI,MAAM,CAAC,IAAI,CAAC,eAAe,CAAC,CAAC,MAAM,GAAG,CAAC,EAAE;QAC9D,kBAAkB,GAAG,eAAsB,CAAC;KAC7C;CACF;AAED,gEAAgE;AAChE,IAAI,sBAAsB,GAA+B,IAAI,CAAC;AAC9D,IAAI,aAAa,CAAC,aAAa,EAAE;IAC/B,IAAI,mBAAmB,CAAC;IACxB,IAAI,aAAa,CAAC,aAAa,CAAC,cAAc,EAAE;QAC9C,mBAAmB,GAAG,IAAI,CAAC,KAAK,CAAC,aAAa,CAAC,aAAa,CAAC,cAAc,CAAC,CAAC;KAC9E;IAED,IAAI,mBAAmB,IAAI,MAAM,CAAC,IAAI,CAAC,mBAAmB,CAAC,CAAC,MAAM,GAAG,CAAC,EAAE;QACtE,sBAAsB,GAAG,mBAA0B,CAAC;KACrD;CACF;AAED,4EAA4E;AAC5E,IAAI,YAAY,GAAsB,IAAI,CAAC;AAC3C,IAAI,iBAAiB,IAAI,iBAAiB,CAAC,QAAQ,EAAE;IACnD,MAAM,SAAS,GAAoB,iBAAiB,CAAC,QAAQ,CAAC;IAE9D,yEAAyE;IACzE,IAAI,OAAO,SAAS,KAAK,QAAQ,EAAE;QACjC,YAAY,GAAG,IAAI,CAAC,KAAK,CAAC,SAAS,CAAC,CAAC;KACtC;SAAM;QACL,YAAY,GAAG,SAAgB,CAAC;KACjC;CACF;AAGD,IAAI,WAAW,GAAuB,kBAAkB,IAAI,sBAAsB,IAAI,YAAY,CAAC;AAEnG,MAAM,EAAE,IAAI,EAAE,YAAY,EAAE,GAAG,eAAe,EAAE,GAAG,CAAC,iBAAiB,IAAI,EAAE,CAAQ,CAAC;AAEpF,MAAM,SAAS,GAAc;IAC3B,GAAG,eAAe;IAClB,uCAAuC;IACvC,YAAY,EAAE,YAAY,IAAI,IAAI;CACnC,CAAC;AAEF,MAAM,CAAC,gBAAgB,CAAC,SAAS,EAAE;IACjC;;;;;OAKG;IACH,sBAAsB,EAAE;QACtB,GAAG;YACD,MAAM,aAAa,GAAG,WAAW,CAAC,IAAI,CAAC,CAAC;YACxC,IAAI,CAAC,aAAa,IAAI,CAAC,kBAAkB,CAAC,aAAa,CAAC,EAAE;gBACxD,OAAO,IAAI,CAAC;aACb;YACD,OAAO,aAAa,CAAC;QACvB,CAAC;QACD,UAAU,EAAE,KAAK;KAClB;IACD,uBAAuB,EAAE;QACvB,GAAG;YACD,MAAM,aAAa,GAAG,WAAW,CAAC,IAAI,CAAC,CAAC;YACxC,IAAI,CAAC,aAAa,IAAI,CAAC,qBAAqB,CAAC,aAAa,CAAC,EAAE;gBAC3D,OAAO,IAAI,CAAC;aACb;YACD,OAAO,aAAa,CAAC;QACvB,CAAC;QACD,UAAU,EAAE,KAAK;KAClB;IACD,QAAQ,EAAE;QACR,GAAG;YACD,MAAM,aAAa,GAAG,WAAW,EAAE,CAAC;YACpC,IAAI,CAAC,aAAa,IAAI,CAAC,kBAAkB,CAAC,aAAa,CAAC,EAAE;gBACxD,OAAO,IAAI,CAAC;aACb;YACD,OAAO,aAAa,CAAC;QACvB,CAAC;QACD,UAAU,EAAE,IAAI;KACjB;IACD,SAAS,EAAE;QACT,GAAG;YACD,MAAM,aAAa,GAAG,WAAW,EAAE,CAAC;YACpC,IAAI,CAAC,aAAa,IAAI,CAAC,qBAAqB,CAAC,aAAa,CAAC,EAAE;gBAC3D,OAAO,IAAI,CAAC;aACb;YACD,OAAO,aAAa,CAAC;QACvB,CAAC;QACD,UAAU,EAAE,IAAI;KACjB;IACD,UAAU,EAAE;QACV,GAAG;YAQD,MAAM,aAAa,GAAG,WAAW,CAAC,IAAI,CAAC,CAAC;YACxC,IAAI,CAAC,aAAa,EAAE;gBAClB,OAAO,IAAI,CAAC;aACb;YAED,wFAAwF;YACxF,mFAAmF;YACnF,IAAI,WAAW,IAAI,WAAW,CAAC,gBAAgB,EAAE;gBAC/C,OAAO,YAAY,CAAC;aACrB;YAED,IAAI,qBAAqB,CAAC,aAAa,CAAC,EAAE;gBACxC,OAAO,aAAa,CAAC,KAAK,EAAE,UAAU,IAAI,IAAI,CAAC;aAChD;iBAAM,IAAI,kBAAkB,CAAC,aAAa,CAAC,EAAE;gBAC5C,OAAO,aAAoB,CAAC;aAC7B;YAED,OAAO,IAAI,CAAC;QACd,CAAC;QACD,UAAU,EAAE,IAAI;KACjB;IACD,YAAY,EAAE;QACZ,GAAG;YACD,MAAM,aAAa,GAAG,WAAW,CAAC,IAAI,CAAC,CAAC;YACxC,IAAI,CAAC,aAAa,EAAE;gBAClB,OAAO,IAAI,CAAC;aACb;YAED,IAAI,qBAAqB,CAAC,aAAa,CAAC,EAAE;gBACxC,OAAO,aAAa,CAAC,KAAK,EAAE,MAAM,IAAI,IAAI,CAAC;aAC5C;iBAAM,IAAI,kBAAkB,CAAC,aAAa,CAAC,EAAE;gBAC5C,OAAO,aAAoB,CAAC;aAC7B;YAED,OAAO,IAAI,CAAC;QACd,CAAC;QACD,UAAU,EAAE,IAAI;KACjB;IACD,SAAS,EAAE;QACT,GAAG;YACD,MAAM,aAAa,GAAG,WAAW,CAAC,IAAI,CAAC,CAAC;YACxC,IAAI,CAAC,aAAa,EAAE;gBAClB,OAAO,IAAI,CAAC;aACb;YAED,IAAI,qBAAqB,CAAC,aAAa,CAAC,EAAE;gBACxC,OAAO,aAAa,CAAC,KAAK,EAAE,GAAG,IAAI,IAAI,CAAC;aACzC;iBAAM,IAAI,kBAAkB,CAAC,aAAa,CAAC,EAAE;gBAC5C,OAAO,aAAoB,CAAC;aAC7B;YAED,OAAO,IAAI,CAAC;QACd,CAAC;QACD,UAAU,EAAE,IAAI;KACjB;IACD,kBAAkB,EAAE;QAClB,GAAG;YACD,OAAO,WAAW,CAAC;QACrB,CAAC;QACD,GAAG,CAAC,KAAyB;YAC3B,WAAW,GAAG,KAAK,CAAC;QACtB,CAAC;QACD,UAAU,EAAE,KAAK;KAClB;CACF,CAAC,CAAC;AAEH,SAAS,kBAAkB,CAAC,QAAqB;IAC/C,OAAO,CAAC,qBAAqB,CAAC,QAAQ,CAAC,CAAC;AAC1C,CAAC;AAED,SAAS,qBAAqB,CAAC,QAAqB;IAClD,OAAO,UAAU,IAAI,QAAQ,CAAC;AAChC,CAAC;AAED,SAAS,WAAW,CAAC,eAAe,GAAG,KAAK;IAC1C,IAAI,CAAC,WAAW,EAAE;QAChB,MAAM,mBAAmB,GAAG,WAAW,KAAK,IAAI,CAAC,CAAC,CAAC,MAAM,CAAC,CAAC,CAAC,WAAW,CAAC;QACxE,IACE,eAAe,CAAC,oBAAoB,KAAK,oBAAoB,CAAC,IAAI;YAClE,QAAQ,CAAC,EAAE,KAAK,KAAK,EACrB;YACA,IAAI,CAAC,eAAe,EAAE;gBACpB,OAAO,CAAC,IAAI,CACV,yBAAyB,mBAAmB,kKAAkK,CAC/M,CAAC;aACH;SACF;aAAM,IACL,eAAe,CAAC,oBAAoB,KAAK,oBAAoB,CAAC,WAAW;YACzE,eAAe,CAAC,oBAAoB,KAAK,oBAAoB,CAAC,UAAU,EACxE;YACA,sEAAsE;YACtE,mEAAmE;YACnE,MAAM,IAAI,UAAU,CAClB,oCAAoC,EACpC,yBAAyB,mBAAmB,sBAAsB,CACnE,CAAC;SACH;KACF;IACD,OAAO,WAAW,CAAC;AACrB,CAAC;AAED,eAAe,SAAsB,CAAC","sourcesContent":["import type { ExpoConfig } from 'expo/config';\n// @ts-ignore -- optional interface, will gracefully degrade to `any` if not installed\nimport type { Manifest as DevLauncherManifest } from 'expo-dev-launcher';\nimport type {\n  EmbeddedManifest,\n  EASConfig,\n  ExpoGoConfig,\n  ExpoUpdatesManifest,\n  // @ts-ignore -- optional interface, will gracefully degrade to `any` if not installed\n} from 'expo-manifests';\nimport { CodedError, requireOptionalNativeModule } from 'expo-modules-core';\n// @ts-ignore -- optional interface, will gracefully degrade to `any` if not installed\nimport type { Manifest as UpdatesManifest, ExpoUpdatesModule } from 'expo-updates';\nimport { Platform, NativeModules } from 'react-native';\n\nimport {\n  AndroidManifest,\n  AppOwnership,\n  Constants,\n  ExecutionEnvironment,\n  IOSManifest,\n  NativeConstants,\n  PlatformManifest,\n  UserInterfaceIdiom,\n  WebManifest,\n} from './Constants.types';\nimport ExponentConstants from './ExponentConstants';\n\nexport {\n  AndroidManifest,\n  AppOwnership,\n  Constants,\n  ExecutionEnvironment,\n  IOSManifest,\n  NativeConstants,\n  PlatformManifest,\n  UserInterfaceIdiom,\n  WebManifest,\n};\n\nif (!ExponentConstants) {\n  console.warn(\n    \"No native ExponentConstants module found, are you sure the expo-constants's module is linked properly?\"\n  );\n}\n\nconst ExpoUpdates = requireOptionalNativeModule<ExpoUpdatesModule>('ExpoUpdates');\n\nlet rawUpdatesManifest: UpdatesManifest | null = null;\n// If expo-updates defines a non-empty manifest, prefer that one\nif (ExpoUpdates) {\n  let updatesManifest: object | undefined;\n  if (ExpoUpdates.manifest) {\n    updatesManifest = ExpoUpdates.manifest;\n  } else if (ExpoUpdates.manifestString) {\n    updatesManifest = JSON.parse(ExpoUpdates.manifestString);\n  }\n  if (updatesManifest && Object.keys(updatesManifest).length > 0) {\n    rawUpdatesManifest = updatesManifest as any;\n  }\n}\n\n// If dev-launcher defines a non-empty manifest, prefer that one\nlet rawDevLauncherManifest: DevLauncherManifest | null = null;\nif (NativeModules.EXDevLauncher) {\n  let devLauncherManifest;\n  if (NativeModules.EXDevLauncher.manifestString) {\n    devLauncherManifest = JSON.parse(NativeModules.EXDevLauncher.manifestString);\n  }\n\n  if (devLauncherManifest && Object.keys(devLauncherManifest).length > 0) {\n    rawDevLauncherManifest = devLauncherManifest as any;\n  }\n}\n\n// Fall back to ExponentConstants.manifest if we don't have one from Updates\nlet rawAppConfig: ExpoConfig | null = null;\nif (ExponentConstants && ExponentConstants.manifest) {\n  const appConfig: object | string = ExponentConstants.manifest;\n\n  // On Android we pass the manifest in JSON form so this step is necessary\n  if (typeof appConfig === 'string') {\n    rawAppConfig = JSON.parse(appConfig);\n  } else {\n    rawAppConfig = appConfig as any;\n  }\n}\n\ntype RawManifest = UpdatesManifest | DevLauncherManifest | ExpoConfig;\nlet rawManifest: RawManifest | null = rawUpdatesManifest ?? rawDevLauncherManifest ?? rawAppConfig;\n\nconst { name, appOwnership, ...nativeConstants } = (ExponentConstants || {}) as any;\n\nconst constants: Constants = {\n  ...nativeConstants,\n  // Ensure this is null in bare workflow\n  appOwnership: appOwnership ?? null,\n};\n\nObject.defineProperties(constants, {\n  /**\n   * Use `manifest` property by default.\n   * This property is only used for internal purposes.\n   * It behaves similarly to the original one, but suppresses warning upon no manifest available.\n   * `expo-asset` uses it to prevent users from seeing mentioned warning.\n   */\n  __unsafeNoWarnManifest: {\n    get(): EmbeddedManifest | null {\n      const maybeManifest = getManifest(true);\n      if (!maybeManifest || !isEmbeddedManifest(maybeManifest)) {\n        return null;\n      }\n      return maybeManifest;\n    },\n    enumerable: false,\n  },\n  __unsafeNoWarnManifest2: {\n    get(): ExpoUpdatesManifest | null {\n      const maybeManifest = getManifest(true);\n      if (!maybeManifest || !isExpoUpdatesManifest(maybeManifest)) {\n        return null;\n      }\n      return maybeManifest;\n    },\n    enumerable: false,\n  },\n  manifest: {\n    get(): EmbeddedManifest | null {\n      const maybeManifest = getManifest();\n      if (!maybeManifest || !isEmbeddedManifest(maybeManifest)) {\n        return null;\n      }\n      return maybeManifest;\n    },\n    enumerable: true,\n  },\n  manifest2: {\n    get(): ExpoUpdatesManifest | null {\n      const maybeManifest = getManifest();\n      if (!maybeManifest || !isExpoUpdatesManifest(maybeManifest)) {\n        return null;\n      }\n      return maybeManifest;\n    },\n    enumerable: true,\n  },\n  expoConfig: {\n    get():\n      | (ExpoConfig & {\n          /**\n           * Only present during development using @expo/cli.\n           */\n          hostUri?: string;\n        })\n      | null {\n      const maybeManifest = getManifest(true);\n      if (!maybeManifest) {\n        return null;\n      }\n\n      // if running an embedded update, maybeManifest is a EmbeddedManifest which doesn't have\n      // the expo config. Instead, the embedded expo-constants app.config should be used.\n      if (ExpoUpdates && ExpoUpdates.isEmbeddedLaunch) {\n        return rawAppConfig;\n      }\n\n      if (isExpoUpdatesManifest(maybeManifest)) {\n        return maybeManifest.extra?.expoClient ?? null;\n      } else if (isEmbeddedManifest(maybeManifest)) {\n        return maybeManifest as any;\n      }\n\n      return null;\n    },\n    enumerable: true,\n  },\n  expoGoConfig: {\n    get(): ExpoGoConfig | null {\n      const maybeManifest = getManifest(true);\n      if (!maybeManifest) {\n        return null;\n      }\n\n      if (isExpoUpdatesManifest(maybeManifest)) {\n        return maybeManifest.extra?.expoGo ?? null;\n      } else if (isEmbeddedManifest(maybeManifest)) {\n        return maybeManifest as any;\n      }\n\n      return null;\n    },\n    enumerable: true,\n  },\n  easConfig: {\n    get(): EASConfig | null {\n      const maybeManifest = getManifest(true);\n      if (!maybeManifest) {\n        return null;\n      }\n\n      if (isExpoUpdatesManifest(maybeManifest)) {\n        return maybeManifest.extra?.eas ?? null;\n      } else if (isEmbeddedManifest(maybeManifest)) {\n        return maybeManifest as any;\n      }\n\n      return null;\n    },\n    enumerable: true,\n  },\n  __rawManifest_TEST: {\n    get(): RawManifest | null {\n      return rawManifest;\n    },\n    set(value: RawManifest | null) {\n      rawManifest = value;\n    },\n    enumerable: false,\n  },\n});\n\nfunction isEmbeddedManifest(manifest: RawManifest): manifest is EmbeddedManifest {\n  return !isExpoUpdatesManifest(manifest);\n}\n\nfunction isExpoUpdatesManifest(manifest: RawManifest): manifest is ExpoUpdatesManifest {\n  return 'metadata' in manifest;\n}\n\nfunction getManifest(suppressWarning = false): RawManifest | null {\n  if (!rawManifest) {\n    const invalidManifestType = rawManifest === null ? 'null' : 'undefined';\n    if (\n      nativeConstants.executionEnvironment === ExecutionEnvironment.Bare &&\n      Platform.OS !== 'web'\n    ) {\n      if (!suppressWarning) {\n        console.warn(\n          `Constants.manifest is ${invalidManifestType} because the embedded app.config could not be read. Ensure that you have installed the expo-constants build scripts if you need to read from Constants.manifest.`\n        );\n      }\n    } else if (\n      nativeConstants.executionEnvironment === ExecutionEnvironment.StoreClient ||\n      nativeConstants.executionEnvironment === ExecutionEnvironment.Standalone\n    ) {\n      // If we somehow get here, this is a truly exceptional state to be in.\n      // Constants.manifest should *always* be defined in those contexts.\n      throw new CodedError(\n        'ERR_CONSTANTS_MANIFEST_UNAVAILABLE',\n        `Constants.manifest is ${invalidManifestType}, must be an object.`\n      );\n    }\n  }\n  return rawManifest;\n}\n\nexport default constants as Constants;\n"]}
+\ No newline at end of file
++{"version":3,"file":"Constants.js","sourceRoot":"","sources":["../src/Constants.ts"],"names":[],"mappings":"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","sourcesContent":["import type { ExpoConfig } from 'expo/config';\n// @ts-ignore -- optional interface, will gracefully degrade to `any` if not installed\nimport type {\n  EmbeddedManifest,\n  EASConfig,\n  ExpoGoConfig,\n  ExpoUpdatesManifest,\n  // @ts-ignore -- optional interface, will gracefully degrade to `any` if not installed\n} from 'expo-manifests';\nimport { CodedError, requireOptionalNativeModule } from 'expo-modules-core';\n// @ts-ignore -- optional interface, will gracefully degrade to `any` if not installed\nimport type { Manifest as UpdatesManifest, ExpoUpdatesModule } from 'expo-updates';\nimport { Platform, NativeModules } from 'react-native';\n\nimport {\n  AndroidManifest,\n  AppOwnership,\n  Constants,\n  ExecutionEnvironment,\n  IOSManifest,\n  NativeConstants,\n  PlatformManifest,\n  UserInterfaceIdiom,\n  WebManifest,\n} from './Constants.types';\nimport ExponentConstants from './ExponentConstants';\ntype DevLauncherManifest = ExpoUpdatesManifest;\n\nexport {\n  AndroidManifest,\n  AppOwnership,\n  Constants,\n  ExecutionEnvironment,\n  IOSManifest,\n  NativeConstants,\n  PlatformManifest,\n  UserInterfaceIdiom,\n  WebManifest,\n};\n\nif (!ExponentConstants) {\n  console.warn(\n    \"No native ExponentConstants module found, are you sure the expo-constants's module is linked properly?\"\n  );\n}\n\nconst ExpoUpdates = requireOptionalNativeModule<ExpoUpdatesModule>('ExpoUpdates');\n\nlet rawUpdatesManifest: UpdatesManifest | null = null;\n// If expo-updates defines a non-empty manifest, prefer that one\nif (ExpoUpdates) {\n  let updatesManifest: object | undefined;\n  if (ExpoUpdates.manifest) {\n    updatesManifest = ExpoUpdates.manifest;\n  } else if (ExpoUpdates.manifestString) {\n    updatesManifest = JSON.parse(ExpoUpdates.manifestString);\n  }\n  if (updatesManifest && Object.keys(updatesManifest).length > 0) {\n    rawUpdatesManifest = updatesManifest as any;\n  }\n}\n\n// If dev-launcher defines a non-empty manifest, prefer that one\nlet rawDevLauncherManifest: DevLauncherManifest | null = null;\nif (NativeModules.EXDevLauncher) {\n  let devLauncherManifest;\n  if (NativeModules.EXDevLauncher.manifestString) {\n    devLauncherManifest = JSON.parse(NativeModules.EXDevLauncher.manifestString);\n  }\n\n  if (devLauncherManifest && Object.keys(devLauncherManifest).length > 0) {\n    rawDevLauncherManifest = devLauncherManifest as any;\n  }\n}\n\n// Fall back to ExponentConstants.manifest if we don't have one from Updates\nlet rawAppConfig: ExpoConfig | null = null;\nif (ExponentConstants && ExponentConstants.manifest) {\n  const appConfig: object | string = ExponentConstants.manifest;\n\n  // On Android we pass the manifest in JSON form so this step is necessary\n  if (typeof appConfig === 'string') {\n    rawAppConfig = JSON.parse(appConfig);\n  } else {\n    rawAppConfig = appConfig as any;\n  }\n}\n\ntype RawManifest = UpdatesManifest | DevLauncherManifest | ExpoConfig;\nlet rawManifest: RawManifest | null = rawUpdatesManifest ?? rawDevLauncherManifest ?? rawAppConfig;\n\nconst { name, appOwnership, ...nativeConstants } = (ExponentConstants || {}) as any;\n\nconst constants: Constants = {\n  ...nativeConstants,\n  // Ensure this is null in bare workflow\n  appOwnership: appOwnership ?? null,\n};\n\nObject.defineProperties(constants, {\n  /**\n   * Use `manifest` property by default.\n   * This property is only used for internal purposes.\n   * It behaves similarly to the original one, but suppresses warning upon no manifest available.\n   * `expo-asset` uses it to prevent users from seeing mentioned warning.\n   */\n  __unsafeNoWarnManifest: {\n    get(): EmbeddedManifest | null {\n      const maybeManifest = getManifest(true);\n      if (!maybeManifest || !isEmbeddedManifest(maybeManifest)) {\n        return null;\n      }\n      return maybeManifest;\n    },\n    enumerable: false,\n  },\n  __unsafeNoWarnManifest2: {\n    get(): ExpoUpdatesManifest | null {\n      const maybeManifest = getManifest(true);\n      if (!maybeManifest || !isExpoUpdatesManifest(maybeManifest)) {\n        return null;\n      }\n      return maybeManifest;\n    },\n    enumerable: false,\n  },\n  manifest: {\n    get(): EmbeddedManifest | null {\n      const maybeManifest = getManifest();\n      if (!maybeManifest || !isEmbeddedManifest(maybeManifest)) {\n        return null;\n      }\n      return maybeManifest;\n    },\n    enumerable: true,\n  },\n  manifest2: {\n    get(): ExpoUpdatesManifest | null {\n      const maybeManifest = getManifest();\n      if (!maybeManifest || !isExpoUpdatesManifest(maybeManifest)) {\n        return null;\n      }\n      return maybeManifest;\n    },\n    enumerable: true,\n  },\n  expoConfig: {\n    get():\n      | (ExpoConfig & {\n          /**\n           * Only present during development using @expo/cli.\n           */\n          hostUri?: string;\n        })\n      | null {\n      const maybeManifest = getManifest(true);\n      if (!maybeManifest) {\n        return null;\n      }\n\n      // if running an embedded update, maybeManifest is a EmbeddedManifest which doesn't have\n      // the expo config. Instead, the embedded expo-constants app.config should be used.\n      if (ExpoUpdates && ExpoUpdates.isEmbeddedLaunch) {\n        return rawAppConfig;\n      }\n\n      if (isExpoUpdatesManifest(maybeManifest)) {\n        return maybeManifest.extra?.expoClient ?? null;\n      } else if (isEmbeddedManifest(maybeManifest)) {\n        return maybeManifest as any;\n      }\n\n      return null;\n    },\n    enumerable: true,\n  },\n  expoGoConfig: {\n    get(): ExpoGoConfig | null {\n      const maybeManifest = getManifest(true);\n      if (!maybeManifest) {\n        return null;\n      }\n\n      if (isExpoUpdatesManifest(maybeManifest)) {\n        return maybeManifest.extra?.expoGo ?? null;\n      } else if (isEmbeddedManifest(maybeManifest)) {\n        return maybeManifest as any;\n      }\n\n      return null;\n    },\n    enumerable: true,\n  },\n  easConfig: {\n    get(): EASConfig | null {\n      const maybeManifest = getManifest(true);\n      if (!maybeManifest) {\n        return null;\n      }\n\n      if (isExpoUpdatesManifest(maybeManifest)) {\n        return maybeManifest.extra?.eas ?? null;\n      } else if (isEmbeddedManifest(maybeManifest)) {\n        return maybeManifest as any;\n      }\n\n      return null;\n    },\n    enumerable: true,\n  },\n  __rawManifest_TEST: {\n    get(): RawManifest | null {\n      return rawManifest;\n    },\n    set(value: RawManifest | null) {\n      rawManifest = value;\n    },\n    enumerable: false,\n  },\n});\n\nfunction isEmbeddedManifest(manifest: RawManifest): manifest is EmbeddedManifest {\n  return !isExpoUpdatesManifest(manifest);\n}\n\nfunction isExpoUpdatesManifest(manifest: RawManifest): manifest is ExpoUpdatesManifest {\n  return 'metadata' in manifest;\n}\n\nfunction getManifest(suppressWarning = false): RawManifest | null {\n  if (!rawManifest) {\n    const invalidManifestType = rawManifest === null ? 'null' : 'undefined';\n    if (\n      nativeConstants.executionEnvironment === ExecutionEnvironment.Bare &&\n      Platform.OS !== 'web'\n    ) {\n      if (!suppressWarning) {\n        console.warn(\n          `Constants.manifest is ${invalidManifestType} because the embedded app.config could not be read. Ensure that you have installed the expo-constants build scripts if you need to read from Constants.manifest.`\n        );\n      }\n    } else if (\n      nativeConstants.executionEnvironment === ExecutionEnvironment.StoreClient ||\n      nativeConstants.executionEnvironment === ExecutionEnvironment.Standalone\n    ) {\n      // If we somehow get here, this is a truly exceptional state to be in.\n      // Constants.manifest should *always* be defined in those contexts.\n      throw new CodedError(\n        'ERR_CONSTANTS_MANIFEST_UNAVAILABLE',\n        `Constants.manifest is ${invalidManifestType}, must be an object.`\n      );\n    }\n  }\n  return rawManifest;\n}\n\nexport default constants as Constants;\n"]}
+\ No newline at end of file
+diff --git a/node_modules/expo-constants/build/Constants.server.d.ts.map b/node_modules/expo-constants/build/Constants.server.d.ts.map
+index 80d5b25..842fac9 100644
+--- a/node_modules/expo-constants/build/Constants.server.d.ts.map
++++ b/node_modules/expo-constants/build/Constants.server.d.ts.map
+@@ -1 +1 @@
+-{"version":3,"file":"Constants.server.d.ts","sourceRoot":"","sources":["../src/Constants.server.ts"],"names":[],"mappings":"AAKA,OAAO,EACL,eAAe,EACf,YAAY,EACZ,SAAS,EACT,oBAAoB,EACpB,WAAW,EACX,eAAe,EACf,gBAAgB,EAChB,kBAAkB,EAClB,WAAW,EACZ,MAAM,mBAAmB,CAAC;AAG3B,OAAO,EACL,eAAe,EACf,YAAY,EACZ,SAAS,EACT,oBAAoB,EACpB,WAAW,EACX,eAAe,EACf,gBAAgB,EAChB,kBAAkB,EAClB,WAAW,GACZ,CAAC;;AA2DF,wBAAsC"}
+\ No newline at end of file
++{"version":3,"file":"Constants.server.d.ts","sourceRoot":"","sources":["../src/Constants.server.ts"],"names":[],"mappings":"AASA,OAAO,EACL,eAAe,EACf,YAAY,EACZ,SAAS,EACT,oBAAoB,EACpB,WAAW,EACX,eAAe,EACf,gBAAgB,EAChB,kBAAkB,EAClB,WAAW,EACZ,MAAM,mBAAmB,CAAC;AAI3B,OAAO,EACL,eAAe,EACf,YAAY,EACZ,SAAS,EACT,oBAAoB,EACpB,WAAW,EACX,eAAe,EACf,gBAAgB,EAChB,kBAAkB,EAClB,WAAW,GACZ,CAAC;wBA2D0B,SAAS;AAArC,wBAAsC"}
+\ No newline at end of file
+diff --git a/node_modules/expo-constants/build/Constants.server.js.map b/node_modules/expo-constants/build/Constants.server.js.map
+index 64d20dc..26d0350 100644
+--- a/node_modules/expo-constants/build/Constants.server.js.map
++++ b/node_modules/expo-constants/build/Constants.server.js.map
+@@ -1 +1 @@
+-{"version":3,"file":"Constants.server.js","sourceRoot":"","sources":["../src/Constants.server.ts"],"names":[],"mappings":"AAKA,OAAO,EAEL,YAAY,EAEZ,oBAAoB,EAIpB,kBAAkB,GAEnB,MAAM,mBAAmB,CAAC;AAC3B,OAAO,iBAAiB,MAAM,4BAA4B,CAAC;AAE3D,OAAO,EAEL,YAAY,EAEZ,oBAAoB,EAIpB,kBAAkB,GAEnB,CAAC;AAIF,MAAM,eAAe,GAAgB,CAAC,GAAG,EAAE;IACzC,IAAI,OAAO,iBAAiB,EAAE,QAAQ,KAAK,QAAQ,EAAE;QACnD,OAAO,IAAI,CAAC,KAAK,CAAC,iBAAiB,CAAC,QAAQ,CAAC,CAAC;KAC/C;IACD,OAAO,iBAAiB,EAAE,QAAe,CAAC;AAC5C,CAAC,CAAC,EAAE,CAAC;AAEL,MAAM,SAAS,GAAc,iBAAiB,CAAC;AAE/C,MAAM,CAAC,gBAAgB,CAAC,SAAS,EAAE;IACjC;;;;;OAKG;IACH,sBAAsB,EAAE;QACtB,GAAG;YACD,OAAO,eAAsB,CAAC;QAChC,CAAC;QACD,UAAU,EAAE,KAAK;KAClB;IACD,QAAQ,EAAE;QACR,GAAG;YACD,OAAO,eAAsB,CAAC;QAChC,CAAC;QACD,UAAU,EAAE,IAAI;KACjB;IACD,UAAU,EAAE;QACV,GAAG;YAQD,OAAO,eAAsB,CAAC;QAChC,CAAC;QACD,UAAU,EAAE,IAAI;KACjB;IACD,YAAY,EAAE;QACZ,GAAG;YACD,OAAO,eAAsB,CAAC;QAChC,CAAC;QACD,UAAU,EAAE,IAAI;KACjB;IACD,SAAS,EAAE;QACT,GAAG;YACD,OAAO,eAAsB,CAAC;QAChC,CAAC;QACD,UAAU,EAAE,IAAI;KACjB;CACF,CAAC,CAAC;AAEH,eAAe,SAAsB,CAAC","sourcesContent":["import type { ExpoConfig } from 'expo/config';\nimport type { Manifest as DevLauncherManifest } from 'expo-dev-launcher';\nimport type { EmbeddedManifest, EASConfig, ExpoGoConfig } from 'expo-manifests';\nimport type { Manifest as UpdatesManifest } from 'expo-updates';\n\nimport {\n  AndroidManifest,\n  AppOwnership,\n  Constants,\n  ExecutionEnvironment,\n  IOSManifest,\n  NativeConstants,\n  PlatformManifest,\n  UserInterfaceIdiom,\n  WebManifest,\n} from './Constants.types';\nimport ExponentConstants from './ExponentConstants.web.js';\n\nexport {\n  AndroidManifest,\n  AppOwnership,\n  Constants,\n  ExecutionEnvironment,\n  IOSManifest,\n  NativeConstants,\n  PlatformManifest,\n  UserInterfaceIdiom,\n  WebManifest,\n};\n\ntype RawManifest = UpdatesManifest | DevLauncherManifest | ExpoConfig;\n\nconst PARSED_MANIFEST: RawManifest = (() => {\n  if (typeof ExponentConstants?.manifest === 'string') {\n    return JSON.parse(ExponentConstants.manifest);\n  }\n  return ExponentConstants?.manifest as any;\n})();\n\nconst constants: Constants = ExponentConstants;\n\nObject.defineProperties(constants, {\n  /**\n   * Use `manifest` property by default.\n   * This property is only used for internal purposes.\n   * It behaves similarly to the original one, but suppresses warning upon no manifest available.\n   * `expo-asset` uses it to prevent users from seeing mentioned warning.\n   */\n  __unsafeNoWarnManifest: {\n    get(): EmbeddedManifest | null {\n      return PARSED_MANIFEST as any;\n    },\n    enumerable: false,\n  },\n  manifest: {\n    get(): EmbeddedManifest | null {\n      return PARSED_MANIFEST as any;\n    },\n    enumerable: true,\n  },\n  expoConfig: {\n    get():\n      | (ExpoConfig & {\n          /**\n           * Only present during development using @expo/cli.\n           */\n          hostUri?: string;\n        })\n      | null {\n      return PARSED_MANIFEST as any;\n    },\n    enumerable: true,\n  },\n  expoGoConfig: {\n    get(): ExpoGoConfig | null {\n      return PARSED_MANIFEST as any;\n    },\n    enumerable: true,\n  },\n  easConfig: {\n    get(): EASConfig | null {\n      return PARSED_MANIFEST as any;\n    },\n    enumerable: true,\n  },\n});\n\nexport default constants as Constants;\n"]}
+\ No newline at end of file
++{"version":3,"file":"Constants.server.js","sourceRoot":"","sources":["../src/Constants.server.ts"],"names":[],"mappings":"AASA,OAAO,EAEL,YAAY,EAEZ,oBAAoB,EAIpB,kBAAkB,GAEnB,MAAM,mBAAmB,CAAC;AAC3B,OAAO,iBAAiB,MAAM,4BAA4B,CAAC;AAG3D,OAAO,EAEL,YAAY,EAEZ,oBAAoB,EAIpB,kBAAkB,GAEnB,CAAC;AAIF,MAAM,eAAe,GAAgB,CAAC,GAAG,EAAE;IACzC,IAAI,OAAO,iBAAiB,EAAE,QAAQ,KAAK,QAAQ,EAAE,CAAC;QACpD,OAAO,IAAI,CAAC,KAAK,CAAC,iBAAiB,CAAC,QAAQ,CAAC,CAAC;IAChD,CAAC;IACD,OAAO,iBAAiB,EAAE,QAAe,CAAC;AAC5C,CAAC,CAAC,EAAE,CAAC;AAEL,MAAM,SAAS,GAAc,iBAAiB,CAAC;AAE/C,MAAM,CAAC,gBAAgB,CAAC,SAAS,EAAE;IACjC;;;;;OAKG;IACH,sBAAsB,EAAE;QACtB,GAAG;YACD,OAAO,eAAsB,CAAC;QAChC,CAAC;QACD,UAAU,EAAE,KAAK;KAClB;IACD,QAAQ,EAAE;QACR,GAAG;YACD,OAAO,eAAsB,CAAC;QAChC,CAAC;QACD,UAAU,EAAE,IAAI;KACjB;IACD,UAAU,EAAE;QACV,GAAG;YAQD,OAAO,eAAsB,CAAC;QAChC,CAAC;QACD,UAAU,EAAE,IAAI;KACjB;IACD,YAAY,EAAE;QACZ,GAAG;YACD,OAAO,eAAsB,CAAC;QAChC,CAAC;QACD,UAAU,EAAE,IAAI;KACjB;IACD,SAAS,EAAE;QACT,GAAG;YACD,OAAO,eAAsB,CAAC;QAChC,CAAC;QACD,UAAU,EAAE,IAAI;KACjB;CACF,CAAC,CAAC;AAEH,eAAe,SAAsB,CAAC","sourcesContent":["import type { ExpoConfig } from 'expo/config';\nimport type {\n  EmbeddedManifest,\n  EASConfig,\n  ExpoGoConfig,\n  ExpoUpdatesManifest,\n} from 'expo-manifests';\nimport type { Manifest as UpdatesManifest } from 'expo-updates';\n\nimport {\n  AndroidManifest,\n  AppOwnership,\n  Constants,\n  ExecutionEnvironment,\n  IOSManifest,\n  NativeConstants,\n  PlatformManifest,\n  UserInterfaceIdiom,\n  WebManifest,\n} from './Constants.types';\nimport ExponentConstants from './ExponentConstants.web.js';\ntype DevLauncherManifest = ExpoUpdatesManifest;\n\nexport {\n  AndroidManifest,\n  AppOwnership,\n  Constants,\n  ExecutionEnvironment,\n  IOSManifest,\n  NativeConstants,\n  PlatformManifest,\n  UserInterfaceIdiom,\n  WebManifest,\n};\n\ntype RawManifest = UpdatesManifest | DevLauncherManifest | ExpoConfig;\n\nconst PARSED_MANIFEST: RawManifest = (() => {\n  if (typeof ExponentConstants?.manifest === 'string') {\n    return JSON.parse(ExponentConstants.manifest);\n  }\n  return ExponentConstants?.manifest as any;\n})();\n\nconst constants: Constants = ExponentConstants;\n\nObject.defineProperties(constants, {\n  /**\n   * Use `manifest` property by default.\n   * This property is only used for internal purposes.\n   * It behaves similarly to the original one, but suppresses warning upon no manifest available.\n   * `expo-asset` uses it to prevent users from seeing mentioned warning.\n   */\n  __unsafeNoWarnManifest: {\n    get(): EmbeddedManifest | null {\n      return PARSED_MANIFEST as any;\n    },\n    enumerable: false,\n  },\n  manifest: {\n    get(): EmbeddedManifest | null {\n      return PARSED_MANIFEST as any;\n    },\n    enumerable: true,\n  },\n  expoConfig: {\n    get():\n      | (ExpoConfig & {\n          /**\n           * Only present during development using @expo/cli.\n           */\n          hostUri?: string;\n        })\n      | null {\n      return PARSED_MANIFEST as any;\n    },\n    enumerable: true,\n  },\n  expoGoConfig: {\n    get(): ExpoGoConfig | null {\n      return PARSED_MANIFEST as any;\n    },\n    enumerable: true,\n  },\n  easConfig: {\n    get(): EASConfig | null {\n      return PARSED_MANIFEST as any;\n    },\n    enumerable: true,\n  },\n});\n\nexport default constants as Constants;\n"]}
+\ No newline at end of file
+diff --git a/node_modules/expo-constants/build/ExponentConstants.web.d.ts.map b/node_modules/expo-constants/build/ExponentConstants.web.d.ts.map
+index 59765b5..d28fd6e 100644
+--- a/node_modules/expo-constants/build/ExponentConstants.web.d.ts.map
++++ b/node_modules/expo-constants/build/ExponentConstants.web.d.ts.map
+@@ -1 +1 @@
+-{"version":3,"file":"ExponentConstants.web.d.ts","sourceRoot":"","sources":["../src/ExponentConstants.web.ts"],"names":[],"mappings":"AAAA,OAAO,EAAwB,eAAe,EAAe,MAAM,mBAAmB,CAAC;;AAgCvF,wBAsEqB"}
+\ No newline at end of file
++{"version":3,"file":"ExponentConstants.web.d.ts","sourceRoot":"","sources":["../src/ExponentConstants.web.ts"],"names":[],"mappings":"AAAA,OAAO,EAAwB,eAAe,EAAe,MAAM,mBAAmB,CAAC;wBAsGlF,eAAe;AAtEpB,wBAsEqB"}
+\ No newline at end of file
+diff --git a/node_modules/expo-constants/build/ExponentConstants.web.js b/node_modules/expo-constants/build/ExponentConstants.web.js
+index 132bbba..61793c9 100644
+--- a/node_modules/expo-constants/build/ExponentConstants.web.js
++++ b/node_modules/expo-constants/build/ExponentConstants.web.js
+@@ -9,10 +9,10 @@ function getBrowserName() {
+         else if (agent.includes('edg')) {
+             return 'Chromium Edge';
+         }
+-        else if (agent.includes('opr') && !!window['opr']) {
++        else if (agent.includes('opr') && 'opr' in window && !!window['opr']) {
+             return 'Opera';
+         }
+-        else if (agent.includes('chrome') && !!window['chrome']) {
++        else if (agent.includes('chrome') && 'chrome' in window && !!window['chrome']) {
+             return 'Chrome';
+         }
+         else if (agent.includes('trident')) {
+diff --git a/node_modules/expo-constants/build/ExponentConstants.web.js.map b/node_modules/expo-constants/build/ExponentConstants.web.js.map
+index fdae09f..74817b3 100644
+--- a/node_modules/expo-constants/build/ExponentConstants.web.js.map
++++ b/node_modules/expo-constants/build/ExponentConstants.web.js.map
+@@ -1 +1 @@
+-{"version":3,"file":"ExponentConstants.web.js","sourceRoot":"","sources":["../src/ExponentConstants.web.ts"],"names":[],"mappings":"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","sourcesContent":["import { ExecutionEnvironment, NativeConstants, WebManifest } from './Constants.types';\n\ndeclare let __DEV__: boolean;\ndeclare let process: { env: any };\ndeclare let navigator: Navigator;\ndeclare let location: Location;\n\nconst _sessionId = (Date.now() + '-' + Math.floor(Math.random() * 1000000000)).toString();\n\nfunction getBrowserName(): string | undefined {\n  if (typeof navigator !== 'undefined' && typeof navigator.userAgent === 'string') {\n    const agent = navigator.userAgent.toLowerCase();\n    if (agent.includes('edge')) {\n      return 'Edge';\n    } else if (agent.includes('edg')) {\n      return 'Chromium Edge';\n    } else if (agent.includes('opr') && !!window['opr']) {\n      return 'Opera';\n    } else if (agent.includes('chrome') && !!window['chrome']) {\n      return 'Chrome';\n    } else if (agent.includes('trident')) {\n      return 'IE';\n    } else if (agent.includes('firefox')) {\n      return 'Firefox';\n    } else if (agent.includes('safari')) {\n      return 'Safari';\n    }\n  }\n\n  return undefined;\n}\n\nexport default {\n  get appOwnership() {\n    return null;\n  },\n  get executionEnvironment() {\n    return ExecutionEnvironment.Bare;\n  },\n  get sessionId(): string {\n    return _sessionId;\n  },\n  get isHeadless(): boolean {\n    if (typeof navigator === 'undefined') return true;\n\n    return /\\bHeadlessChrome\\//.test(navigator.userAgent);\n  },\n\n  get expoVersion(): string | null {\n    return (this.manifest as any)!.sdkVersion || null;\n  },\n  get linkingUri(): string {\n    if (typeof location !== 'undefined') {\n      // On native this is `exp://`\n      // On web we should use the protocol and hostname (location.origin)\n      return location.origin;\n    } else {\n      return '';\n    }\n  },\n  get expoRuntimeVersion(): string | null {\n    return this.expoVersion;\n  },\n  get deviceName(): string | undefined {\n    return getBrowserName();\n  },\n  get systemFonts(): string[] {\n    // TODO: Bacon: Maybe possible.\n    return [];\n  },\n  get statusBarHeight(): number {\n    return 0;\n  },\n  get deviceYearClass(): number | null {\n    // TODO: Bacon: The android version isn't very accurate either, maybe we could try and guess this value.\n    return null;\n  },\n  get manifest(): WebManifest {\n    // This is defined by @expo/webpack-config or babel-preset-expo.\n    // If your site is bundled with a different config then you may not have access to the app.json automatically.\n    return process.env.APP_MANIFEST || {};\n  },\n  get manifest2(): null {\n    return null;\n  },\n  get experienceUrl(): string {\n    if (typeof location !== 'undefined') {\n      return location.origin;\n    } else {\n      return '';\n    }\n  },\n  get debugMode(): boolean {\n    return __DEV__;\n  },\n  async getWebViewUserAgentAsync(): Promise<string | null> {\n    if (typeof navigator !== 'undefined') {\n      return navigator.userAgent;\n    } else {\n      return null;\n    }\n  },\n} as NativeConstants;\n"]}
+\ No newline at end of file
++{"version":3,"file":"ExponentConstants.web.js","sourceRoot":"","sources":["../src/ExponentConstants.web.ts"],"names":[],"mappings":"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","sourcesContent":["import { ExecutionEnvironment, NativeConstants, WebManifest } from './Constants.types';\n\ndeclare let __DEV__: boolean;\ndeclare let process: { env: any };\ndeclare let navigator: Navigator;\ndeclare let location: Location;\n\nconst _sessionId = (Date.now() + '-' + Math.floor(Math.random() * 1000000000)).toString();\n\nfunction getBrowserName(): string | undefined {\n  if (typeof navigator !== 'undefined' && typeof navigator.userAgent === 'string') {\n    const agent = navigator.userAgent.toLowerCase();\n    if (agent.includes('edge')) {\n      return 'Edge';\n    } else if (agent.includes('edg')) {\n      return 'Chromium Edge';\n    } else if (agent.includes('opr') && 'opr' in window && !!window['opr']) {\n      return 'Opera';\n    } else if (agent.includes('chrome') && 'chrome' in window && !!window['chrome']) {\n      return 'Chrome';\n    } else if (agent.includes('trident')) {\n      return 'IE';\n    } else if (agent.includes('firefox')) {\n      return 'Firefox';\n    } else if (agent.includes('safari')) {\n      return 'Safari';\n    }\n  }\n\n  return undefined;\n}\n\nexport default {\n  get appOwnership() {\n    return null;\n  },\n  get executionEnvironment() {\n    return ExecutionEnvironment.Bare;\n  },\n  get sessionId(): string {\n    return _sessionId;\n  },\n  get isHeadless(): boolean {\n    if (typeof navigator === 'undefined') return true;\n\n    return /\\bHeadlessChrome\\//.test(navigator.userAgent);\n  },\n\n  get expoVersion(): string | null {\n    return (this.manifest as any)!.sdkVersion || null;\n  },\n  get linkingUri(): string {\n    if (typeof location !== 'undefined') {\n      // On native this is `exp://`\n      // On web we should use the protocol and hostname (location.origin)\n      return location.origin;\n    } else {\n      return '';\n    }\n  },\n  get expoRuntimeVersion(): string | null {\n    return this.expoVersion;\n  },\n  get deviceName(): string | undefined {\n    return getBrowserName();\n  },\n  get systemFonts(): string[] {\n    // TODO: Bacon: Maybe possible.\n    return [];\n  },\n  get statusBarHeight(): number {\n    return 0;\n  },\n  get deviceYearClass(): number | null {\n    // TODO: Bacon: The android version isn't very accurate either, maybe we could try and guess this value.\n    return null;\n  },\n  get manifest(): WebManifest {\n    // This is defined by @expo/webpack-config or babel-preset-expo.\n    // If your site is bundled with a different config then you may not have access to the app.json automatically.\n    return process.env.APP_MANIFEST || {};\n  },\n  get manifest2(): null {\n    return null;\n  },\n  get experienceUrl(): string {\n    if (typeof location !== 'undefined') {\n      return location.origin;\n    } else {\n      return '';\n    }\n  },\n  get debugMode(): boolean {\n    return __DEV__;\n  },\n  async getWebViewUserAgentAsync(): Promise<string | null> {\n    if (typeof navigator !== 'undefined') {\n      return navigator.userAgent;\n    } else {\n      return null;\n    }\n  },\n} as NativeConstants;\n"]}
+\ No newline at end of file
+diff --git a/node_modules/expo-constants/ios/EXConstants.podspec b/node_modules/expo-constants/ios/EXConstants.podspec
+index 4b8b2db..fc4608a 100644
+--- a/node_modules/expo-constants/ios/EXConstants.podspec
++++ b/node_modules/expo-constants/ios/EXConstants.podspec
+@@ -12,10 +12,10 @@ Pod::Spec.new do |s|
+   s.homepage       = package['homepage']
+   s.platforms       = {
+     :ios => '15.1',
+-    :osx => '10.15',
++    :osx => '11.0',
+     :tvos => '15.1'
+   }
+-  s.swift_version  = '5.4'
++  s.swift_version  = '5.9'
+   s.source         = { git: 'https://github.com/expo/expo.git' }
+   s.static_framework = true
+ 
+@@ -34,9 +34,10 @@ Pod::Spec.new do |s|
+     s.source_files = "**/*.{h,m,swift}"
+   end
+ 
++  env_vars = ENV['PROJECT_ROOT'] ? "PROJECT_ROOT=#{ENV['PROJECT_ROOT']} " : ""
+   script_phase = {
+     :name => 'Generate app.config for prebuilt Constants.manifest',
+-    :script => 'bash -l -c "$PODS_TARGET_SRCROOT/../scripts/get-app-config-ios.sh"',
++    :script => "bash -l -c \"#{env_vars}$PODS_TARGET_SRCROOT/../scripts/get-app-config-ios.sh\"",
+     :execution_position => :before_compile
+   }
+   # :always_out_of_date is only available in CocoaPods 1.13.0 and later
+diff --git a/node_modules/expo-constants/src/Constants.server.ts b/node_modules/expo-constants/src/Constants.server.ts
+index 7f72078..a88554f 100644
+--- a/node_modules/expo-constants/src/Constants.server.ts
++++ b/node_modules/expo-constants/src/Constants.server.ts
+@@ -1,6 +1,10 @@
+ import type { ExpoConfig } from 'expo/config';
+-import type { Manifest as DevLauncherManifest } from 'expo-dev-launcher';
+-import type { EmbeddedManifest, EASConfig, ExpoGoConfig } from 'expo-manifests';
++import type {
++  EmbeddedManifest,
++  EASConfig,
++  ExpoGoConfig,
++  ExpoUpdatesManifest,
++} from 'expo-manifests';
+ import type { Manifest as UpdatesManifest } from 'expo-updates';
+ 
+ import {
+@@ -15,6 +19,7 @@ import {
+   WebManifest,
+ } from './Constants.types';
+ import ExponentConstants from './ExponentConstants.web.js';
++type DevLauncherManifest = ExpoUpdatesManifest;
+ 
+ export {
+   AndroidManifest,
+diff --git a/node_modules/expo-constants/src/Constants.ts b/node_modules/expo-constants/src/Constants.ts
+index 36350ea..368a35d 100644
+--- a/node_modules/expo-constants/src/Constants.ts
++++ b/node_modules/expo-constants/src/Constants.ts
+@@ -1,6 +1,5 @@
+ import type { ExpoConfig } from 'expo/config';
+ // @ts-ignore -- optional interface, will gracefully degrade to `any` if not installed
+-import type { Manifest as DevLauncherManifest } from 'expo-dev-launcher';
+ import type {
+   EmbeddedManifest,
+   EASConfig,
+@@ -25,6 +24,7 @@ import {
+   WebManifest,
+ } from './Constants.types';
+ import ExponentConstants from './ExponentConstants';
++type DevLauncherManifest = ExpoUpdatesManifest;
+ 
+ export {
+   AndroidManifest,
+diff --git a/node_modules/expo-constants/src/ExponentConstants.web.ts b/node_modules/expo-constants/src/ExponentConstants.web.ts
+index c7c6101..d5695d8 100644
+--- a/node_modules/expo-constants/src/ExponentConstants.web.ts
++++ b/node_modules/expo-constants/src/ExponentConstants.web.ts
+@@ -14,9 +14,9 @@ function getBrowserName(): string | undefined {
+       return 'Edge';
+     } else if (agent.includes('edg')) {
+       return 'Chromium Edge';
+-    } else if (agent.includes('opr') && !!window['opr']) {
++    } else if (agent.includes('opr') && 'opr' in window && !!window['opr']) {
+       return 'Opera';
+-    } else if (agent.includes('chrome') && !!window['chrome']) {
++    } else if (agent.includes('chrome') && 'chrome' in window && !!window['chrome']) {
+       return 'Chrome';
+     } else if (agent.includes('trident')) {
+       return 'IE';
