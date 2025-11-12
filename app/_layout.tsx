@@ -61,12 +61,10 @@ export default function RootLayout() {
 
     return () => {
       if (notificationListener.current) {
-        Notifications.removeNotificationSubscription(
-          notificationListener.current
-        );
+        notificationListener.current.remove();
       }
       if (responseListener.current) {
-        Notifications.removeNotificationSubscription(responseListener.current);
+        responseListener.current.remove();
       }
     };
   }, []);
@@ -83,18 +81,29 @@ export default function RootLayout() {
     }
   }, [consentCompleted]);
 
+  const theme = {
+    ...DefaultTheme,
+    colors: {
+      ...DefaultTheme.colors,
+      background: Colors.background,
+      card: Colors.background,
+      text: Colors.text,
+      primary: Colors.activeIcon,
+    },
+  };
+
   return (
-    <SafeAreaProvider>
-      <View style={styles.appContainer}>
-        {Platform.OS === "ios" && <View style={styles.statusBarBackground} />}
-        <LoaderProvider>
-          <RefreshProvider>
-            <SavedContentProvider>
-              <PortfolioProvider>
-                <OnboardingProvider>
-                  <WebViewNavigationProvider>
-                    <WebViewProvider>
-                      <ThemeProvider value={DefaultTheme}>
+    <ThemeProvider value={theme}>
+      <SafeAreaProvider>
+        <View style={styles.appContainer}>
+          {Platform.OS === "ios" && <View style={styles.statusBarBackground} />}
+          <LoaderProvider>
+            <RefreshProvider>
+              <SavedContentProvider>
+                <PortfolioProvider>
+                  <OnboardingProvider>
+                    <WebViewNavigationProvider>
+                      <WebViewProvider>
                         <StatusBar
                           backgroundColor={Colors.background}
                           style="light"
@@ -114,16 +123,16 @@ export default function RootLayout() {
                             </OfflineGuard>
                           </OnboardingWrapper>
                         </SafeAreaView>
-                      </ThemeProvider>
-                    </WebViewProvider>
-                  </WebViewNavigationProvider>
-                </OnboardingProvider>
-              </PortfolioProvider>
-            </SavedContentProvider>
-          </RefreshProvider>
-        </LoaderProvider>
-      </View>
-    </SafeAreaProvider>
+                      </WebViewProvider>
+                    </WebViewNavigationProvider>
+                  </OnboardingProvider>
+                </PortfolioProvider>
+              </SavedContentProvider>
+            </RefreshProvider>
+          </LoaderProvider>
+        </View>
+      </SafeAreaProvider>
+    </ThemeProvider>
   );
 }
 
