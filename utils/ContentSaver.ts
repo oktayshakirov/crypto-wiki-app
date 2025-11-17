@@ -482,7 +482,7 @@ export class ContentSaver {
         if (localPath) {
           try {
             const base64Data = await FileSystem.readAsStringAsync(localPath, {
-              encoding: FileSystem.EncodingType.Base64,
+              encoding: (FileSystem as any).EncodingType.Base64,
             });
 
             const extension =
@@ -534,7 +534,7 @@ export class ContentSaver {
               const base64Data = await FileSystem.readAsStringAsync(
                 cachedPath,
                 {
-                  encoding: FileSystem.EncodingType.Base64,
+                  encoding: (FileSystem as any).EncodingType.Base64,
                 }
               );
 

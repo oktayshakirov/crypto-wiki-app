@@ -2,7 +2,7 @@ import * as FileSystem from "expo-file-system";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const IMAGE_CACHE_KEY = "@image_cache_mapping";
-const CACHE_DIR = FileSystem.cacheDirectory + "saved_images/";
+const CACHE_DIR = (FileSystem as any).cacheDirectory + "saved_images/";
 
 export class ImageCache {
   static async ensureCacheDirExists(): Promise<void> {
