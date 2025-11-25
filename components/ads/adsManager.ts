@@ -1,12 +1,45 @@
 import { useEffect, useRef } from "react";
 import { AppState } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { showInterstitial } from "./InterstitialAd";
-import { showAppOpenAd } from "./AppOpenAd";
+import {
+  showInterstitial,
+  reloadInterstitial,
+  waitForInterstitialLoad,
+  isInterstitialLoaded,
+} from "./InterstitialAd";
+import {
+  showAppOpenAd,
+  reloadAppOpenAd,
+  waitForAppOpenAdLoad,
+  getAppOpenAdLoaded,
+} from "./AppOpenAd";
 
 const AD_INTERVAL_MS = 60000;
+const LAST_AD_SHOWN_TIME_KEY = "lastAdShownTime";
 
-export function initializeGlobalAds() {}
+async function getLastAdShownTime(): Promise<number> {
+  try {
+    const lastAdShownString = await AsyncStorage.getItem(
+      LAST_AD_SHOWN_TIME_KEY
+    );
+    return lastAdShownString ? parseInt(lastAdShownString, 10) : 0;
+  } catch (error) {
+    console.error("Failed to get last ad shown time:", error);
+    return 0;
+  }
+}
+
+async function setLastAdShownTime(): Promise<void> {
+  try {
+    await AsyncStorage.setItem(LAST_AD_SHOWN_TIME_KEY, Date.now().toString());
+  } catch (error) {
+    console.error("Failed to set last ad shown time:", error);
+  }
+}
+
+function shouldShowAd(lastAdShownTime: number): boolean {
+  return Date.now() - lastAdShownTime > AD_INTERVAL_MS;
+}
 
 export function useGlobalAds() {
   const appState = useRef(AppState.currentState);
@@ -19,19 +52,38 @@ export function useGlobalAds() {
           appState.current.match(/inactive|background/) &&
           nextAppState === "active"
         ) {
-          const lastAdShownString = await AsyncStorage.getItem(
-            "lastAdShownTime"
-          );
-          const lastAdShownTime = lastAdShownString
-            ? parseInt(lastAdShownString, 10)
-            : 0;
-          const now = Date.now();
+          // Reload ads if they're not loaded
+          try {
+            if (!isInterstitialLoaded()) {
+              await reloadInterstitial();
+            } else {
+              await waitForInterstitialLoad();
+            }
+            if (!getAppOpenAdLoaded()) {
+              await reloadAppOpenAd();
+            } else {
+              await waitForAppOpenAdLoad();
+            }
+          } catch (error) {
+            console.error("Failed to reload ads on foreground:", error);
+          }
 
-          if (now - lastAdShownTime > AD_INTERVAL_MS) {
-            try {
-              await showAppOpenAd();
-              await AsyncStorage.setItem("lastAdShownTime", now.toString());
-            } catch {}
+          // Show app open ad if enough time has passed
+          try {
+            const lastAdShownTime = await getLastAdShownTime();
+            if (shouldShowAd(lastAdShownTime)) {
+              const ready =
+                getAppOpenAdLoaded() ||
+                (await reloadAppOpenAd()) ||
+                (await waitForAppOpenAdLoad());
+
+              if (ready && getAppOpenAdLoaded()) {
+                await showAppOpenAd();
+                await setLastAdShownTime();
+              }
+            }
+          } catch (error) {
+            console.error("Failed to show app open ad on foreground:", error);
           }
         }
 
@@ -45,17 +97,21 @@ export function useGlobalAds() {
   }, []);
 
   const handleGlobalPress = async () => {
-    const lastAdShownString = await AsyncStorage.getItem("lastAdShownTime");
-    const lastAdShownTime = lastAdShownString
-      ? parseInt(lastAdShownString, 10)
-      : 0;
-    const now = Date.now();
+    try {
+      const lastAdShownTime = await getLastAdShownTime();
+      if (shouldShowAd(lastAdShownTime)) {
+        const ready =
+          isInterstitialLoaded() ||
+          (await reloadInterstitial()) ||
+          (await waitForInterstitialLoad());
 
-    if (now - lastAdShownTime > AD_INTERVAL_MS) {
-      try {
-        await showInterstitial();
-        await AsyncStorage.setItem("lastAdShownTime", now.toString());
-      } catch {}
+        if (ready && isInterstitialLoaded()) {
+          await showInterstitial();
+          await setLastAdShownTime();
+        }
+      }
+    } catch (error) {
+      console.error("Failed to show interstitial ad:", error);
     }
   };
 

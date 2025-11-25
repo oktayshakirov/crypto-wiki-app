@@ -29,7 +29,7 @@ export default function OfflineViewerScreen() {
 
   useEffect(() => {
     if (webViewRef.current) {
-      registerWebView("offline-viewer", webViewRef);
+      registerWebView("offline-viewer", webViewRef as any);
     }
     return () => unregisterWebView("offline-viewer");
   }, [registerWebView, unregisterWebView]);
@@ -68,8 +68,9 @@ export default function OfflineViewerScreen() {
         type as SavedContent["type"],
         id
       );
+
       setContent(savedContent);
-    } catch {
+    } catch (error) {
       setContent(null);
     } finally {
       setLoading(false);

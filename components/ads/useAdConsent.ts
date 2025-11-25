@@ -5,9 +5,17 @@ export function useAdConsent() {
   const [consent, setConsent] = useState<"granted" | "denied" | null>(null);
 
   useEffect(() => {
-    AsyncStorage.getItem("trackingConsent").then((stored) => {
-      setConsent(stored as "granted" | "denied" | null);
-    });
+    async function loadConsent() {
+      try {
+        const stored = await AsyncStorage.getItem("trackingConsent");
+        setConsent(stored as "granted" | "denied" | null);
+      } catch (error) {
+        console.error("Failed to load ad consent:", error);
+        setConsent(null);
+      }
+    }
+
+    loadConsent();
   }, []);
 
   return {
