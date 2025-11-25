@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { View, StyleSheet, Animated } from "react-native";
+import React, { useState, useEffect, useRef } from "react";
+import { View, StyleSheet, Animated, AppState } from "react-native";
 import { BannerAd, BannerAdSize } from "react-native-google-mobile-ads";
 import { getAdUnitId } from "./adConfig";
 import { useAdConsent } from "./useAdConsent";
@@ -8,6 +8,27 @@ const BannerAdComponent = () => {
   const { requestNonPersonalizedAdsOnly } = useAdConsent();
   const [isAdLoaded, setIsAdLoaded] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
+  const [adKey, setAdKey] = useState(0);
+  const appState = useRef(AppState.currentState);
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (nextAppState) => {
+      if (
+        appState.current.match(/inactive|background/) &&
+        nextAppState === "active"
+      ) {
+        // Only remount if ad is not loaded to force a fresh request
+        if (!isAdLoaded) {
+          setAdKey((prev) => prev + 1);
+        }
+      }
+      appState.current = nextAppState;
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
 
   const handleAdLoaded = () => {
     setIsAdLoaded(true);
@@ -34,6 +55,7 @@ const BannerAdComponent = () => {
       ]}
     >
       <BannerAd
+        key={adKey}
         unitId={getAdUnitId("banner")!}
         size={BannerAdSize.ADAPTIVE_BANNER}
         requestOptions={{

@@ -88,6 +88,7 @@ export class ContentSaver {
         currentPageSlug,
         currentUrl
       );
+      console.log("[ContentSaver] Prepared page data for saving:", pageData);
       const success = await saveCurrentPage(pageData);
 
       if (success) {
@@ -510,62 +511,12 @@ export class ContentSaver {
         extractedMetadata.description || "Content saved for offline viewing"
       }</p>`;
 
-    const imgRegex = /<img[^>]+src="([^"]*)"[^>]*>/gi;
-    let match;
-    let imageCount = 0;
+    const imgRegex = /<img[^>]*>/gi;
+    processedContent = processedContent.replace(imgRegex, "");
 
-    while ((match = imgRegex.exec(processedContent)) !== null) {
-      const fullImgTag = match[0];
-      const imgSrc = match[1];
-
-      imageCount++;
-
-      if (imgSrc && imgSrc.startsWith("/images/")) {
-        const fullImageUrl = "https://www.thecrypto.wiki" + imgSrc;
-
-        try {
-          const cachedPath = await ImageCache.downloadAndCacheImage(
-            fullImageUrl,
-            "content-image"
-          );
-
-          if (cachedPath) {
-            try {
-              const base64Data = await FileSystem.readAsStringAsync(
-                cachedPath,
-                {
-                  encoding: (FileSystem as any).EncodingType.Base64,
-                }
-              );
-
-              const extension = imgSrc.split(".").pop()?.toLowerCase() || "jpg";
-              const mimeType =
-                extension === "png"
-                  ? "image/png"
-                  : extension === "gif"
-                  ? "image/gif"
-                  : extension === "webp"
-                  ? "image/webp"
-                  : "image/jpeg";
-
-              const dataUrl = `data:${mimeType};base64,${base64Data}`;
-
-              const newImgTag = fullImgTag.replace(imgSrc, dataUrl);
-              processedContent = processedContent.replace(
-                fullImgTag,
-                newImgTag
-              );
-            } catch (error) {
-              const newImgTag = fullImgTag.replace(imgSrc, cachedPath);
-              processedContent = processedContent.replace(
-                fullImgTag,
-                newImgTag
-              );
-            }
-          }
-        } catch (error) {}
-      }
-    }
+    const exchangeCtaRegex =
+      /<div class="my-8 "\s*><div class="card p-6 text-center">[\s\S]*?<\/div>\s*<\/div>/gi;
+    processedContent = processedContent.replace(exchangeCtaRegex, "");
 
     return {
       title: extractedMetadata.title || "Unknown Title",
