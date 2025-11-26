@@ -1,8 +1,8 @@
 import { useEffect, useRef } from "react";
 import { AppState } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { showInterstitial } from "./InterstitialAd";
-import { showAppOpenAd } from "./AppOpenAd";
+import { showInterstitial, ensureInterstitialLoaded } from "./InterstitialAd";
+import { showAppOpenAd, ensureAppOpenAdLoaded } from "./AppOpenAd";
 
 const AD_INTERVAL_MS = 60000;
 
@@ -19,6 +19,15 @@ export function useGlobalAds() {
           appState.current.match(/inactive|background/) &&
           nextAppState === "active"
         ) {
+          try {
+            await Promise.all([
+              ensureInterstitialLoaded(),
+              ensureAppOpenAdLoaded(),
+            ]);
+          } catch {
+            // ignore ensure errors, we will try loading again next time
+          }
+
           const lastAdShownString = await AsyncStorage.getItem(
             "lastAdShownTime"
           );
@@ -53,6 +62,7 @@ export function useGlobalAds() {
 
     if (now - lastAdShownTime > AD_INTERVAL_MS) {
       try {
+        await ensureInterstitialLoaded();
         await showInterstitial();
         await AsyncStorage.setItem("lastAdShownTime", now.toString());
       } catch {}

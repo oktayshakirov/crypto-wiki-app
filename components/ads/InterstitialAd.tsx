@@ -4,35 +4,84 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 let interstitial: InterstitialAd | null = null;
 let isAdLoaded = false;
+let initializingPromise: Promise<void> | null = null;
+let interstitialListeners: Array<() => void> = [];
 
-export async function initializeInterstitial() {
+function detachListeners() {
+  interstitialListeners.forEach((unsubscribe) => unsubscribe());
+  interstitialListeners = [];
+}
+
+async function createInterstitialInstance() {
   const consent = await AsyncStorage.getItem("trackingConsent");
   const requestNonPersonalizedAdsOnly = consent !== "granted";
 
-  interstitial = InterstitialAd.createForAdRequest(
-    getAdUnitId("interstitial")!,
-    {
-      requestNonPersonalizedAdsOnly,
-    }
+  const ad = InterstitialAd.createForAdRequest(getAdUnitId("interstitial")!, {
+    requestNonPersonalizedAdsOnly,
+  });
+
+  detachListeners();
+  interstitialListeners.push(
+    ad.addAdEventListener(AdEventType.LOADED, () => {
+      isAdLoaded = true;
+    })
+  );
+  interstitialListeners.push(
+    ad.addAdEventListener(AdEventType.ERROR, () => {
+      isAdLoaded = false;
+    })
+  );
+  interstitialListeners.push(
+    ad.addAdEventListener(AdEventType.CLOSED, () => {
+      isAdLoaded = false;
+      ad.load();
+    })
   );
 
-  interstitial.addAdEventListener(AdEventType.LOADED, () => {
-    isAdLoaded = true;
-  });
+  return ad;
+}
 
-  interstitial.addAdEventListener(AdEventType.ERROR, () => {
-    isAdLoaded = false;
-  });
+export async function initializeInterstitial(force = false) {
+  if (initializingPromise && !force) {
+    return initializingPromise;
+  }
 
-  interstitial.addAdEventListener(AdEventType.CLOSED, () => {
-    isAdLoaded = false;
-    interstitial!.load();
-  });
+  initializingPromise = (async () => {
+    interstitial = await createInterstitialInstance();
+    await interstitial.load();
+  })();
 
-  await interstitial.load();
+  try {
+    await initializingPromise;
+  } finally {
+    initializingPromise = null;
+  }
+}
+
+export async function ensureInterstitialLoaded() {
+  if (!interstitial) {
+    await initializeInterstitial();
+    return;
+  }
+
+  if (!isAdLoaded) {
+    try {
+      await interstitial.load();
+    } catch {
+      await initializeInterstitial(true);
+    }
+  }
+}
+
+export function isInterstitialReady() {
+  return isAdLoaded;
 }
 
 export async function showInterstitial() {
+  if (!interstitial || !isAdLoaded) {
+    await ensureInterstitialLoaded();
+  }
+
   if (interstitial && isAdLoaded) {
     interstitial.show();
     isAdLoaded = false;
