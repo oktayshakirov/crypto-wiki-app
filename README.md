@@ -4,7 +4,7 @@ A comprehensive and user-friendly iOS/Android app built with Expo, providing edu
 
 ## Demo
 
-![Desktop Demo](./assets/Screenshots/Banner.jpg "Desktop Demo")
+![Desktop Demo](./assets/screenshots/Banner.jpg "Desktop Demo")
 
 <p align="center">
   <a href="https://thecrypto.wiki/app"><strong>➥ Live Demo</strong></a>
