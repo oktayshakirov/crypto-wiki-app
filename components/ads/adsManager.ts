@@ -10,22 +10,38 @@ export function initializeGlobalAds() {}
 
 export function useGlobalAds() {
   const appState = useRef(AppState.currentState);
+  const lastBackgroundTimeRef = useRef<number>(0);
 
   useEffect(() => {
     const subscription = AppState.addEventListener(
       "change",
       async (nextAppState) => {
+        const currentState = appState.current;
+
         if (
-          appState.current.match(/inactive|background/) &&
+          currentState === "active" &&
+          nextAppState.match(/inactive|background/)
+        ) {
+          lastBackgroundTimeRef.current = Date.now();
+        }
+
+        if (
+          currentState.match(/inactive|background/) &&
           nextAppState === "active"
         ) {
+          const now = Date.now();
+          const backgroundTime =
+            lastBackgroundTimeRef.current > 0
+              ? now - lastBackgroundTimeRef.current
+              : 0;
+
           try {
             await Promise.all([
-              ensureInterstitialLoaded(),
-              ensureAppOpenAdLoaded(),
+              ensureInterstitialLoaded(backgroundTime),
+              ensureAppOpenAdLoaded(backgroundTime),
             ]);
           } catch {
-            // ignore ensure errors, we will try loading again next time
+            // Ignore ensure errors, will retry next time
           }
 
           const lastAdShownString = await AsyncStorage.getItem(
@@ -34,13 +50,14 @@ export function useGlobalAds() {
           const lastAdShownTime = lastAdShownString
             ? parseInt(lastAdShownString, 10)
             : 0;
-          const now = Date.now();
 
           if (now - lastAdShownTime > AD_INTERVAL_MS) {
             try {
               await showAppOpenAd();
               await AsyncStorage.setItem("lastAdShownTime", now.toString());
-            } catch {}
+            } catch {
+              // Ignore show errors
+            }
           }
         }
 

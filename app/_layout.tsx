@@ -28,6 +28,7 @@ import {
 import { getOrRegisterPushToken } from "@/utils/pushToken";
 import { initializeInterstitial } from "@/components/ads/InterstitialAd";
 import { loadAppOpenAd } from "@/components/ads/AppOpenAd";
+import { useGlobalAds } from "@/components/ads/adsManager";
 import OfflineGuard from "@/components/OfflineGuard";
 import OnboardingWrapper from "@/components/OnboardingWrapper";
 
@@ -36,11 +37,16 @@ function AdInitializer() {
 
   useEffect(() => {
     if (!isOnboardingActive && !isLoading) {
-      initializeInterstitial();
-      loadAppOpenAd();
+      initializeInterstitial().catch(() => {});
+      loadAppOpenAd().catch(() => {});
     }
   }, [isOnboardingActive, isLoading]);
 
+  return null;
+}
+
+function GlobalAdsManager() {
+  useGlobalAds();
   return null;
 }
 
@@ -117,6 +123,7 @@ export default function RootLayout() {
                             onConsentCompleted={() => setConsentCompleted(true)}
                           />
                           <AdInitializer />
+                          <GlobalAdsManager />
                           <OnboardingWrapper>
                             <OfflineGuard>
                               <Slot />
