@@ -30,8 +30,6 @@ const BannerAdComponent = () => {
         appState.current.match(/inactive|background/) &&
         nextAppState === "active"
       ) {
-        // Reload banner ad when app comes to foreground
-        // Force remount by changing key
         setIsAdLoaded(false);
         setAdKey((prev) => prev + 1);
       }
