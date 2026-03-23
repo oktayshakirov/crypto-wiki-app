@@ -4,7 +4,7 @@
     "slug": "the-crypto-wiki",
     "owner": "oktay.shakirov",
     "projectId": "21761514-c6bd-4a35-9ef1-a85c0f4b6f09",
-    "version": "5.3.0",
+    "version": "5.4.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "TheCrypto.wiki",
@@ -13,7 +13,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.shadev.thecryptowiki",
-      "buildNumber": "7",
+      "buildNumber": "8",
       "config": {
         "googleMobileAdsAppId": "ca-app-pub-5852582960793521~5465329102"
       },
@@ -151,7 +151,7 @@
     },
     "android": {
       "package": "com.shadev.thecryptowiki",
-      "versionCode": 12,
+      "versionCode": 13,
       "config": {
         "googleMobileAdsAppId": "ca-app-pub-5852582960793521~3669031701"
       },
@@ -159,9 +159,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#000000"
       },
-      "permissions": [
-        "com.google.android.gms.permission.AD_ID"
-      ]
+      "permissions": ["com.google.android.gms.permission.AD_ID"]
     },
     "web": {
       "bundler": "metro",
@@ -188,6 +186,12 @@
       },
       "eas": {
         "projectId": "21761514-c6bd-4a35-9ef1-a85c0f4b6f09"
+      },
+      "revenueCat": {
+        "apiKey": "",
+        "iosApiKey": "",
+        "androidApiKey": "",
+        "entitlementId": "pro"
       }
     }
   }

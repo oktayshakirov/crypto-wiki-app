@@ -6,10 +6,12 @@ import {
   StyleSheet,
   Animated,
   Dimensions,
+  Alert,
 } from "react-native";
 import { Colors } from "@/constants/Colors";
 import MaterialIcons from "@expo/vector-icons/Fontisto";
 import { useRouter } from "expo-router";
+import { useRevenueCat } from "@/contexts/RevenueCatContext";
 
 const { width, height } = Dimensions.get("window");
 
@@ -26,6 +28,7 @@ export default function HeaderMenu({ savedCounts }: HeaderMenuProps) {
   const [menuAnimation] = useState(new Animated.Value(0));
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const router = useRouter();
+  const { isPro, isSupported, isReady, showPaywall } = useRevenueCat();
 
   const toggleMenu = () => {
     const toValue = isMenuOpen ? 0 : 1;
@@ -57,6 +60,28 @@ export default function HeaderMenu({ savedCounts }: HeaderMenuProps) {
   });
 
   const menuItems = [
+    {
+      label: isPro ? "You're Pro (No Ads)" : "Remove Ads",
+      icon: "star",
+      action: async () => {
+        if (!isSupported) {
+          Alert.alert(
+            "Not Supported",
+            "In-app purchases are available only on iOS and Android."
+          );
+          return;
+        }
+        if (!isReady) {
+          Alert.alert(
+            "Please wait",
+            "Store is still loading. Try again in a few seconds."
+          );
+          return;
+        }
+        await showPaywall();
+      },
+      count: null as number | null,
+    },
     {
       label: "Saved Posts",
       icon: "quote-a-left",
@@ -116,8 +141,12 @@ export default function HeaderMenu({ savedCounts }: HeaderMenuProps) {
                 key={index}
                 style={styles.menuItem}
                 activeOpacity={0.7}
-                onPress={() => {
-                  router.push(item.route);
+                onPress={async () => {
+                  if ("route" in item && item.route) {
+                    router.push(item.route);
+                  } else if ("action" in item && item.action) {
+                    await item.action();
+                  }
                   toggleMenu();
                 }}
               >
@@ -128,7 +157,9 @@ export default function HeaderMenu({ savedCounts }: HeaderMenuProps) {
                   style={styles.menuIcon}
                 />
                 <Text style={styles.menuText}>{item.label}</Text>
-                <Text style={styles.menuCount}>({item.count})</Text>
+                {typeof item.count === "number" && (
+                  <Text style={styles.menuCount}>({item.count})</Text>
+                )}
               </TouchableOpacity>
             ))}
           </View>
