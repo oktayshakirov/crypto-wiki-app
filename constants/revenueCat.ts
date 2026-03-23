@@ -1,0 +1,1 @@
+export const DEFAULT_REVENUECAT_ENTITLEMENT = "pro";

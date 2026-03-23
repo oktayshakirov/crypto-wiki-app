@@ -4,12 +4,7 @@ import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useRef, useState } from "react";
-import {
-  Platform,
-  View,
-  StyleSheet,
-  TouchableWithoutFeedback,
-} from "react-native";
+import { Platform, View, StyleSheet } from "react-native";
 import * as Notifications from "expo-notifications";
 import { EventSubscription } from "expo-modules-core";
 import BannerAd from "@/components/ads/BannerAd";
@@ -31,16 +26,18 @@ import { loadAppOpenAd } from "@/components/ads/AppOpenAd";
 import { useGlobalAds } from "@/components/ads/adsManager";
 import OfflineGuard from "@/components/OfflineGuard";
 import OnboardingWrapper from "@/components/OnboardingWrapper";
+import { RevenueCatProvider, useRevenueCat } from "@/contexts/RevenueCatContext";
 
 function AdInitializer() {
   const { isOnboardingActive, isLoading } = useOnboarding();
+  const { isPro, isReady } = useRevenueCat();
 
   useEffect(() => {
-    if (!isOnboardingActive && !isLoading) {
+    if (isReady && !isOnboardingActive && !isLoading && !isPro) {
       initializeInterstitial().catch(() => {});
       loadAppOpenAd().catch(() => {});
     }
-  }, [isOnboardingActive, isLoading]);
+  }, [isOnboardingActive, isLoading, isPro, isReady]);
 
   return null;
 }
@@ -51,13 +48,12 @@ function GlobalAdsManager() {
 }
 
 export default function RootLayout() {
-  const [expoPushToken, setExpoPushToken] = useState("");
   const [consentCompleted, setConsentCompleted] = useState(false);
   const notificationListener = useRef<EventSubscription | null>(null);
   const responseListener = useRef<EventSubscription | null>(null);
 
   useEffect(() => {
-    const adapterStatuses = initialize();
+    initialize();
 
     notificationListener.current =
       Notifications.addNotificationReceivedListener(() => {});
@@ -80,7 +76,7 @@ export default function RootLayout() {
       getOrRegisterPushToken()
         .then((token) => {
           if (token) {
-            setExpoPushToken(token);
+            // Token is auto-synced by getOrRegisterPushToken side effects.
           }
         })
         .catch(() => {});
@@ -104,12 +100,13 @@ export default function RootLayout() {
         <View style={styles.appContainer}>
           {Platform.OS === "ios" && <View style={styles.statusBarBackground} />}
           <LoaderProvider>
-            <RefreshProvider>
-              <SavedContentProvider>
-                <PortfolioProvider>
-                  <OnboardingProvider>
-                    <WebViewNavigationProvider>
-                      <WebViewProvider>
+            <RevenueCatProvider>
+              <RefreshProvider>
+                <SavedContentProvider>
+                  <PortfolioProvider>
+                    <OnboardingProvider>
+                      <WebViewNavigationProvider>
+                        <WebViewProvider>
                         <StatusBar
                           backgroundColor={Colors.background}
                           style="light"
@@ -130,12 +127,13 @@ export default function RootLayout() {
                             </OfflineGuard>
                           </OnboardingWrapper>
                         </SafeAreaView>
-                      </WebViewProvider>
-                    </WebViewNavigationProvider>
-                  </OnboardingProvider>
-                </PortfolioProvider>
-              </SavedContentProvider>
-            </RefreshProvider>
+                        </WebViewProvider>
+                      </WebViewNavigationProvider>
+                    </OnboardingProvider>
+                  </PortfolioProvider>
+                </SavedContentProvider>
+              </RefreshProvider>
+            </RevenueCatProvider>
           </LoaderProvider>
         </View>
       </SafeAreaProvider>
