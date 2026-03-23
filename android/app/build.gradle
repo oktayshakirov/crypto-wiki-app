@@ -180,3 +180,10 @@ dependencies {
         implementation jscFlavor
     }
 }
+
+// Workaround for RN New Architecture clean failures:
+// externalNativeBuildClean can reference generated codegen JNI paths that no longer
+// exist after dependent module clean tasks run.
+tasks.matching { it.name.startsWith("externalNativeBuildClean") }.configureEach {
+    enabled = false
+}
