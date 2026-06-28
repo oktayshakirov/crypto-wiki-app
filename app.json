@@ -19,6 +19,11 @@
       },
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
+        "LSApplicationQueriesSchemes": [
+          "googlegmail",
+          "ms-outlook",
+          "mailto"
+        ],
         "SKAdNetworkItems": [
           {
             "SKAdNetworkIdentifier": "cstr6suwn9.skadnetwork"
@@ -159,7 +164,9 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#000000"
       },
-      "permissions": ["com.google.android.gms.permission.AD_ID"]
+      "permissions": [
+        "com.google.android.gms.permission.AD_ID"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -178,7 +185,8 @@
       ],
       "expo-tracking-transparency",
       "expo-font",
-      "expo-web-browser"
+      "expo-web-browser",
+      "expo-mail-composer"
     ],
     "extra": {
       "router": {
@@ -186,12 +194,6 @@
       },
       "eas": {
         "projectId": "21761514-c6bd-4a35-9ef1-a85c0f4b6f09"
-      },
-      "revenueCat": {
-        "apiKey": "",
-        "iosApiKey": "",
-        "androidApiKey": "",
-        "entitlementId": "pro"
       }
     }
   }

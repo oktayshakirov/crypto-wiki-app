@@ -1,13 +1,5 @@
 import { Platform } from "react-native";
-import Constants from "expo-constants";
 import { DEFAULT_REVENUECAT_ENTITLEMENT } from "@/constants/revenueCat";
-
-type RevenueCatRuntimeConfig = {
-  apiKey?: string;
-  iosApiKey?: string;
-  androidApiKey?: string;
-  entitlementId?: string;
-};
 
 type CustomerInfo = {
   entitlements?: {
@@ -15,40 +7,24 @@ type CustomerInfo = {
   };
 };
 
+export type PlanLabel = "Free" | "Monthly" | "Pro" | "Lifetime";
+
 let isConfigured = false;
 
-function getRevenueCatConfig(): RevenueCatRuntimeConfig {
-  const extra = Constants.expoConfig?.extra ?? {};
-  const rcConfig = (extra.revenueCat ?? {}) as RevenueCatRuntimeConfig;
-  return rcConfig;
-}
-
 export function getEntitlementId() {
-  return getRevenueCatConfig().entitlementId || DEFAULT_REVENUECAT_ENTITLEMENT;
+  return DEFAULT_REVENUECAT_ENTITLEMENT;
 }
 
 function getRevenueCatApiKey() {
-  const config = getRevenueCatConfig();
-  const sharedEnv =
-    process.env.EXPO_PUBLIC_REVENUECAT_API_KEY ||
-    process.env.REVENUECAT_API_KEY ||
-    "";
-  const iosEnv =
-    process.env.EXPO_PUBLIC_REVENUECAT_API_KEY_IOS ||
-    process.env.REVENUECAT_API_KEY_IOS ||
-    "";
-  const androidEnv =
-    process.env.EXPO_PUBLIC_REVENUECAT_API_KEY_ANDROID ||
-    process.env.REVENUECAT_API_KEY_ANDROID ||
-    "";
+  const sharedEnv = process.env.EXPO_PUBLIC_REVENUECAT_API_KEY || "";
+  const iosEnv = process.env.EXPO_PUBLIC_REVENUECAT_API_KEY_IOS || "";
+  const androidEnv = process.env.EXPO_PUBLIC_REVENUECAT_API_KEY_ANDROID || "";
 
   if (Platform.OS === "ios") {
-    return iosEnv || sharedEnv || config.iosApiKey || config.apiKey || "";
+    return iosEnv || sharedEnv;
   }
   if (Platform.OS === "android") {
-    return (
-      androidEnv || sharedEnv || config.androidApiKey || config.apiKey || ""
-    );
+    return androidEnv || sharedEnv;
   }
   return "";
 }
@@ -67,7 +43,14 @@ export async function configureRevenueCat() {
   if (isConfigured) return true;
 
   const apiKey = getRevenueCatApiKey().trim();
-  if (!apiKey) return false;
+  if (!apiKey) {
+    if (__DEV__) {
+      console.warn(
+        "[RevenueCat] Missing API key. Use EXPO_PUBLIC_REVENUECAT_API_KEY or platform-specific EXPO_PUBLIC_REVENUECAT_API_KEY_IOS / EXPO_PUBLIC_REVENUECAT_API_KEY_ANDROID in .env and restart Metro."
+      );
+    }
+    return false;
+  }
 
   const Purchases = getPurchasesModule();
   if (__DEV__) {
@@ -89,8 +72,34 @@ export function hasProEntitlement(customerInfo: CustomerInfo | null): boolean {
   return Boolean(customerInfo.entitlements.active[getEntitlementId()]);
 }
 
+export function getPlanLabel(customerInfo: CustomerInfo | null): PlanLabel {
+  if (!hasProEntitlement(customerInfo)) return "Free";
+  const entitlement = customerInfo?.entitlements?.active?.[getEntitlementId()] as
+    | { productIdentifier?: string }
+    | undefined;
+  const id = (entitlement?.productIdentifier ?? "").toLowerCase();
+  if (id.includes("lifetime")) return "Lifetime";
+  if (id.includes("month") || id.includes("annual") || id.includes("year")) {
+    return "Monthly";
+  }
+  return "Pro";
+}
+
 export async function presentPaywall() {
   if (!isRevenueCatSupported()) return false;
+
+  if (!isConfigured) {
+    const configured = await configureRevenueCat();
+    if (!configured) {
+      return false;
+    }
+  }
+
+  const customerInfo = await getCustomerInfo();
+  if (hasProEntitlement(customerInfo)) {
+    return false;
+  }
+
   const RevenueCatUIImport = require("react-native-purchases-ui");
   const RevenueCatUI = RevenueCatUIImport.default ?? RevenueCatUIImport;
   await RevenueCatUI.presentPaywall({ displayCloseButton: true });

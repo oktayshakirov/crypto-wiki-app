@@ -1,1 +1,1 @@
-export const DEFAULT_REVENUECAT_ENTITLEMENT = "pro";
+export const DEFAULT_REVENUECAT_ENTITLEMENT = "Crypto Wiki Pro";
