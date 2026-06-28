@@ -6,8 +6,9 @@ import { showAppOpenAd, ensureAppOpenAdLoaded } from "./AppOpenAd";
 import { useRevenueCat } from "@/contexts/RevenueCatContext";
 
 const AD_INTERVAL_MS = 60000;
-const PAYWALL_EVERY_N_INTERSTITIAL_OPPORTUNITIES = 5;
-const INTERSTITIAL_OPPORTUNITY_COUNT_KEY = "interstitialOpportunityCount";
+// Show the paywall once per app session, on the Nth ad opportunity. After that,
+// every opportunity is a normal interstitial until the app is reopened.
+const PAYWALL_ON_NTH_OPPORTUNITY = 2;
 
 export function initializeGlobalAds() {}
 
@@ -15,6 +16,9 @@ export function useGlobalAds() {
   const { isPro, isReady, isSupported, showPaywall } = useRevenueCat();
   const appState = useRef(AppState.currentState);
   const lastBackgroundTimeRef = useRef<number>(0);
+  // Per-session counters (reset on every foreground / cold start).
+  const sessionOpportunityCountRef = useRef(0);
+  const paywallShownThisSessionRef = useRef(false);
 
   useEffect(() => {
     if (isPro || !isReady) {
@@ -36,6 +40,10 @@ export function useGlobalAds() {
           currentState.match(/inactive|background/) &&
           nextAppState === "active"
         ) {
+          // New foreground session: reset the per-session paywall counters.
+          sessionOpportunityCountRef.current = 0;
+          paywallShownThisSessionRef.current = false;
+
           const now = Date.now();
           const backgroundTime =
             lastBackgroundTimeRef.current > 0
@@ -89,30 +97,22 @@ export function useGlobalAds() {
 
     if (now - lastAdShownTime > AD_INTERVAL_MS) {
       try {
-        let opportunityCount = 0;
-        const opportunityCountRaw = await AsyncStorage.getItem(
-          INTERSTITIAL_OPPORTUNITY_COUNT_KEY
-        );
-        if (opportunityCountRaw) {
-          opportunityCount = parseInt(opportunityCountRaw, 10) || 0;
-        }
+        const nextOpportunityCount = sessionOpportunityCountRef.current + 1;
+        sessionOpportunityCountRef.current = nextOpportunityCount;
 
-        const nextOpportunityCount = opportunityCount + 1;
         const shouldShowPaywall =
           isSupported &&
-          nextOpportunityCount % PAYWALL_EVERY_N_INTERSTITIAL_OPPORTUNITIES === 0;
+          !paywallShownThisSessionRef.current &&
+          nextOpportunityCount === PAYWALL_ON_NTH_OPPORTUNITY;
 
         if (shouldShowPaywall) {
+          paywallShownThisSessionRef.current = true;
           await showPaywall();
         } else {
           await ensureInterstitialLoaded();
           await showInterstitial();
         }
 
-        await AsyncStorage.setItem(
-          INTERSTITIAL_OPPORTUNITY_COUNT_KEY,
-          nextOpportunityCount.toString()
-        );
         await AsyncStorage.setItem("lastAdShownTime", now.toString());
       } catch {}
     }

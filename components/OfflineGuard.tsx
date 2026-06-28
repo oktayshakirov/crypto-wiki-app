@@ -32,10 +32,6 @@ export default function OfflineGuard({
     }
   }, [isOffline, hideLoader]);
 
-  if (isOffline) {
-    hideLoader();
-  }
-
   useEffect(() => {
     if (isOffline) {
       hideLoader();
