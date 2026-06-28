@@ -4,7 +4,7 @@
     "slug": "the-crypto-wiki",
     "owner": "oktay.shakirov",
     "projectId": "21761514-c6bd-4a35-9ef1-a85c0f4b6f09",
-    "version": "5.4.0",
+    "version": "5.7.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "TheCrypto.wiki",
@@ -156,7 +156,7 @@
     },
     "android": {
       "package": "com.shadev.thecryptowiki",
-      "versionCode": 13,
+      "versionCode": 20,
       "config": {
         "googleMobileAdsAppId": "ca-app-pub-5852582960793521~3669031701"
       },
