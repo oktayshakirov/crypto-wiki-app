@@ -206,18 +206,20 @@ export default function PlanModal({ visible, onClose }: PlanModalProps) {
             </TouchableOpacity>
           )}
 
-          <TouchableOpacity
-            style={styles.secondaryButton}
-            onPress={handleRestore}
-            activeOpacity={0.8}
-            disabled={restoring}
-          >
-            {restoring ? (
-              <ActivityIndicator size="small" color={Colors.text} />
-            ) : (
-              <Text style={styles.secondaryButtonText}>Restore Purchases</Text>
-            )}
-          </TouchableOpacity>
+          {!isPro && (
+            <TouchableOpacity
+              style={styles.secondaryButton}
+              onPress={handleRestore}
+              activeOpacity={0.8}
+              disabled={restoring}
+            >
+              {restoring ? (
+                <ActivityIndicator size="small" color={Colors.text} />
+              ) : (
+                <Text style={styles.secondaryButtonText}>Restore Purchases</Text>
+              )}
+            </TouchableOpacity>
+          )}
 
           {__DEV__ && (
             <View style={styles.devCard}>
