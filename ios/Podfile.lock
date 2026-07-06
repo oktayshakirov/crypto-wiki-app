@@ -262,6 +262,8 @@ PODS:
     - ExpoModulesCore
   - ExpoWebBrowser (15.0.9):
     - ExpoModulesCore
+  - ExtensionStorage (1.0.0):
+    - ExpoModulesCore
   - EXUpdatesInterface (2.0.0):
     - ExpoModulesCore
   - FBLazyVector (0.81.5)
@@ -2322,6 +2324,7 @@ DEPENDENCIES:
   - ExpoSystemUI (from `../node_modules/expo-system-ui/ios`)
   - ExpoTrackingTransparency (from `../node_modules/expo-tracking-transparency/ios`)
   - ExpoWebBrowser (from `../node_modules/expo-web-browser/ios`)
+  - "ExtensionStorage (from `../node_modules/@bacons/apple-targets/ios`)"
   - EXUpdatesInterface (from `../node_modules/expo-updates-interface/ios`)
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
@@ -2471,6 +2474,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-tracking-transparency/ios"
   ExpoWebBrowser:
     :path: "../node_modules/expo-web-browser/ios"
+  ExtensionStorage:
+    :path: "../node_modules/@bacons/apple-targets/ios"
   EXUpdatesInterface:
     :path: "../node_modules/expo-updates-interface/ios"
   FBLazyVector:
@@ -2662,6 +2667,7 @@ SPEC CHECKSUMS:
   ExpoSystemUI: 2761aa6875849af83286364811d46e8ed8ea64c7
   ExpoTrackingTransparency: f9ad2b1955c71085aa9208ed180721301614bac9
   ExpoWebBrowser: b973e1351fdcf5fec0c400997b1851f5a8219ec3
+  ExtensionStorage: 5796de20bf181317c376d693fedb64c6781a33ba
   EXUpdatesInterface: 5adf50cb41e079c861da6d9b4b954c3db9a50734
   FBLazyVector: e95a291ad2dadb88e42b06e0c5fb8262de53ec12
   Google-Mobile-Ads-SDK: b833c723759e32bbaf06edaaf2293f08ed898232
@@ -2750,6 +2756,6 @@ SPEC CHECKSUMS:
   RNWorklets: 54d8dffb7f645873a58484658ddfd4bd1a9a0bc1
   Yoga: 5934998fbeaef7845dbf698f698518695ab4cd1a
 
-PODFILE CHECKSUM: 9f9a476752a25dc98ed68df49a8cc25fd2aa4631
+PODFILE CHECKSUM: 2d7e91bccddd52355dadc6634d79767cf5a498b7
 
 COCOAPODS: 1.16.2

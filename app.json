@@ -14,6 +14,12 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.shadev.thecryptowiki",
       "buildNumber": "8",
+      "appleTeamId": "2UNNRK9L5Q",
+      "entitlements": {
+        "com.apple.security.application-groups": [
+          "group.com.shadev.thecryptowiki"
+        ]
+      },
       "config": {
         "googleMobileAdsAppId": "ca-app-pub-5852582960793521~5465329102"
       },
@@ -186,7 +192,81 @@
       "expo-tracking-transparency",
       "expo-font",
       "expo-web-browser",
-      "expo-mail-composer"
+      "expo-mail-composer",
+      "@bacons/apple-targets",
+      [
+        "react-native-android-widget",
+        {
+          "widgets": [
+            {
+              "name": "PortfolioWidget",
+              "label": "Portfolio Value",
+              "description": "Your portfolio value and profit/loss at a glance.",
+              "minWidth": "180dp",
+              "minHeight": "110dp",
+              "targetCellWidth": 3,
+              "targetCellHeight": 2,
+              "resizeMode": "horizontal|vertical",
+              "updatePeriodMillis": 1800000
+            },
+            {
+              "name": "FearGreedWidget",
+              "label": "Fear & Greed (Pro)",
+              "description": "Crypto Fear & Greed Index. Requires Pro - upgrade inside the app.",
+              "minWidth": "110dp",
+              "minHeight": "110dp",
+              "targetCellWidth": 2,
+              "targetCellHeight": 2,
+              "resizeMode": "horizontal|vertical",
+              "updatePeriodMillis": 3600000
+            },
+            {
+              "name": "HeatmapWidget",
+              "label": "Crypto Heatmap (Pro)",
+              "description": "Top coins by market cap, colored by 24h change. Requires Pro - upgrade inside the app.",
+              "minWidth": "250dp",
+              "minHeight": "110dp",
+              "targetCellWidth": 4,
+              "targetCellHeight": 2,
+              "resizeMode": "horizontal|vertical",
+              "updatePeriodMillis": 1800000
+            },
+            {
+              "name": "LatestPostWidget",
+              "label": "Latest Post (Pro)",
+              "description": "The newest article from TheCrypto.wiki. Requires Pro - upgrade inside the app.",
+              "minWidth": "110dp",
+              "minHeight": "110dp",
+              "targetCellWidth": 2,
+              "targetCellHeight": 2,
+              "resizeMode": "horizontal|vertical",
+              "updatePeriodMillis": 21600000
+            },
+            {
+              "name": "LatestExchangeWidget",
+              "label": "Latest Exchange (Pro)",
+              "description": "The newest exchange review from TheCrypto.wiki. Requires Pro - upgrade inside the app.",
+              "minWidth": "110dp",
+              "minHeight": "110dp",
+              "targetCellWidth": 2,
+              "targetCellHeight": 2,
+              "resizeMode": "horizontal|vertical",
+              "updatePeriodMillis": 21600000
+            },
+            {
+              "name": "LatestOGWidget",
+              "label": "Latest OG (Pro)",
+              "description": "The newest crypto OG profile from TheCrypto.wiki. Requires Pro - upgrade inside the app.",
+              "minWidth": "110dp",
+              "minHeight": "110dp",
+              "targetCellWidth": 2,
+              "targetCellHeight": 2,
+              "resizeMode": "horizontal|vertical",
+              "updatePeriodMillis": 21600000
+            }
+          ]
+        }
+      ]
     ],
     "extra": {
       "router": {

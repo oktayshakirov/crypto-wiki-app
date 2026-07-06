@@ -4,6 +4,8 @@ import { Expo, ExpoPushMessage } from "expo-server-sdk";
 import { onDocumentCreated } from "firebase-functions/v2/firestore";
 import { onRequest } from "firebase-functions/v2/https";
 
+export { getWidgetData, getWidgetContent, getWidgetHeatmap } from "./widgets";
+
 if (!admin.apps.length) {
   admin.initializeApp();
 }
