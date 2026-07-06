@@ -18,6 +18,7 @@ import {
   presentPaywall,
   restorePurchases,
 } from "@/services/revenueCat";
+import { updateWidgetProStatus } from "@/utils/widgetBridge";
 
 const DEV_PRO_OVERRIDE_KEY = "devProOverride";
 
@@ -98,6 +99,11 @@ export function RevenueCatProvider({ children }: { children: React.ReactNode }) 
       mounted = false;
     };
   }, [refreshCustomerInfo]);
+
+  useEffect(() => {
+    if (!isReady) return;
+    updateWidgetProStatus(isPro).catch(() => {});
+  }, [isPro, isReady]);
 
   useEffect(() => {
     if (!isSupported || !isReady) return;

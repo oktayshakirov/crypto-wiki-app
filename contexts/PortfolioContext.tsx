@@ -13,6 +13,7 @@ import {
 } from "@/utils/portfolioStorage";
 import { PortfolioAPI } from "@/utils/portfolioAPI";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
+import { updateWidgetPortfolio } from "@/utils/widgetBridge";
 
 interface PortfolioContextType {
   assets: PortfolioAsset[];
@@ -63,6 +64,10 @@ export function PortfolioProvider({ children }: PortfolioProviderProps) {
   useEffect(() => {
     loadPortfolio();
   }, []);
+
+  useEffect(() => {
+    updateWidgetPortfolio(summary).catch(() => {});
+  }, [summary]);
 
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (nextAppState) => {
