@@ -18,6 +18,7 @@
     <meta-data android:name="expo.modules.updates.ENABLED" android:value="false"/>
     <meta-data android:name="expo.modules.updates.EXPO_UPDATES_CHECK_ON_LAUNCH" android:value="ALWAYS"/>
     <meta-data android:name="expo.modules.updates.EXPO_UPDATES_LAUNCH_WAIT_MS" android:value="0"/>
+    <service android:name="com.reactnativeandroidwidget.RNWidgetCollectionService" android:permission="android.permission.BIND_REMOTEVIEWS"/>
     <activity android:name=".MainActivity" android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|uiMode" android:launchMode="singleTask" android:windowSoftInputMode="adjustResize" android:theme="@style/Theme.App.SplashScreen" android:exported="true" android:screenOrientation="portrait">
       <intent-filter>
         <action android:name="android.intent.action.MAIN"/>
@@ -31,5 +32,47 @@
         <data android:scheme="exp+the-crypto-wiki"/>
       </intent-filter>
     </activity>
+    <receiver android:name=".widget.PortfolioWidget" android:exported="false" android:label="Portfolio Value">
+      <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+        <action android:name="com.shadev.thecryptowiki.WIDGET_CLICK"/>
+      </intent-filter>
+      <meta-data android:name="android.appwidget.provider" android:resource="@xml/widgetprovider_portfoliowidget"/>
+    </receiver>
+    <receiver android:name=".widget.FearGreedWidget" android:exported="false" android:label="Fear &amp; Greed (Pro)">
+      <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+        <action android:name="com.shadev.thecryptowiki.WIDGET_CLICK"/>
+      </intent-filter>
+      <meta-data android:name="android.appwidget.provider" android:resource="@xml/widgetprovider_feargreedwidget"/>
+    </receiver>
+    <receiver android:name=".widget.HeatmapWidget" android:exported="false" android:label="Crypto Heatmap (Pro)">
+      <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+        <action android:name="com.shadev.thecryptowiki.WIDGET_CLICK"/>
+      </intent-filter>
+      <meta-data android:name="android.appwidget.provider" android:resource="@xml/widgetprovider_heatmapwidget"/>
+    </receiver>
+    <receiver android:name=".widget.LatestPostWidget" android:exported="false" android:label="Latest Post (Pro)">
+      <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+        <action android:name="com.shadev.thecryptowiki.WIDGET_CLICK"/>
+      </intent-filter>
+      <meta-data android:name="android.appwidget.provider" android:resource="@xml/widgetprovider_latestpostwidget"/>
+    </receiver>
+    <receiver android:name=".widget.LatestExchangeWidget" android:exported="false" android:label="Latest Exchange (Pro)">
+      <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+        <action android:name="com.shadev.thecryptowiki.WIDGET_CLICK"/>
+      </intent-filter>
+      <meta-data android:name="android.appwidget.provider" android:resource="@xml/widgetprovider_latestexchangewidget"/>
+    </receiver>
+    <receiver android:name=".widget.LatestOGWidget" android:exported="false" android:label="Latest OG (Pro)">
+      <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+        <action android:name="com.shadev.thecryptowiki.WIDGET_CLICK"/>
+      </intent-filter>
+      <meta-data android:name="android.appwidget.provider" android:resource="@xml/widgetprovider_latestogwidget"/>
+    </receiver>
   </application>
 </manifest>

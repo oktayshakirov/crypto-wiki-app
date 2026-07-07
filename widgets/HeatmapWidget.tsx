@@ -8,6 +8,7 @@ function HeroCell({ coin }: { coin: HeatmapCoin }) {
     <FlexWidget
       style={{
         flex: 45,
+        height: "match_parent",
         margin: 2,
         borderRadius: 8,
         backgroundColor: changeColor(coin.change24h),
@@ -30,12 +31,13 @@ function HeroCell({ coin }: { coin: HeatmapCoin }) {
 
 function Cell({ coin }: { coin: HeatmapCoin | null }) {
   if (!coin) {
-    return <FlexWidget style={{ flex: 1, margin: 2 }} />;
+    return <FlexWidget style={{ flex: 1, height: "match_parent", margin: 2 }} />;
   }
   return (
     <FlexWidget
       style={{
         flex: 1,
+        height: "match_parent",
         margin: 2,
         borderRadius: 6,
         backgroundColor: changeColor(coin.change24h),
@@ -110,9 +112,14 @@ export function HeatmapWidget({
       }}
     >
       <HeroCell coin={hero} />
-      <FlexWidget style={{ flex: 55, flexDirection: "column" }}>
+      <FlexWidget
+        style={{ flex: 55, height: "match_parent", flexDirection: "column" }}
+      >
         {rows.map((row, ri) => (
-          <FlexWidget key={ri} style={{ flex: 1, flexDirection: "row" }}>
+          <FlexWidget
+            key={ri}
+            style={{ flex: 1, width: "match_parent", flexDirection: "row" }}
+          >
             {Array.from({ length: columns }).map((_, ci) => (
               <Cell key={ci} coin={row[ci] ?? null} />
             ))}
