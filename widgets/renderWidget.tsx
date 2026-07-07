@@ -53,7 +53,7 @@ async function fetchJson<T>(url: string): Promise<T | null> {
 
 export async function renderWidgetByName(
   name: string,
-  _dimensions: { width: number; height: number }
+  dimensions: { width: number; height: number }
 ): Promise<React.ReactElement> {
   const snapshot = await getSnapshot();
 
@@ -83,6 +83,7 @@ export async function renderWidgetByName(
           label="LATEST POST"
           item={content?.latestPost ?? null}
           deepLink={DEEP_LINKS.posts}
+          widthDp={dimensions?.width}
         />
       );
     }
@@ -94,6 +95,7 @@ export async function renderWidgetByName(
           label="LATEST EXCHANGE"
           item={content?.latestExchange ?? null}
           deepLink={DEEP_LINKS.exchanges}
+          widthDp={dimensions?.width}
         />
       );
     }
@@ -105,6 +107,7 @@ export async function renderWidgetByName(
           label="LATEST OG"
           item={content?.latestOG ?? null}
           deepLink={DEEP_LINKS.ogs}
+          widthDp={dimensions?.width}
         />
       );
     }

@@ -83,7 +83,7 @@ struct ContentProvider: TimelineProvider {
     }
 
     private func fetchThumb(_ imageUrl: String?) async -> Data? {
-        guard let thumb = thumbnailURL(imageUrl) else { return nil }
+        guard let thumb = thumbnailURL(imageUrl, width: 256) else { return nil }
         return await WidgetAPI.fetchImage(from: thumb)
     }
 }
@@ -112,11 +112,13 @@ struct ContentItemView: View {
                         .lineLimit(3)
                         .minimumScaleFactor(0.75)
                     if let data = imageData, let uiImage = UIImage(data: data) {
+                        // Full width when wide, height-capped when square/tall,
+                        // original ratio always preserved.
                         Image(uiImage: uiImage)
                             .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(width: 56, height: 56)
-                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                            .aspectRatio(contentMode: .fit)
+                            .frame(maxWidth: .infinity, maxHeight: 70, alignment: .leading)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
                     }
                     Spacer(minLength: 0)
                 }
