@@ -3,4 +3,10 @@
   <string name="expo_system_ui_user_interface_style" translatable="false">automatic</string>
   <string name="expo_splash_screen_resize_mode" translatable="false">contain</string>
   <string name="expo_splash_screen_status_bar_translucent" translatable="false">false</string>
+  <string name="widget_portfoliowidget_description" translatable="false">Your portfolio value and profit/loss at a glance.</string>
+  <string name="widget_feargreedwidget_description" translatable="false">Crypto Fear &amp; Greed Index. Requires Pro - upgrade inside the app.</string>
+  <string name="widget_heatmapwidget_description" translatable="false">Top coins by market cap, colored by 24h change. Requires Pro - upgrade inside the app.</string>
+  <string name="widget_latestpostwidget_description" translatable="false">The newest article from TheCrypto.wiki. Requires Pro - upgrade inside the app.</string>
+  <string name="widget_latestexchangewidget_description" translatable="false">The newest exchange review from TheCrypto.wiki. Requires Pro - upgrade inside the app.</string>
+  <string name="widget_latestogwidget_description" translatable="false">The newest crypto OG profile from TheCrypto.wiki. Requires Pro - upgrade inside the app.</string>
 </resources>

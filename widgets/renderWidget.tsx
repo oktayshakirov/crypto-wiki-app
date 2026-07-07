@@ -114,7 +114,9 @@ export async function renderWidgetByName(
 
     case "HeatmapWidget": {
       const heatmap = await fetchJson<HeatmapData>(WIDGET_API.heatmap);
-      return <HeatmapWidget data={heatmap} />;
+      // Taller widget = more coins in the right grid (mirrors iOS medium/large).
+      const restCount = (dimensions?.height ?? 0) >= 200 ? 10 : 4;
+      return <HeatmapWidget data={heatmap} restCount={restCount} />;
     }
 
     default:
