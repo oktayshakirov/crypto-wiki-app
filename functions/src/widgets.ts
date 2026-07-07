@@ -31,6 +31,8 @@ interface ContentItem {
   title: string;
   image: string;
   url: string;
+  imgWidth?: number;
+  imgHeight?: number;
 }
 
 interface ContentData {
@@ -147,7 +149,40 @@ async function fetchLatestItem(
     )?.[1] ??
     "";
 
-  return { title: cleanTitle(ogTitle), image: ogImage, url };
+  const dims = ogImage ? await pngSize(ogImage) : null;
+
+  return {
+    title: cleanTitle(ogTitle),
+    image: ogImage,
+    url,
+    imgWidth: dims?.w,
+    imgHeight: dims?.h,
+  };
+}
+
+// Reads a PNG's intrinsic dimensions from its IHDR header (first ~24 bytes) via a
+// Range request, so widgets can preserve the original aspect ratio. Site images
+// are PNG; returns null for anything else or on failure.
+async function pngSize(
+  url: string
+): Promise<{ w: number; h: number } | null> {
+  try {
+    const res = await fetch(url, { headers: { Range: "bytes=0-33" } });
+    if (!res.ok && res.status !== 206) return null;
+    const buf = Buffer.from(await res.arrayBuffer());
+    if (
+      buf.length >= 24 &&
+      buf[0] === 0x89 &&
+      buf[1] === 0x50 &&
+      buf[2] === 0x4e &&
+      buf[3] === 0x47
+    ) {
+      return { w: buf.readUInt32BE(16), h: buf.readUInt32BE(20) };
+    }
+    return null;
+  } catch {
+    return null;
+  }
 }
 
 async function fetchContent(): Promise<ContentData> {

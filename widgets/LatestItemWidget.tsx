@@ -7,16 +7,38 @@ import {
 import { ContentItem, thumbnailUrl } from "./types";
 
 // Small 2x2 card (portfolio-style): widget name, then thumbnail, then title.
+const CARD_PADDING = 14;
+const MAX_IMG_HEIGHT = 70;
+
+// Fit the image within (available width x max height) preserving its original
+// ratio: wide images fill the full width, square/tall images get height-capped.
+function imageSize(
+  item: ContentItem,
+  widthDp?: number
+): { width: number; height: number } {
+  const availWidth = Math.max((widthDp || 150) - CARD_PADDING * 2, 60);
+  const iw = item.imgWidth;
+  const ih = item.imgHeight;
+  if (!iw || !ih) {
+    return { width: availWidth, height: Math.min(availWidth * 0.6, MAX_IMG_HEIGHT) };
+  }
+  const scale = Math.min(availWidth / iw, MAX_IMG_HEIGHT / ih);
+  return { width: Math.round(iw * scale), height: Math.round(ih * scale) };
+}
+
 export function LatestItemWidget({
   label,
   item,
   deepLink,
+  widthDp,
 }: {
   label: string;
   item: ContentItem | null;
   deepLink: string;
+  widthDp?: number;
 }) {
-  const thumb = item?.image ? thumbnailUrl(item.image) : "";
+  const thumb = item?.image ? thumbnailUrl(item.image, 256) : "";
+  const imgSize = item ? imageSize(item, widthDp) : null;
 
   return (
     <FlexWidget
@@ -43,12 +65,12 @@ export function LatestItemWidget({
             maxLines={3}
             style={{ fontSize: 14, fontWeight: "bold", color: "#ffffff" }}
           />
-          {thumb ? (
+          {thumb && imgSize ? (
             <ImageWidget
               image={thumb as `https:${string}`}
-              imageWidth={56}
-              imageHeight={56}
-              radius={10}
+              imageWidth={imgSize.width}
+              imageHeight={imgSize.height}
+              radius={8}
               style={{ marginTop: 8 }}
             />
           ) : null}

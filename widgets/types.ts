@@ -7,6 +7,8 @@ export interface ContentItem {
   title: string;
   image: string;
   url: string;
+  imgWidth?: number;
+  imgHeight?: number;
 }
 
 export interface ContentData {
