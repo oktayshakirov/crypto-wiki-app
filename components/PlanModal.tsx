@@ -8,25 +8,11 @@ import {
   ScrollView,
   Platform,
   Alert,
-  Linking,
   ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
 import { useRevenueCat } from "@/contexts/RevenueCatContext";
-
-const APP_STORE_ID = "6742765176";
-const ANDROID_PACKAGE = "com.shadev.thecryptowiki";
-
-const MANAGE_URL =
-  Platform.OS === "ios"
-    ? "https://apps.apple.com/account/subscriptions"
-    : `https://play.google.com/store/account/subscriptions?package=${ANDROID_PACKAGE}`;
-
-const STORE_URL =
-  Platform.OS === "ios"
-    ? `https://apps.apple.com/app/id${APP_STORE_ID}`
-    : `https://play.google.com/store/apps/details?id=${ANDROID_PACKAGE}`;
 
 interface PlanModalProps {
   visible: boolean;
@@ -62,10 +48,6 @@ export default function PlanModal({ visible, onClose }: PlanModalProps) {
       return;
     }
     await showPaywall();
-  };
-
-  const handleManageInStore = () => {
-    Linking.openURL(MANAGE_URL).catch(() => Linking.openURL(STORE_URL));
   };
 
   const handleRestore = async () => {
@@ -143,53 +125,19 @@ export default function PlanModal({ visible, onClose }: PlanModalProps) {
           </View>
 
           {isPro ? (
-            <>
-              <TouchableOpacity
-                style={styles.primaryButton}
-                onPress={handleManageInStore}
-                activeOpacity={0.8}
-              >
-                <Ionicons
-                  name="settings-outline"
-                  size={18}
-                  color="#000"
-                  style={styles.buttonIcon}
-                />
-                <Text style={styles.primaryButtonText}>
-                  Manage in {Platform.OS === "ios" ? "App Store" : "Play Store"}
-                </Text>
-              </TouchableOpacity>
-
-              {planLabel === "Monthly" && (
-                <View style={styles.tipCard}>
-                  <Ionicons
-                    name="sparkles-outline"
-                    size={18}
-                    color={Colors.activeIcon}
-                    style={styles.tipIcon}
-                  />
-                  <Text style={styles.tipText}>
-                    Save money with Pro Lifetime — pay once and keep Pro forever,
-                    including all future features.
-                  </Text>
-                </View>
-              )}
-
-              {planLabel === "Lifetime" && (
-                <View style={styles.tipCard}>
-                  <Ionicons
-                    name="heart-outline"
-                    size={18}
-                    color={Colors.activeIcon}
-                    style={styles.tipIcon}
-                  />
-                  <Text style={styles.tipText}>
-                    Thank you for your support! 🎉 You'll receive any future
-                    features and improvements at no extra cost.
-                  </Text>
-                </View>
-              )}
-            </>
+            <View style={styles.tipCard}>
+              <Ionicons
+                name="heart-outline"
+                size={18}
+                color={Colors.activeIcon}
+                style={styles.tipIcon}
+              />
+              <Text style={styles.tipText}>
+                Thank you for your support! 🎉 Your purchase unlocks Pro
+                benefits forever. You'll also receive any future features and
+                improvements we add to the app at no extra cost.
+              </Text>
+            </View>
           ) : (
             <TouchableOpacity
               style={styles.primaryButton}
