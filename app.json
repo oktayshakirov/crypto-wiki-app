@@ -4,7 +4,7 @@
     "slug": "the-crypto-wiki",
     "owner": "oktay.shakirov",
     "projectId": "21761514-c6bd-4a35-9ef1-a85c0f4b6f09",
-    "version": "5.8.0",
+    "version": "5.8.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "TheCrypto.wiki",
@@ -13,7 +13,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.shadev.thecryptowiki",
-      "buildNumber": "9",
+      "buildNumber": "10",
       "appleTeamId": "2UNNRK9L5Q",
       "entitlements": {
         "com.apple.security.application-groups": [
@@ -158,7 +158,7 @@
     },
     "android": {
       "package": "com.shadev.thecryptowiki",
-      "versionCode": 21,
+      "versionCode": 22,
       "config": {
         "googleMobileAdsAppId": "ca-app-pub-5852582960793521~3669031701"
       },
