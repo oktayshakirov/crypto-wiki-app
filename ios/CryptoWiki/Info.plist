@@ -19,7 +19,7 @@
     <key>CFBundlePackageType</key>
     <string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
     <key>CFBundleShortVersionString</key>
-    <string>5.8.0</string>
+    <string>5.8.1</string>
     <key>CFBundleSignature</key>
     <string>????</string>
     <key>CFBundleURLTypes</key>
@@ -39,7 +39,7 @@
       </dict>
     </array>
     <key>CFBundleVersion</key>
-    <string>9</string>
+    <string>10</string>
     <key>GADApplicationIdentifier</key>
     <string>ca-app-pub-5852582960793521~5465329102</string>
     <key>ITSAppUsesNonExemptEncryption</key>
