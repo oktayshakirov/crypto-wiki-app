@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
-import { AppState, Platform, StyleSheet, View } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
 import { WebView } from "react-native-webview";
 import { useRefresh } from "@/contexts/RefreshContext";
 import { Colors } from "@/constants/Colors";
@@ -7,6 +7,7 @@ import { useLoader } from "@/contexts/LoaderContext";
 import { useSavedContent } from "@/contexts/SavedContentContext";
 import { useGlobalAds } from "@/components/ads/adsManager";
 import { handleNetworkError } from "@/utils/networkErrorHandler";
+import { useStaleWebViewReload } from "@/hooks/useStaleWebViewReload";
 import { Pressable } from "react-native";
 import { openBrowserAsync } from "expo-web-browser";
 import { useFocusEffect, useRouter } from "expo-router";
@@ -53,15 +54,10 @@ export default function ToolsScreen() {
     showLoaderMin();
   }, [refreshCount, setSavedContentUrl]);
 
-  useEffect(() => {
-    const subscription = AppState.addEventListener("change", (nextAppState) => {
-      if (nextAppState === "active") {
-        setWebViewKey((prev) => prev + 1);
-        showLoaderMin();
-      }
-    });
-    return () => subscription.remove();
-  }, []);
+  useStaleWebViewReload(() => {
+    setWebViewKey((prev) => prev + 1);
+    showLoaderMin();
+  });
 
   useFocusEffect(
     React.useCallback(() => {
