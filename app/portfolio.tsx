@@ -20,7 +20,11 @@ import { PortfolioAsset } from "@/utils/portfolioStorage";
 import { PortfolioAPI } from "@/utils/portfolioAPI";
 import MaterialIcons from "@expo/vector-icons/Fontisto";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
+import { useWatchlist } from "@/hooks/useWatchlist";
+import { getCoinName } from "@/utils/coinNames";
 import Header from "@/components/Header";
+import PortfolioHistoryChart from "@/components/PortfolioHistoryChart";
+import WatchlistSection from "@/components/WatchlistSection";
 
 const POPULAR_CRYPTOS = [
   { symbol: "BTC", name: "Bitcoin" },
@@ -95,13 +99,10 @@ function AddCryptoModal({
     try {
       const availableSymbols = await PortfolioAPI.getAvailableCoins();
 
-      const coinsWithNames = availableSymbols.map((symbol) => {
-        const knownCrypto = POPULAR_CRYPTOS.find((c) => c.symbol === symbol);
-        return {
-          symbol,
-          name: knownCrypto?.name || symbol,
-        };
-      });
+      const coinsWithNames = availableSymbols.map((symbol) => ({
+        symbol,
+        name: getCoinName(symbol),
+      }));
 
       setAllAvailableCoins(coinsWithNames);
     } catch (error) {
@@ -375,7 +376,14 @@ function CryptoCard({
     <View style={styles.cryptoCard}>
       <View style={styles.cryptoHeader}>
         <View style={styles.cryptoInfo}>
-          <Text style={styles.cryptoSymbol}>{crypto.symbol}</Text>
+          <View style={styles.cryptoTitleRow}>
+            <Text style={styles.cryptoSymbol}>{crypto.symbol}</Text>
+            {getCoinName(crypto.symbol) !== crypto.symbol && (
+              <Text style={styles.cryptoName}>
+                {getCoinName(crypto.symbol)}
+              </Text>
+            )}
+          </View>
           <Text style={styles.cryptoAmount}>
             {crypto.amount.toFixed(8).replace(/\.?0+$/, "")} {crypto.symbol}
           </Text>
@@ -442,6 +450,7 @@ export default function PortfolioScreen() {
   const {
     assets,
     summary,
+    history,
     isLoading,
     isRefreshing,
     error,
@@ -458,6 +467,12 @@ export default function PortfolioScreen() {
   const [editingCrypto, setEditingCrypto] = useState<
     PortfolioAsset | undefined
   >();
+  const {
+    items: watchlistItems,
+    addToWatchlist,
+    removeFromWatchlist,
+    refreshWatchlist,
+  } = useWatchlist();
 
   useEffect(() => {
     if (error) {
@@ -514,12 +529,14 @@ export default function PortfolioScreen() {
         style={styles.scrollView}
         data={[
           { type: "summary", data: null },
+          ...(assets.length > 0 ? [{ type: "chart", data: null }] : []),
           { type: "addButton", data: null },
           ...(isLoading && assets.length === 0
             ? [{ type: "loading", data: null }]
             : assets.length === 0
             ? [{ type: "empty", data: null }]
             : assets.map((asset) => ({ type: "asset", data: asset }))),
+          { type: "watchlist", data: null },
         ]}
         keyExtractor={(item, index) => `${item.type}-${index}`}
         renderItem={({ item }) => {
@@ -577,6 +594,18 @@ export default function PortfolioScreen() {
                 </View>
               );
 
+            case "chart":
+              return <PortfolioHistoryChart history={history} />;
+
+            case "watchlist":
+              return (
+                <WatchlistSection
+                  items={watchlistItems}
+                  onAdd={addToWatchlist}
+                  onRemove={removeFromWatchlist}
+                />
+              );
+
             case "addButton":
               return (
                 <TouchableOpacity
@@ -629,7 +658,10 @@ export default function PortfolioScreen() {
         refreshControl={
           <RefreshControl
             refreshing={isRefreshing}
-            onRefresh={refreshPortfolio}
+            onRefresh={() => {
+              refreshPortfolio(true);
+              refreshWatchlist();
+            }}
             tintColor={Colors.activeIcon}
             enabled={!isOffline}
           />
@@ -772,10 +804,19 @@ const styles = StyleSheet.create({
   cryptoInfo: {
     flex: 1,
   },
+  cryptoTitleRow: {
+    flexDirection: "row",
+    alignItems: "baseline",
+    gap: 8,
+  },
   cryptoSymbol: {
     fontSize: 20,
     fontWeight: "bold",
     color: Colors.text,
+  },
+  cryptoName: {
+    fontSize: 14,
+    color: Colors.icon,
   },
   cryptoAmount: {
     fontSize: 14,

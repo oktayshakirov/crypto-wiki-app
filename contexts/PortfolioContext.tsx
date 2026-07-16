@@ -12,12 +12,15 @@ import {
   PortfolioStorage,
 } from "@/utils/portfolioStorage";
 import { PortfolioAPI } from "@/utils/portfolioAPI";
+import { PortfolioHistory, HistoryPoint } from "@/utils/portfolioHistory";
+import { getCoinName } from "@/utils/coinNames";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import { updateWidgetPortfolio } from "@/utils/widgetBridge";
 
 interface PortfolioContextType {
   assets: PortfolioAsset[];
   summary: PortfolioSummary | null;
+  history: HistoryPoint[];
   isLoading: boolean;
   isRefreshing: boolean;
   error: string | null;
@@ -35,7 +38,7 @@ interface PortfolioContextType {
   removeAsset: (id: string) => Promise<boolean>;
 
   // Data operations
-  refreshPortfolio: () => Promise<void>;
+  refreshPortfolio: (force?: boolean) => Promise<void>;
   loadPortfolio: () => Promise<void>;
   clearError: () => void;
 
@@ -56,6 +59,7 @@ interface PortfolioProviderProps {
 export function PortfolioProvider({ children }: PortfolioProviderProps) {
   const [assets, setAssets] = useState<PortfolioAsset[]>([]);
   const [summary, setSummary] = useState<PortfolioSummary | null>(null);
+  const [history, setHistory] = useState<HistoryPoint[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -67,6 +71,12 @@ export function PortfolioProvider({ children }: PortfolioProviderProps) {
 
   useEffect(() => {
     updateWidgetPortfolio(summary).catch(() => {});
+
+    if (summary && summary.assetsCount > 0) {
+      PortfolioHistory.record(summary.totalValue, summary.lastUpdated)
+        .then(setHistory)
+        .catch(() => {});
+    }
   }, [summary]);
 
   useEffect(() => {
@@ -84,13 +94,15 @@ export function PortfolioProvider({ children }: PortfolioProviderProps) {
     setError(null);
 
     try {
-      const [storedAssets, storedSummary] = await Promise.all([
+      const [storedAssets, storedSummary, storedHistory] = await Promise.all([
         PortfolioStorage.getAllAssets(),
         PortfolioStorage.getSummary(),
+        PortfolioHistory.getHistory(),
       ]);
 
       setAssets(storedAssets);
       setSummary(storedSummary);
+      setHistory(storedHistory);
 
       if (storedAssets.length > 0 && !isOffline) {
         refreshPortfolio();
@@ -102,7 +114,8 @@ export function PortfolioProvider({ children }: PortfolioProviderProps) {
     }
   }, [isOffline]);
 
-  const refreshPortfolio = useCallback(async () => {
+  const refreshPortfolio = useCallback(
+    async (force: boolean = false) => {
     if (isOffline) return;
 
     setIsRefreshing(true);
@@ -115,7 +128,9 @@ export function PortfolioProvider({ children }: PortfolioProviderProps) {
         return;
       }
 
-      PortfolioAPI.clearCache();
+      if (force) {
+        PortfolioAPI.clearCache();
+      }
 
       const symbols = currentAssets.map((asset) => asset.symbol);
       const prices = await PortfolioAPI.getMultiplePrices(symbols);
@@ -132,7 +147,9 @@ export function PortfolioProvider({ children }: PortfolioProviderProps) {
     } finally {
       setIsRefreshing(false);
     }
-  }, [isOffline]);
+    },
+    [isOffline]
+  );
 
   const addAsset = useCallback(
     async (
@@ -168,7 +185,7 @@ export function PortfolioProvider({ children }: PortfolioProviderProps) {
         const newAsset: PortfolioAsset = {
           id: PortfolioStorage.generateAssetId(),
           symbol: symbol.toUpperCase(),
-          name: symbol.toUpperCase(),
+          name: getCoinName(symbol),
           amount,
           purchasePrice: finalPurchasePrice,
           currentPrice: currentPrice || finalPurchasePrice,
@@ -270,6 +287,7 @@ export function PortfolioProvider({ children }: PortfolioProviderProps) {
   const value: PortfolioContextType = {
     assets,
     summary,
+    history,
     isLoading,
     isRefreshing,
     error,

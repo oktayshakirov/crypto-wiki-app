@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
-import { AppState, Platform, StyleSheet, View, Pressable } from "react-native";
+import { Platform, StyleSheet, View, Pressable } from "react-native";
 import { WebView } from "react-native-webview";
 import { useFocusEffect } from "expo-router";
 import { openBrowserAsync } from "expo-web-browser";
@@ -11,6 +11,7 @@ import { useWebViewNavigation } from "@/contexts/WebViewNavigationContext";
 import { useWebView } from "@/contexts/WebViewContext";
 import { useGlobalAds } from "@/components/ads/adsManager";
 import { handleNetworkError } from "@/utils/networkErrorHandler";
+import { useStaleWebViewReload } from "@/hooks/useStaleWebViewReload";
 
 export default function HomeScreen() {
   const { refreshCount } = useRefresh("home");
@@ -63,15 +64,10 @@ export default function HomeScreen() {
     return () => unregisterWebView("home");
   }, [registerWebView, unregisterWebView]);
 
-  useEffect(() => {
-    const subscription = AppState.addEventListener("change", (nextAppState) => {
-      if (nextAppState === "active") {
-        setWebViewKey((prev) => prev + 1);
-        showLoaderMin();
-      }
-    });
-    return () => subscription.remove();
-  }, []);
+  useStaleWebViewReload(() => {
+    setWebViewKey((prev) => prev + 1);
+    showLoaderMin();
+  });
 
   useFocusEffect(
     React.useCallback(() => {
