@@ -92,8 +92,8 @@ android {
         applicationId 'com.shadev.thecryptowiki'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 22
-        versionName "5.9.0"
+        versionCode 23
+        versionName "5.9.1"
 
         buildConfigField "String", "REACT_NATIVE_RELEASE_LEVEL", "\"${findProperty('reactNativeReleaseLevel') ?: 'stable'}\""
     }
