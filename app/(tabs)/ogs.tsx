@@ -7,6 +7,7 @@ import { useRefresh } from "@/contexts/RefreshContext";
 import { Colors } from "@/constants/Colors";
 import { useLoader } from "@/contexts/LoaderContext";
 import { useSavedContent } from "@/contexts/SavedContentContext";
+import { useWebViewNavigation } from "@/contexts/WebViewNavigationContext";
 import { useWebView } from "@/contexts/WebViewContext";
 import { useGlobalAds } from "@/components/ads/adsManager";
 import { handleNetworkError } from "@/utils/networkErrorHandler";
@@ -17,6 +18,7 @@ export default function OgsScreen() {
   const { showLoaderMin, hideLoaderMin, isContentVisible } = useLoader();
   const { setCurrentUrl: setSavedContentUrl, forceRefreshSavedState } =
     useSavedContent();
+  const { pendingNavigation, clearPendingNavigation } = useWebViewNavigation();
   const { registerWebView, unregisterWebView } = useWebView();
   const webViewRef = useRef<WebView | null>(null);
   const [webViewKey, setWebViewKey] = useState(0);
@@ -39,6 +41,23 @@ export default function OgsScreen() {
     setWebViewKey((prev) => prev + 1);
     showLoaderMin();
   }, [refreshCount, setSavedContentUrl]);
+
+  // Deep link from a "New OG" push notification: see hooks/useNotificationDeepLink.
+  useEffect(() => {
+    if (pendingNavigation?.targetTab !== "ogs") {
+      return;
+    }
+    setCurrentUrl(pendingNavigation.url);
+    setSavedContentUrl(pendingNavigation.url);
+    setWebViewKey((prev) => prev + 1);
+    showLoaderMin();
+    clearPendingNavigation();
+  }, [
+    pendingNavigation,
+    clearPendingNavigation,
+    setSavedContentUrl,
+    showLoaderMin,
+  ]);
 
   useStaleWebViewReload(() => {
     setWebViewKey((prev) => prev + 1);

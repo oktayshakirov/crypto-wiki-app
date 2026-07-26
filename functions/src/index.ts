@@ -41,6 +41,40 @@ export const registerPushToken = onRequest(async (req, res) => {
   }
 });
 
+const SITE_URL = "https://www.thecrypto.wiki";
+
+/**
+ * Documents are keyed by slug, so editing a post's title updates the existing
+ * document instead of creating a new one. The `notify` flag is set by the
+ * blog's sync script, which is the single source of truth for what counts as
+ * genuinely new content. Firestore triggers are at-least-once, so `notifiedAt`
+ * guards against a retry sending the same notification twice.
+ */
+async function claimNotification(
+  ref: FirebaseFirestore.DocumentReference,
+  data: { notify?: boolean; notifiedAt?: unknown } | undefined
+): Promise<boolean> {
+  if (data?.notify !== true) {
+    return false;
+  }
+
+  try {
+    return await db.runTransaction(async (tx) => {
+      const fresh = await tx.get(ref);
+      if (!fresh.exists || fresh.data()?.notifiedAt) {
+        return false;
+      }
+      tx.update(ref, {
+        notifiedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+      return true;
+    });
+  } catch (error) {
+    console.error("Error claiming notification:", error);
+    return false;
+  }
+}
+
 async function sendPushNotification(
   title: string,
   body: string,
@@ -82,17 +116,32 @@ async function sendPushNotification(
   }
 }
 
+type ContentDoc =
+  | { title?: string; slug?: string; notify?: boolean }
+  | undefined;
+
 export const sendNewPostNotification = onDocumentCreated(
   "posts/{postId}",
   async (event) => {
     try {
       const snap = event.data!;
-      const postData = snap.data() as { title?: string } | undefined;
-      const postTitle = postData?.title || "New Post";
-      const title = "New Post on CryptoWiki";
-      const body = postTitle;
+      const postData = snap.data() as ContentDoc;
 
-      await sendPushNotification(title, body);
+      if (!(await claimNotification(snap.ref, postData))) {
+        return;
+      }
+
+      const slug = postData?.slug || event.params.postId;
+
+      await sendPushNotification(
+        "New Post on CryptoWiki",
+        postData?.title || "New Post",
+        {
+          type: "post",
+          slug,
+          url: `${SITE_URL}/posts/${slug}`,
+        }
+      );
     } catch (error) {
       console.error("Error in sendNewPostNotification:", error);
     }
@@ -104,12 +153,23 @@ export const sendNewExchangeNotification = onDocumentCreated(
   async (event) => {
     try {
       const snap = event.data!;
-      const exchangeData = snap.data() as { title?: string } | undefined;
-      const exchangeTitle = exchangeData?.title || "New Exchange";
-      const title = "New Exchange on CryptoWiki";
-      const body = exchangeTitle;
+      const exchangeData = snap.data() as ContentDoc;
 
-      await sendPushNotification(title, body);
+      if (!(await claimNotification(snap.ref, exchangeData))) {
+        return;
+      }
+
+      const slug = exchangeData?.slug || event.params.exchangeId;
+
+      await sendPushNotification(
+        "New Exchange on CryptoWiki",
+        exchangeData?.title || "New Exchange",
+        {
+          type: "exchange",
+          slug,
+          url: `${SITE_URL}/exchanges/${slug}`,
+        }
+      );
     } catch (error) {
       console.error("Error in sendNewExchangeNotification:", error);
     }
@@ -121,12 +181,23 @@ export const sendNewOGNotification = onDocumentCreated(
   async (event) => {
     try {
       const snap = event.data!;
-      const ogData = snap.data() as { title?: string } | undefined;
-      const ogTitle = ogData?.title || "New Crypto OG";
-      const title = "New Crypto OG on CryptoWiki";
-      const body = ogTitle;
+      const ogData = snap.data() as ContentDoc;
 
-      await sendPushNotification(title, body);
+      if (!(await claimNotification(snap.ref, ogData))) {
+        return;
+      }
+
+      const slug = ogData?.slug || event.params.ogId;
+
+      await sendPushNotification(
+        "New Crypto OG on CryptoWiki",
+        ogData?.title || "New Crypto OG",
+        {
+          type: "og",
+          slug,
+          url: `${SITE_URL}/crypto-ogs/${slug}`,
+        }
+      );
     } catch (error) {
       console.error("Error in sendNewOGNotification:", error);
     }
