@@ -10,6 +10,12 @@
     "scheme": "TheCrypto.wiki",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "runtimeVersion": {
+      "policy": "fingerprint"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/21761514-c6bd-4a35-9ef1-a85c0f4b6f09"
+    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.shadev.thecryptowiki",
