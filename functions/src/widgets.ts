@@ -208,25 +208,54 @@ async function fetchContent(): Promise<ContentData> {
   return data;
 }
 
+// In-process cache in front of the Firestore one. Cloud Run keeps an instance
+// warm between requests, so most requests can be answered without touching
+// Firestore at all.
+//
+// This matters because widget traffic scales with installs, not with anything
+// we control: every device polling on its own timer used to cost one document
+// read each. With maxInstances capped at 10, Firestore now sees at most one read
+// per instance per TTL regardless of how many devices are calling.
+//
+// Firestore stays the shared tier underneath: it survives cold starts and is
+// what keeps a new instance from re-fetching from the upstream API.
+const memoryCache = new Map<string, { value: unknown; expiresAt: number }>();
+
 async function serveCached<T extends { updatedAt: number }>(
   cacheDocId: string,
   ttlMs: number,
   fetcher: () => Promise<T>
 ): Promise<T> {
+  const now = Date.now();
+
+  const local = memoryCache.get(cacheDocId);
+  if (local && now < local.expiresAt) {
+    return local.value as T;
+  }
+
   const cacheRef = db.collection("widgetCache").doc(cacheDocId);
   const cacheDoc = await cacheRef.get();
   const cached = cacheDoc.exists ? (cacheDoc.data() as T) : null;
 
-  if (cached && Date.now() - cached.updatedAt < ttlMs) {
+  if (cached && now - cached.updatedAt < ttlMs) {
+    // Only hold it in memory for the part of the TTL it has left, so an entry
+    // written by another instance still expires on schedule here.
+    memoryCache.set(cacheDocId, {
+      value: cached,
+      expiresAt: cached.updatedAt + ttlMs,
+    });
     return cached;
   }
 
   try {
     const fresh = await fetcher();
     await cacheRef.set(fresh);
+    memoryCache.set(cacheDocId, { value: fresh, expiresAt: now + ttlMs });
     return fresh;
   } catch (error) {
-    // Serve stale data over failing entirely
+    // Serve stale data over failing entirely. Do not cache the stale value in
+    // memory: the next request should retry the fetcher rather than sit on a
+    // failure for a full TTL.
     if (cached) return cached;
     throw error;
   }

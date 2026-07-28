@@ -12,6 +12,7 @@ import { useWebView } from "@/contexts/WebViewContext";
 import { useGlobalAds } from "@/components/ads/adsManager";
 import { handleNetworkError } from "@/utils/networkErrorHandler";
 import { useStaleWebViewReload } from "@/hooks/useStaleWebViewReload";
+import { useWebViewHttpRetry } from "@/hooks/useWebViewHttpRetry";
 
 export default function OgsScreen() {
   const { refreshCount } = useRefresh("ogs");
@@ -60,6 +61,13 @@ export default function OgsScreen() {
   ]);
 
   useStaleWebViewReload(() => {
+    setWebViewKey((prev) => prev + 1);
+    showLoaderMin();
+  });
+
+  // Absorbs the brief 404 a freshly deployed page can return when a push
+  // notification is tapped the instant it arrives.
+  const handleHttpError = useWebViewHttpRetry(currentUrl, () => {
     setWebViewKey((prev) => prev + 1);
     showLoaderMin();
   });
@@ -146,6 +154,7 @@ export default function OgsScreen() {
               const { nativeEvent } = syntheticEvent;
               handleNetworkError(nativeEvent);
             }}
+            onHttpError={handleHttpError}
           />
           <Pressable
             style={StyleSheet.absoluteFill}
