@@ -1,0 +1,19 @@
+rules_version = '2';
+
+// Every read and write in this project goes through the Admin SDK - the Cloud
+// Functions in functions/src and the site's API routes - and the Admin SDK
+// bypasses these rules entirely. No client has ever talked to Firestore
+// directly, so the correct posture for client access is to deny all of it.
+//
+// This is not only about writes. `pushTokens` holds a token for every installed
+// device and `views` holds traffic data; under permissive rules anyone who knows
+// the project id could read both straight out of a client SDK. Denying by
+// default means a future feature has to opt in deliberately rather than
+// inheriting whatever the console happened to be left on.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
