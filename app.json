@@ -19,7 +19,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.shadev.thecryptowiki",
-      "buildNumber": "10",
+      "buildNumber": "11",
       "appleTeamId": "2UNNRK9L5Q",
       "entitlements": {
         "com.apple.security.application-groups": [
