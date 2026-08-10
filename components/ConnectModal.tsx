@@ -28,6 +28,7 @@ const ANDROID_PACKAGE = "com.shadev.thecryptowiki";
 const SOCIAL = {
   tiktok: "https://www.tiktok.com/@thecrypto.wiki",
   instagram: "https://www.instagram.com/thecrypto.wiki",
+  youtube: "https://www.youtube.com/@TheCrypto_Wiki",
   telegram: "https://t.me/thecryptowiki",
   facebook: "https://www.facebook.com/thecryptowiki",
   twitter: "https://x.com/TheCrypto_Wiki",
@@ -271,6 +272,13 @@ export default function ConnectModal({ visible, onClose }: ConnectModalProps) {
               label="Follow on Instagram"
               onPress={() => openSocial(SOCIAL.instagram, "Instagram")}
               iconColor="#E1306C"
+            />
+            <View style={styles.divider} />
+            <Row
+              icon="logo-youtube"
+              label="Subscribe on YouTube"
+              onPress={() => openSocial(SOCIAL.youtube, "YouTube")}
+              iconColor="#FF0000"
             />
             <View style={styles.divider} />
             <Row
