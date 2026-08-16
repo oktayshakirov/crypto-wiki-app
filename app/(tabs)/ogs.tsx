@@ -13,6 +13,10 @@ import { useGlobalAds } from "@/components/ads/adsManager";
 import { handleNetworkError } from "@/utils/networkErrorHandler";
 import { useStaleWebViewReload } from "@/hooks/useStaleWebViewReload";
 import { useWebViewHttpRetry } from "@/hooks/useWebViewHttpRetry";
+import {
+  createShouldStartLoadWithRequest,
+  VIDEO_WEBVIEW_PROPS,
+} from "@/utils/webViewVideo";
 
 export default function OgsScreen() {
   const { refreshCount } = useRefresh("ogs");
@@ -93,14 +97,12 @@ export default function OgsScreen() {
     }
   };
 
-  const handleShouldStartLoadWithRequest = (request: any) => {
-    const { url } = request;
-    if (!url.includes("thecrypto.wiki")) {
+  const handleShouldStartLoadWithRequest = createShouldStartLoadWithRequest(
+    "thecrypto.wiki",
+    (url) => {
       openBrowserAsync(url);
-      return false;
     }
-    return true;
-  };
+  );
 
   return (
     <View style={[styles.container, { backgroundColor: Colors.background }]}>
@@ -125,6 +127,7 @@ export default function OgsScreen() {
             source={{ uri: currentUrl }}
             cacheEnabled
             domStorageEnabled
+            {...VIDEO_WEBVIEW_PROPS}
             style={[styles.webview, { opacity: isContentVisible ? 1 : 0 }]}
             injectedJavaScript={injectedJavaScript}
             onMessage={(event) => {

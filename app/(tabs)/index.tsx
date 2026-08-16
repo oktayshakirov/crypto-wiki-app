@@ -12,6 +12,10 @@ import { useWebView } from "@/contexts/WebViewContext";
 import { useGlobalAds } from "@/components/ads/adsManager";
 import { handleNetworkError } from "@/utils/networkErrorHandler";
 import { useStaleWebViewReload } from "@/hooks/useStaleWebViewReload";
+import {
+  createShouldStartLoadWithRequest,
+  VIDEO_WEBVIEW_PROPS,
+} from "@/utils/webViewVideo";
 
 export default function HomeScreen() {
   const { refreshCount } = useRefresh("home");
@@ -83,14 +87,12 @@ export default function HomeScreen() {
     }
   };
 
-  const handleShouldStartLoadWithRequest = (request: any) => {
-    const { url } = request;
-    if (!url.includes("thecrypto.wiki")) {
+  const handleShouldStartLoadWithRequest = createShouldStartLoadWithRequest(
+    "thecrypto.wiki",
+    (url) => {
       openBrowserAsync(url);
-      return false;
     }
-    return true;
-  };
+  );
 
   return (
     <View style={[styles.container, { backgroundColor: Colors.background }]}>
@@ -115,6 +117,7 @@ export default function HomeScreen() {
             source={{ uri: currentUrl }}
             cacheEnabled
             domStorageEnabled
+            {...VIDEO_WEBVIEW_PROPS}
             style={[styles.webview, { opacity: isContentVisible ? 1 : 0 }]}
             injectedJavaScript={injectedJavaScript}
             onMessage={(event) => {
