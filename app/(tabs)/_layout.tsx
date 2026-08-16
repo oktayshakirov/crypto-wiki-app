@@ -61,7 +61,7 @@ export default function TabLayout() {
           options={{
             title: "Videos",
             tabBarIcon: ({ color }) => (
-              <MaterialIcons name="play" size={23} color={color} />
+              <MaterialIcons name="youtube-play" size={23} color={color} />
             ),
             tabBarButton: (props) => (
               <HapticTab {...props} refreshKey="videos" />
