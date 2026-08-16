@@ -57,6 +57,19 @@ export default function TabLayout() {
         />
 
         <Tabs.Screen
+          name="videos"
+          options={{
+            title: "Videos",
+            tabBarIcon: ({ color }) => (
+              <MaterialIcons name="play" size={23} color={color} />
+            ),
+            tabBarButton: (props) => (
+              <HapticTab {...props} refreshKey="videos" />
+            ),
+          }}
+        />
+
+        <Tabs.Screen
           name="exchanges"
           options={{
             title: "Exchanges",
@@ -80,18 +93,12 @@ export default function TabLayout() {
           }}
         />
 
-        <Tabs.Screen
-          name="tools"
-          options={{
-            title: "Tools",
-            tabBarIcon: ({ color }) => (
-              <MaterialIcons name="pie-chart-2" size={23} color={color} />
-            ),
-            tabBarButton: (props) => (
-              <HapticTab {...props} refreshKey="tools" />
-            ),
-          }}
-        />
+        {/* Tools moved to the header menu when Videos arrived: six tabs put
+            "Exchanges" past the label width a 375pt phone can give it, and a
+            utility section survives that demotion better than a content one.
+            `href: null` keeps /tools routable - the menu, and any link to it,
+            still work - it only leaves the bar. */}
+        <Tabs.Screen name="tools" options={{ href: null }} />
       </Tabs>
     </View>
   );
