@@ -11,6 +11,10 @@ import { useStaleWebViewReload } from "@/hooks/useStaleWebViewReload";
 import { Pressable } from "react-native";
 import { openBrowserAsync } from "expo-web-browser";
 import { useFocusEffect, useRouter } from "expo-router";
+import {
+  createShouldStartLoadWithRequest,
+  VIDEO_WEBVIEW_PROPS,
+} from "@/utils/webViewVideo";
 
 export default function ToolsScreen() {
   const router = useRouter();
@@ -73,14 +77,12 @@ export default function ToolsScreen() {
     }
   };
 
-  const handleShouldStartLoadWithRequest = (request: any) => {
-    const { url } = request;
-    if (!url.includes("thecrypto.wiki")) {
+  const handleShouldStartLoadWithRequest = createShouldStartLoadWithRequest(
+    "thecrypto.wiki",
+    (url) => {
       openBrowserAsync(url);
-      return false;
     }
-    return true;
-  };
+  );
 
   return (
     <View style={[styles.container, { backgroundColor: Colors.background }]}>
@@ -105,6 +107,7 @@ export default function ToolsScreen() {
             source={{ uri: currentUrl }}
             cacheEnabled
             domStorageEnabled
+            {...VIDEO_WEBVIEW_PROPS}
             style={[styles.webview, { opacity: isContentVisible ? 1 : 0 }]}
             injectedJavaScript={injectedJavaScript}
             onMessage={handleMessage}
