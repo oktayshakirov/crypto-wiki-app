@@ -94,6 +94,13 @@ export default function HeaderMenu({ savedCounts }: HeaderMenuProps) {
       count: savedCounts["crypto-ogs"],
     },
     {
+      // Lives here rather than in the tab bar; see the note in (tabs)/_layout.
+      label: "Tools",
+      icon: "pie-chart-2",
+      route: "/tools",
+      count: null,
+    },
+    {
       label: "Connect with Us",
       ionicon: "chatbubble-ellipses",
       iconColor: Colors.activeIcon,
