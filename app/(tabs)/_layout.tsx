@@ -57,26 +57,6 @@ export default function TabLayout() {
         />
 
         <Tabs.Screen
-          name="videos"
-          options={{
-            title: "Videos",
-            // 20, not the 23 the other tabs use. This glyph is the YouTube
-            // logo, so it is 1.42em wide where the rest are 1em or less
-            // (advance 1456 against unitsPerEm 1024), and React Navigation
-            // gives every tab icon a fixed 31pt-wide slot. At 23 it wants
-            // 32.7pt and gets clipped on both sides; 20 renders 28.4pt wide and
-            // fits. A wide mark also reads as large as a square one at less
-            // height, so it stays balanced next to its neighbours.
-            tabBarIcon: ({ color }) => (
-              <MaterialIcons name="youtube-play" size={20} color={color} />
-            ),
-            tabBarButton: (props) => (
-              <HapticTab {...props} refreshKey="videos" />
-            ),
-          }}
-        />
-
-        <Tabs.Screen
           name="exchanges"
           options={{
             title: "Exchanges",
@@ -97,6 +77,26 @@ export default function TabLayout() {
               <MaterialIcons name="persons" size={23} color={color} />
             ),
             tabBarButton: (props) => <HapticTab {...props} refreshKey="ogs" />,
+          }}
+        />
+
+        <Tabs.Screen
+          name="videos"
+          options={{
+            title: "Videos",
+            // 20, not the 23 the other tabs use. This glyph is the YouTube
+            // logo, so it is 1.42em wide where the rest are 1em or less
+            // (advance 1456 against unitsPerEm 1024), and React Navigation
+            // gives every tab icon a fixed 31pt-wide slot. At 23 it wants
+            // 32.7pt and gets clipped on both sides; 20 renders 28.4pt wide and
+            // fits. A wide mark also reads as large as a square one at less
+            // height, so it stays balanced next to its neighbours.
+            tabBarIcon: ({ color }) => (
+              <MaterialIcons name="youtube-play" size={20} color={color} />
+            ),
+            tabBarButton: (props) => (
+              <HapticTab {...props} refreshKey="videos" />
+            ),
           }}
         />
 
