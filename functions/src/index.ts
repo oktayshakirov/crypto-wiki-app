@@ -258,3 +258,35 @@ export const sendNewOGNotification = onDocumentCreated(
     }
   }
 );
+
+// Videos are not MDX like the sections above - they come from json/videos.json
+// in the site repo, which the content index reads into the "videos" collection.
+// Only long form reaches it, because only long form has a page at
+// /videos/<slug> for the notification to open.
+export const sendNewVideoNotification = onDocumentCreated(
+  "videos/{videoId}",
+  async (event) => {
+    try {
+      const snap = event.data!;
+      const videoData = snap.data() as ContentDoc;
+
+      if (!(await claimNotification(snap.ref, videoData))) {
+        return;
+      }
+
+      const slug = videoData?.slug || event.params.videoId;
+
+      await sendPushNotification(
+        "New video on CryptoWiki",
+        videoData?.title || "New video",
+        {
+          type: "video",
+          slug,
+          url: `${SITE_URL}/videos/${slug}`,
+        }
+      );
+    } catch (error) {
+      console.error("Error in sendNewVideoNotification:", error);
+    }
+  }
+);

@@ -5,6 +5,7 @@
 //   type "post"     -> https://www.thecrypto.wiki/posts/<slug>      -> Posts tab
 //   type "exchange" -> https://www.thecrypto.wiki/exchanges/<slug>  -> Exchanges tab
 //   type "og"       -> https://www.thecrypto.wiki/crypto-ogs/<slug> -> OGs tab
+//   type "video"    -> https://www.thecrypto.wiki/videos/<slug>     -> Videos tab
 //
 // Anyone who learns an Expo push token can send to it, so the payload is
 // untrusted input: the URL is host-checked against our own site before it is
@@ -16,8 +17,12 @@ const ALLOWED_HOSTS = ["www.thecrypto.wiki", "thecrypto.wiki"];
 
 /** Tab route, paired with the `targetTab` key its screen matches on. */
 export interface NotificationTarget {
-  pathname: "/(tabs)/posts" | "/(tabs)/exchanges" | "/(tabs)/ogs";
-  targetTab: "posts" | "exchanges" | "ogs";
+  pathname:
+    | "/(tabs)/posts"
+    | "/(tabs)/exchanges"
+    | "/(tabs)/ogs"
+    | "/(tabs)/videos";
+  targetTab: "posts" | "exchanges" | "ogs" | "videos";
   url: string;
 }
 
@@ -29,11 +34,16 @@ const EXCHANGES: Destination = {
   targetTab: "exchanges",
 };
 const OGS: Destination = { pathname: "/(tabs)/ogs", targetTab: "ogs" };
+const VIDEOS: Destination = {
+  pathname: "/(tabs)/videos",
+  targetTab: "videos",
+};
 
 const TYPE_TO_TAB: Record<string, Destination> = {
   post: POSTS,
   exchange: EXCHANGES,
   og: OGS,
+  video: VIDEOS,
 };
 
 /** Fallback when `type` is missing or unrecognised: infer the tab from the path. */
@@ -41,6 +51,7 @@ const PATH_TO_TAB: { prefix: string; destination: Destination }[] = [
   { prefix: "/posts", destination: POSTS },
   { prefix: "/exchanges", destination: EXCHANGES },
   { prefix: "/crypto-ogs", destination: OGS },
+  { prefix: "/videos", destination: VIDEOS },
 ];
 
 /**
