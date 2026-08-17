@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Platform, StyleSheet, View, Pressable } from "react-native";
 import { WebView } from "react-native-webview";
-import { useFocusEffect } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { openBrowserAsync } from "expo-web-browser";
 import { useRefresh } from "@/contexts/RefreshContext";
 import { Colors } from "@/constants/Colors";
@@ -17,8 +17,10 @@ import {
   createShouldStartLoadWithRequest,
   VIDEO_WEBVIEW_PROPS,
 } from "@/utils/webViewVideo";
+import { handleNativeNavigation } from "@/utils/webViewBridge";
 
 export default function ExchangesScreen() {
+  const router = useRouter();
   const { refreshCount } = useRefresh("exchanges");
   const { showLoaderMin, hideLoaderMin, isContentVisible } = useLoader();
   const { setCurrentUrl: setSavedContentUrl, forceRefreshSavedState } =
@@ -133,6 +135,9 @@ export default function ExchangesScreen() {
             onMessage={(event) => {
               try {
                 const data = JSON.parse(event.nativeEvent.data);
+                if (handleNativeNavigation(data, router)) {
+                  return;
+                }
                 if (data.type === "URL_CHECK") {
                   (global as any).webviewCurrentUrl = data.fullUrl;
                   (global as any).webviewCurrentPath = data.currentPath;

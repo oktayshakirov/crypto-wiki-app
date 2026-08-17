@@ -15,6 +15,7 @@ import {
   createShouldStartLoadWithRequest,
   VIDEO_WEBVIEW_PROPS,
 } from "@/utils/webViewVideo";
+import { handleNativeNavigation } from "@/utils/webViewBridge";
 
 export default function ToolsScreen() {
   const router = useRouter();
@@ -41,9 +42,7 @@ export default function ToolsScreen() {
   const handleMessage = (event: any) => {
     try {
       const data = JSON.parse(event.nativeEvent.data);
-      if (data.type === "NAVIGATE" && data.path === "/portfolio") {
-        router.push("/portfolio");
-      }
+      handleNativeNavigation(data, router);
     } catch (error) {
       if (event.nativeEvent.data === "ad") {
         handleGlobalPress();

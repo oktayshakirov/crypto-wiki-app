@@ -100,11 +100,16 @@ export default function TabLayout() {
           }}
         />
 
-        {/* Tools moved to the header menu when Videos arrived: six tabs put
-            "Exchanges" past the label width a 375pt phone can give it, and a
-            utility section survives that demotion better than a content one.
-            `href: null` keeps /tools routable - the menu, and any link to it,
-            still work - it only leaves the bar. */}
+        {/* Tools lost its tab when Videos arrived: six tabs put "Exchanges"
+            past the label width a 375pt phone can give it. It is reached from
+            the row of tiles under the hero on the home page instead - the site
+            carries that, so it can be reordered without an app release. The
+            menu is for saved content and account, so it does not belong there.
+
+            `href: null` keeps /tools routable: this screen still renders the
+            tools page, still handles the NAVIGATE bridge into the native
+            portfolio, and is still a valid push target. It only leaves the
+            bar. */}
         <Tabs.Screen name="tools" options={{ href: null }} />
       </Tabs>
     </View>
