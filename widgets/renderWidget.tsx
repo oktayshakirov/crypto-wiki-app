@@ -10,6 +10,8 @@ import { PortfolioWidget } from "./PortfolioWidget";
 import { FearGreedWidget } from "./FearGreedWidget";
 import { LatestItemWidget } from "./LatestItemWidget";
 import { HeatmapWidget } from "./HeatmapWidget";
+import { HalvingWidget } from "./HalvingWidget";
+import { getHalvingData } from "./halving";
 import { LockedWidget } from "./LockedWidget";
 
 const PRO_WIDGET_LABELS: Record<string, string> = {
@@ -18,6 +20,7 @@ const PRO_WIDGET_LABELS: Record<string, string> = {
   LatestExchangeWidget: "Latest Exchange",
   LatestOGWidget: "Latest OG",
   HeatmapWidget: "Crypto Heatmap",
+  HalvingWidget: "Bitcoin Halving",
 };
 
 async function getSnapshot(): Promise<WidgetSnapshot> {
@@ -107,6 +110,21 @@ export async function renderWidgetByName(
           label="LATEST OG"
           item={content?.latestOG ?? null}
           deepLink={DEEP_LINKS.ogs}
+          widthDp={dimensions?.width}
+        />
+      );
+    }
+
+    case "HalvingWidget": {
+      // No Cloud Function behind this one: the block height comes straight from
+      // mempool.space, and a failed call still yields a clock estimate, so
+      // there is no empty state to render.
+      const halving = await getHalvingData();
+      // 2x2 is roughly 110-160dp wide; anything wider is the 4x2 shape.
+      return (
+        <HalvingWidget
+          data={halving}
+          wide={(dimensions?.width ?? 0) >= 200}
           widthDp={dimensions?.width}
         />
       );

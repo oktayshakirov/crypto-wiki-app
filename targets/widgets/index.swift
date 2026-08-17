@@ -10,5 +10,6 @@ struct CryptoWikiWidgets: WidgetBundle {
         LatestPostWidget()
         LatestExchangeWidget()
         LatestOGWidget()
+        HalvingWidget()
     }
 }
