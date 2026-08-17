@@ -268,6 +268,19 @@
               "targetCellHeight": 2,
               "resizeMode": "horizontal|vertical",
               "updatePeriodMillis": 21600000
+            },
+            {
+              "name": "HalvingWidget",
+              "label": "Bitcoin Halving (Pro)",
+              "description": "Countdown to the next Bitcoin halving. Requires Pro - upgrade inside the app.",
+              "minWidth": "110dp",
+              "minHeight": "110dp",
+              "targetCellWidth": 2,
+              "targetCellHeight": 2,
+              "maxResizeWidth": "360dp",
+              "maxResizeHeight": "200dp",
+              "resizeMode": "horizontal|vertical",
+              "updatePeriodMillis": 3600000
             }
           ]
         }
