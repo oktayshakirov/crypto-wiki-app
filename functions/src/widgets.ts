@@ -105,6 +105,21 @@ function cleanTitle(raw: string): string {
 // `listingPath` is the section index, `itemPrefix` is an individual item's URL
 // prefix. Posts list newest-first (takeLast = false); exchanges and crypto-ogs
 // list newest-last (takeLast = true), so we pick the last card link there.
+/**
+ * Last path segments that belong to a listing rather than to an item.
+ *
+ * The latest item is scraped out of the listing page's own links, and a tab
+ * sitting above the grid matches that pattern just as well as an article does.
+ * When /posts gained its "Most popular" tab, `href="/posts/popular"` became the
+ * first match on the page, so the Latest Post widget started showing "Most
+ * Popular Crypto Posts" over the site's meta image - that page's own og: tags.
+ *
+ * Pagination never had the problem: `/posts/page/2` carries a second slash and
+ * the pattern stops at the first one. It is listed anyway, because the next tab
+ * someone adds will not necessarily be so lucky.
+ */
+const LISTING_SUBROUTES = new Set(["popular", "page", "latest", "featured"]);
+
 async function fetchLatestItem(
   listingPath: string,
   itemPrefix: string,
@@ -121,7 +136,9 @@ async function fetchLatestItem(
   const matches = [
     ...listHtml.matchAll(new RegExp(`href="(${itemPrefix}/[^"/]+)"`, "g")),
   ];
-  const slugs = [...new Set(matches.map((m) => m[1]))];
+  const slugs = [...new Set(matches.map((m) => m[1]))].filter(
+    (slug) => !LISTING_SUBROUTES.has(slug.split("/").pop() ?? "")
+  );
   const slug = takeLast ? slugs[slugs.length - 1] : slugs[0];
 
   if (!slug) return null;
