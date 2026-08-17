@@ -168,12 +168,15 @@ async function fetchLatestItem(
 
   const dims = ogImage ? await pngSize(ogImage) : null;
 
+  // `dims` is null whenever the image is not a PNG - most article covers are
+  // JPEG - and dims?.w is then `undefined`, which Firestore's `.set()` throws
+  // on outright rather than storing as absent. The result is cached, so the
+  // width/height fields are only added when there is a real value.
   return {
     title: cleanTitle(ogTitle),
     image: ogImage,
     url,
-    imgWidth: dims?.w,
-    imgHeight: dims?.h,
+    ...(dims ? { imgWidth: dims.w, imgHeight: dims.h } : {}),
   };
 }
 
