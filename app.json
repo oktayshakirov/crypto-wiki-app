@@ -194,6 +194,7 @@
       "expo-web-browser",
       "expo-mail-composer",
       "./plugins/withRestrictedResizability",
+      "./plugins/withAdMobManifestReplace",
       "@bacons/apple-targets",
       [
         "react-native-android-widget",
