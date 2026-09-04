@@ -9,6 +9,7 @@ let isLoadingInterstitial = false;
 let initializingPromise: Promise<void> | null = null;
 let interstitialListeners: Array<() => void> = [];
 let adLoadTimestamp: number = 0;
+let pendingOnClosed: (() => void) | null = null;
 const AD_STALE_TIMEOUT_MS = 4 * 60 * 60 * 1000;
 const AD_BACKGROUND_STALE_MS = 30 * 60 * 1000;
 
@@ -99,6 +100,9 @@ async function createInterstitialInstance() {
           // Ignore reload errors
         }
       }
+      const onClosed = pendingOnClosed;
+      pendingOnClosed = null;
+      onClosed?.();
     })
   );
 
@@ -167,7 +171,12 @@ export function isInterstitialReady() {
   return isAdLoaded && !isShowingAd && !isLoadingInterstitial;
 }
 
-export async function showInterstitial() {
+/**
+ * Shows the interstitial. `onClosed` fires once the ad is dismissed —
+ * used to present the paywall right after an ad, while ad fatigue is fresh.
+ * Not called if no ad ends up being shown.
+ */
+export async function showInterstitial(onClosed?: () => void) {
   if (isShowingAd || isLoadingInterstitial) {
     return;
   }
@@ -182,8 +191,10 @@ export async function showInterstitial() {
   if (interstitial && isAdLoaded && !isShowingAd && !isLoadingInterstitial) {
     try {
       isShowingAd = true;
+      pendingOnClosed = onClosed ?? null;
       await interstitial.show();
     } catch {
+      pendingOnClosed = null;
       isShowingAd = false;
       isAdLoaded = false;
     }

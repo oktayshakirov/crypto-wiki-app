@@ -25,6 +25,8 @@ import { getCoinName } from "@/utils/coinNames";
 import Header from "@/components/Header";
 import PortfolioHistoryChart from "@/components/PortfolioHistoryChart";
 import WatchlistSection from "@/components/WatchlistSection";
+import PortfolioInsightsModal from "@/components/PortfolioInsightsModal";
+import { useRevenueCat } from "@/contexts/RevenueCatContext";
 
 const POPULAR_CRYPTOS = [
   { symbol: "BTC", name: "Bitcoin" },
@@ -464,9 +466,11 @@ export default function PortfolioScreen() {
   } = usePortfolio();
 
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showInsightsModal, setShowInsightsModal] = useState(false);
   const [editingCrypto, setEditingCrypto] = useState<
     PortfolioAsset | undefined
   >();
+  const { isPro, showPaywall } = useRevenueCat();
   const {
     items: watchlistItems,
     addToWatchlist,
@@ -591,6 +595,28 @@ export default function PortfolioScreen() {
                       </Text>
                     </View>
                   )}
+
+                  {assets.length > 0 && (
+                    <TouchableOpacity
+                      style={styles.insightsButton}
+                      onPress={() => {
+                        if (!isPro) {
+                          showPaywall().catch(() => {});
+                          return;
+                        }
+                        setShowInsightsModal(true);
+                      }}
+                    >
+                      <MaterialIcons
+                        name="bar-chart"
+                        size={16}
+                        color={Colors.activeIcon}
+                      />
+                      <Text style={styles.insightsButtonText}>
+                        View Portfolio Insights
+                      </Text>
+                    </TouchableOpacity>
+                  )}
                 </View>
               );
 
@@ -678,6 +704,12 @@ export default function PortfolioScreen() {
         onAdd={editingCrypto ? handleEditCrypto : handleAddCrypto}
         editCrypto={editingCrypto}
       />
+
+      <PortfolioInsightsModal
+        visible={showInsightsModal}
+        assets={assets}
+        onClose={() => setShowInsightsModal(false)}
+      />
     </View>
   );
 }
@@ -740,6 +772,22 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.icon,
     marginLeft: 8,
+  },
+  insightsButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    marginTop: 14,
+    paddingVertical: 10,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: Colors.activeIcon,
+  },
+  insightsButtonText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: Colors.activeIcon,
   },
   addButton: {
     backgroundColor: Colors.activeIcon,

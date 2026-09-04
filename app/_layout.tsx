@@ -24,7 +24,7 @@ import { getOrRegisterPushToken } from "@/utils/pushToken";
 import { useNotificationDeepLink } from "@/hooks/useNotificationDeepLink";
 import { initializeInterstitial } from "@/components/ads/InterstitialAd";
 import { loadAppOpenAd } from "@/components/ads/AppOpenAd";
-import { useGlobalAds } from "@/components/ads/adsManager";
+import { useGlobalAds, useAppOpenPaywallTracking } from "@/components/ads/adsManager";
 import OfflineGuard from "@/components/OfflineGuard";
 import OnboardingWrapper from "@/components/OnboardingWrapper";
 import { RevenueCatProvider, useRevenueCat } from "@/contexts/RevenueCatContext";
@@ -45,6 +45,7 @@ function AdInitializer() {
 
 function GlobalAdsManager() {
   useGlobalAds();
+  useAppOpenPaywallTracking();
   return null;
 }
 
