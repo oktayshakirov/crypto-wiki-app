@@ -8,6 +8,14 @@ import { useOnboarding } from "@/contexts/OnboardingContext";
 
 const AD_INTERVAL_MS = 60000;
 
+// No ad (app-open or interstitial) may show within this long of the JS bundle
+// starting up. Covers cold launch, plus the inactive->active blips caused by
+// system permission dialogs (ATT, notifications) firing right after launch —
+// without this, those blips satisfy the AD_INTERVAL_MS cooldown immediately
+// and an ad can appear before the user has done anything.
+const LAUNCH_GRACE_PERIOD_MS = 20000;
+const appLaunchTime = Date.now();
+
 // A backgrounded app counts as a new "session" for paywall pacing only after
 // this long away — brief app-switcher glances shouldn't inflate the count.
 const MIN_BACKGROUND_FOR_NEW_SESSION_MS = 30 * 60 * 1000;
@@ -84,7 +92,10 @@ export function useGlobalAds() {
             ? parseInt(lastAdShownString, 10)
             : 0;
 
-          if (now - lastAdShownTime > AD_INTERVAL_MS) {
+          if (
+            now - appLaunchTime > LAUNCH_GRACE_PERIOD_MS &&
+            now - lastAdShownTime > AD_INTERVAL_MS
+          ) {
             try {
               await showAppOpenAd();
               await AsyncStorage.setItem("lastAdShownTime", now.toString());
@@ -113,7 +124,10 @@ export function useGlobalAds() {
       : 0;
     const now = Date.now();
 
-    if (now - lastAdShownTime > AD_INTERVAL_MS) {
+    if (
+      now - appLaunchTime > LAUNCH_GRACE_PERIOD_MS &&
+      now - lastAdShownTime > AD_INTERVAL_MS
+    ) {
       try {
         await ensureInterstitialLoaded();
         await showInterstitial(() => {
